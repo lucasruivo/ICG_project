@@ -279,3 +279,5 @@ Objetivo:
 - mais animações
 - animações do ser humano e interações com outros objetos no meio 
 - secao de configuracao unica para manutencao
+
+## Deploy em: https://lucasruivo.github.io/ICG_project/index.html
