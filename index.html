@@ -129,7 +129,6 @@
             </div>
         </div>
 
-        <button id="exportButton" class="action-button">Exportar GLTF</button>
         <button id="downloadSceneJsonButton" class="action-button secondary">Download Cenário JSON</button>
         <button id="loadSceneJsonButton" class="action-button tertiary">Load Cenário JSON</button>
         <button id="deleteModeButton" class="action-button danger">Modo Apagar: OFF</button>
@@ -153,7 +152,6 @@
 
 		import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
         import { createDino } from './dino.js';
         import { createTerrain } from './terrain.js';
         import { createTree } from './tree.js';
@@ -1002,23 +1000,6 @@ function init() {
     }
 
     const clock = new THREE.Clock();
-
-    function exportGLTF() {
-                const exporter = new GLTFExporter();
-                exporter.parse(scene, function (gltf) {
-                    const output = JSON.stringify(gltf);
-                    const blob = new Blob([output], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = 'modelo_threejs_para_blender.gltf';
-                    link.click();
-                }, {});
-            }
-
-            // Atalhos para exportar
-            document.getElementById('exportButton').addEventListener('click', exportGLTF);
-            window.addEventListener('keydown', (e) => { if(e.key === 'e' || e.key === 'E') exportGLTF(); });
 
             document.getElementById('downloadSceneJsonButton').addEventListener('click', () => {
                 const output = JSON.stringify(serializeScenario(), null, 2);

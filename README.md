@@ -7,7 +7,6 @@ Este projeto e um editor 3D de cenario feito com Three.js, com:
 - insercao de multiplos modelos 3D low-poly
 - drag and drop de objetos sobre o terreno
 - exportacao/importacao do cenario em JSON
-- exportacao da cena para GLTF
 - modo de controlo em primeira pessoa no modelo humano
 - sistema de sombras dinamicas
 
@@ -107,10 +106,7 @@ Notas:
 - `rock` guarda tambem `rockSize`.
 - `dino` e unico (ha logica para nao duplicar sem limpar).
 
-## 4.5 Exportacao GLTF
-Botao `Exportar GLTF` (e atalho `E`) usa `GLTFExporter` para exportar a cena atual.
-
-## 4.6 Modo primeira pessoa no humano
+## 4.5 Modo primeira pessoa no humano
 Implementado em `index.html`:
 
 - entrar/sair por botao ou tecla `F`
@@ -123,7 +119,7 @@ Implementado em `index.html`:
 - camera posicionada na altura dos olhos com offset frontal
 - OrbitControls desativados neste modo
 
-## 4.7 Sombras e iluminacao
+## 4.6 Sombras e iluminacao
 
 - `DirectionalLight` com `castShadow = true`
 - `PCFSoftShadowMap`
@@ -133,7 +129,7 @@ Implementado em `index.html`:
 
 Isto reduz cortes/desaparecimento de sombras quando a zona ativa muda.
 
-## 4.8 Animacoes ativas
+## 4.7 Animacoes ativas
 
 ### Dino
 No loop `animate()`:
@@ -258,7 +254,6 @@ Objetivo:
 - criacao de 6 tipos de modelos (mais 3 tamanhos de pedra)
 - drag and drop de objetos
 - modo apagar + apagar por teclado
-- export GLTF da cena
 - export/import JSON do cenario
 - animacao do dino
 - movimento autonomo do tumbleweed
