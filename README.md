@@ -248,7 +248,7 @@ Objetivo:
 - evitar objetos a flutuar
 - permitir ajuste fino por tipo (dino, humano, tumbleweed)
 
-## 7. O que ja esta implementado (resumo rapido)
+## 7. O que ja esta implementado
 
 - editor de cenario com sidebar
 - criacao de 6 tipos de modelos (mais 3 tamanhos de pedra)
@@ -261,7 +261,7 @@ Objetivo:
 - esconder sidebar no modo humano e restaurar ao sair
 - sombras dinamicas com foco adaptativo
 
-## 8. Possiveis melhorias futuras
+## 8. Melhorias futuras
 
 - menu de configuracao (velocidade do humano, altura salto, sensibilidade)
 - presets de luz/sombra (qualidade baixa/media/alta)
@@ -274,3 +274,6 @@ Objetivo:
 - mais animações
 - animações do ser humano e interações com outros objetos no meio 
 - secao de configuracao unica para manutencao
+- colocar colisões com os objetos
+
+## Deploy em: https://lucasruivo.github.io/ICG_project/index.html
