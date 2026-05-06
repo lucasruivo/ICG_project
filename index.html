@@ -18,11 +18,14 @@
     <title>3D Tabletop Editor</title>
     <meta charset="utf-8">
     <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; display: flex; }
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background: #1b2632; }
         
         /* Barra Lateral */
         #sidebar {
-            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
             height: 100vh;
             background: #2c3e50;
             color: white;
@@ -31,10 +34,35 @@
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: transform 0.25s ease;
+            will-change: transform;
         }
 
-        #viewport { flex-grow: 1; position: relative; }
+        #sidebar.hidden {
+            transform: translateX(-100%);
+            pointer-events: none;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: #34495e;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #7f8c8d;
+            border-radius: 4px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: #95a5a6;
+        }
+
+        #viewport {
+            position: absolute;
+            inset: 0;
+        }
 
         .menu-section { border-bottom: 1px solid #555; padding-bottom: 15px; }
         h3 { margin-top: 0; color: #ecf0f1; font-size: 18px; }
@@ -51,6 +79,90 @@
         .model-item:hover { background: #45a049; }
 
         input[type="color"] { width: 100%; height: 40px; cursor: pointer; border: none; }
+
+        .terrain-tone-control {
+            margin-top: 10px;
+        }
+
+        .terrain-tone-control label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #ecf0f1;
+        }
+
+        .texture-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .texture-slot {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #243446;
+            box-shadow: inset 0 -50px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .texture-slot-main {
+            position: absolute;
+            inset: 0;
+            border: 0;
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding: 10px;
+        }
+
+        .texture-slot-main::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.08));
+        }
+
+        .texture-slot-main span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .texture-slot.active {
+            outline: 2px solid #f1c40f;
+            box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.35), inset 0 -50px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .texture-slot-empty {
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.08) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.08) 75%, transparent 75%, transparent);
+            background-size: 18px 18px;
+        }
+
+        .texture-slot-edit {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            z-index: 2;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 9px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .texture-slot-edit:hover {
+            background: rgba(0, 0, 0, 0.78);
+        }
         
         .action-button {
             padding: 10px;
@@ -75,7 +187,23 @@
             box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.35);
         }
 
+        /* Controles de Terreno */
+        .terrain-control {
+            margin-bottom: 12px;
+        }
+
+        .terrain-control label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #ecf0f1;
+        }
+
         /* Acordeão de pedras */
+        .menu-section .model-item {
+            font-size: 14px;
+            padding: 12px;
+        }
         .accordion-header {
             background: hsl(210, 49%, 48%);
             padding: 10px;
@@ -104,8 +232,37 @@
     <div id="sidebar">
         <div class="menu-section">
             <h3>Cenário</h3>
-            <label>Cor do Tabuleiro:</label>
-            <input type="color" id="bgColor" value="#808080">
+            <label>Texturas do Terreno:</label>
+            <div class="texture-grid">
+                <div class="texture-slot active" id="terrainTextureSlot0Card">
+                    <button type="button" class="texture-slot-main" id="terrainTextureSlot0Button" onclick="setTerrainTextureSlot(0)">
+                        <span>Textura 1</span>
+                    </button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(0)">Editar URL</button>
+                </div>
+                <div class="texture-slot" id="terrainTextureSlot1Card">
+                    <button type="button" class="texture-slot-main" id="terrainTextureSlot1Button" onclick="setTerrainTextureSlot(1)">
+                        <span>Textura 2</span>
+                    </button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(1)">Editar URL</button>
+                </div>
+                <div class="texture-slot" id="terrainTextureSlot2Card">
+                    <button type="button" class="texture-slot-main texture-slot-empty" id="terrainTextureSlot2Button" onclick="setTerrainTextureSlot(2)">
+                        <span>Textura 3</span>
+                    </button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(2)">Editar URL</button>
+                </div>
+                <div class="texture-slot" id="terrainTextureSlot3Card">
+                    <button type="button" class="texture-slot-main texture-slot-empty" id="terrainTextureSlot3Button" onclick="setTerrainTextureSlot(3)">
+                        <span>Textura 4</span>
+                    </button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(3)">Editar URL</button>
+                </div>
+            </div>
+            <div class="terrain-tone-control">
+                <label for="terrainTintColor">Tom do Terreno:</label>
+                <input type="color" id="terrainTintColor" value="#ffffff">
+            </div>
         </div>
 
         <div class="menu-section">
@@ -113,9 +270,8 @@
             <div class="model-item" onclick="addDino()">Dinossauro T-Rex</div>
             <div class="model-item" onclick="addTree()">Árvore</div>
             <div class="model-item" onclick="addGrass()">Ervinhas</div>
-            <div class="model-item" onclick="addBush()">Arbusto Deserto</div>
-            <div class="model-item" onclick="addTumbleweed()">Bola Rolante (Tumbleweed)</div>
             <div class="model-item" onclick="addHuman()">Ser Humano</div>
+            <div class="model-item" onclick="addCact()">Cacto</div>
 
             <!-- Acordeão Pedra -->
             <div class="accordion-header" onclick="toggleRockAccordion(this)">
@@ -128,6 +284,10 @@
                 <div class="model-item" onclick="addRock('large')">Pedra Grande</div>
             </div>
         </div>
+
+        <button id="bushToggleButton" class="action-button tertiary">Bushes no Mapa: OFF</button>
+        <button id="grassToggleButton" class="action-button tertiary">Erva no Mapa: OFF</button>
+        <button id="tumbleweedToggleButton" class="action-button">Tumbleweeds no Mapa: OFF</button>
 
         <button id="downloadSceneJsonButton" class="action-button secondary">Download Cenário JSON</button>
         <button id="loadSceneJsonButton" class="action-button tertiary">Load Cenário JSON</button>
@@ -160,7 +320,8 @@
         import { createRock } from './lrock.js';
         import { createTumbleweed } from './tumbleweed.js';
         import { createHuman } from './human.js';
-    
+        import { createCact } from './cact.js';
+
         let dinoData;
         let scene;
         let terrain; // Variável para o novo chão
@@ -171,7 +332,492 @@
         let rocks = [];
         let tumbleweeds = [];
         let humans = [];
+        let cacts = [];
         const SCENE_EXPORT_VERSION = 1;
+        let bushEffectEnabled = false;
+        let bushToggleButton = null;
+        let grassEffectEnabled = false;
+        let grassToggleButton = null;
+        let tumbleweedEffectEnabled = false;
+        let tumbleweedSpawnTimer = 0;
+        let tumbleweedToggleButton = null;
+        const terrainTextureLoader = new THREE.TextureLoader();
+        terrainTextureLoader.setCrossOrigin('anonymous');
+        const terrainTextureCache = new Map();
+        const terrainTextureSlots = [
+            { label: 'Textura 1', url: 'https://static4.depositphotos.com/1011255/274/i/450/depositphotos_2747178-stock-photo-soil-background.jpg' },
+            { label: 'Textura 2', url: 'https://www.manytextures.com/wallpaper/1/1050/1680/green-grass-wallpaper.jpg' },
+            { label: 'Textura 3', url: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/70505a3b-10b9-40fa-9297-9e932a6f5596/d19w0ke-0c5e53d4-8f24-4cce-bf78-5d0242ce1872.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi83MDUwNWEzYi0xMGI5LTQwZmEtOTI5Ny05ZTkzMmE2ZjU1OTYvZDE5dzBrZS0wYzVlNTNkNC04ZjI0LTRjY2UtYmY3OC01ZDAyNDJjZTE4NzIuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.uJODMNuBNj3HfmLZFd59y1ffLDkk3_wIogSFXPrF5uo' },
+            { label: 'Textura 4', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCfBuPYZoG-_VBqLJnSTKgRW87sy2dGqtArw&s' },
+        ];
+        const terrainTextureButtons = [null, null, null, null];
+        const terrainTextureCards = [null, null, null, null];
+        let terrainActiveTextureSlotIndex = 0;
+        let terrainTintColor = '#ffffff';
+
+        const TERRAIN_TEXTURE_PRESETS = {
+            grass: {
+                roughness: 0.8,
+                label: 'Relvosa',
+            },
+            sand: {
+                roughness: 0.95,
+                label: 'Areosa',
+            },
+            rocky: {
+                roughness: 0.75,
+                label: 'Pedrosa',
+            },
+            mixed: {
+                roughness: 0.85,
+                label: 'Mista',
+            },
+            thyme: {
+                roughness: 0.98,
+                label: 'Relva seca',
+                mapUrl: 'https://static4.depositphotos.com/1011255/274/i/450/depositphotos_2747178-stock-photo-soil-background.jpg',
+            },
+            stone: {
+                roughness: 0.98,
+                label: 'Pedrosa',
+                mapUrl: 'https://as1.ftcdn.net/jpg/02/29/39/48/1000_F_229394888_qsno5pKbbcMJAZPs1IbHImp7sowUKF90.jpg',
+            },
+        };
+
+        const BUSH_EFFECT_SETTINGS = {
+            count: 96,
+            edgeMargin: 90,
+            positionJitter: 0.16,
+        };
+
+        const TUMBLEWEED_EFFECT_SETTINGS = {
+            maxActive: 30,
+            initialSeedCount: 18,
+            minSpawnInterval: 0.35,
+            maxSpawnInterval: 0.8,
+            cornerMargin: 40,
+            lateralSpreadFactor: 1.34,
+            despawnPadding: 220,
+            pathDistanceJitter: 110,
+            spawnBoundsInset: 40,
+            seedProgressJitter: 0.04,
+            seedLateralJitter: 0.16,
+        };
+
+        function getTerrainBounds() {
+            if (!terrain) return null;
+
+            terrain.updateMatrixWorld(true);
+            return new THREE.Box3().setFromObject(terrain);
+        }
+
+        function getHaltonValue(index, base) {
+            let result = 0;
+            let factor = 1 / base;
+            let current = index;
+
+            while (current > 0) {
+                result += factor * (current % base);
+                current = Math.floor(current / base);
+                factor /= base;
+            }
+
+            return result;
+        }
+
+        function jitterNormalized(value, amount) {
+            return THREE.MathUtils.clamp(value + (Math.random() - 0.5) * amount, 0, 1);
+        }
+
+        function mapNormalizedToTerrainXZ(normalizedX, normalizedZ, inset = 0) {
+            const bounds = getTerrainBounds();
+            if (!bounds) return null;
+
+            return new THREE.Vector2(
+                THREE.MathUtils.lerp(bounds.min.x + inset, bounds.max.x - inset, normalizedX),
+                THREE.MathUtils.lerp(bounds.min.z + inset, bounds.max.z - inset, normalizedZ)
+            );
+        }
+
+        function clampPointToTerrainBounds(point, inset = 0) {
+            const bounds = getTerrainBounds();
+            if (!bounds) return point;
+
+            point.x = THREE.MathUtils.clamp(point.x, bounds.min.x + inset, bounds.max.x - inset);
+            point.y = THREE.MathUtils.clamp(point.y, bounds.min.z + inset, bounds.max.z - inset);
+            return point;
+        }
+
+        function getTumbleweedFlow() {
+            const bounds = getTerrainBounds();
+            if (!bounds) return null;
+
+            const width = bounds.max.x - bounds.min.x;
+            const depth = bounds.max.z - bounds.min.z;
+            const margin = Math.min(
+                TUMBLEWEED_EFFECT_SETTINGS.cornerMargin,
+                width * 0.12,
+                depth * 0.12
+            );
+            const start = new THREE.Vector2(bounds.min.x + margin, bounds.min.z + margin);
+            const end = new THREE.Vector2(bounds.max.x - margin, bounds.max.z - margin);
+            const direction = end.clone().sub(start).normalize();
+            const lateral = new THREE.Vector2(-direction.y, direction.x);
+
+            return {
+                bounds,
+                start,
+                direction,
+                pathLength: start.distanceTo(end),
+                lateralSpread: Math.min(width, depth) * TUMBLEWEED_EFFECT_SETTINGS.lateralSpreadFactor * 0.5,
+                lateral,
+            };
+        }
+
+        function randomTumbleweedSpawnInterval() {
+            const { minSpawnInterval, maxSpawnInterval } = TUMBLEWEED_EFFECT_SETTINGS;
+            return minSpawnInterval + Math.random() * (maxSpawnInterval - minSpawnInterval);
+        }
+
+        function applyTerrainTintColor(color) {
+            terrainTintColor = color;
+            if (terrain?.material) {
+                terrain.material.color.set(color);
+            }
+            const tintInput = document.getElementById('terrainTintColor');
+            if (tintInput && tintInput.value !== color) {
+                tintInput.value = color;
+            }
+        }
+
+        function loadTerrainTextureFromUrl(url) {
+            if (!url) return null;
+
+            let texture = terrainTextureCache.get(url);
+            if (!texture) {
+                texture = terrainTextureLoader.load(url);
+                texture.colorSpace = THREE.SRGBColorSpace;
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(10, 10);
+                terrainTextureCache.set(url, texture);
+            }
+            return texture;
+        }
+
+        function refreshTerrainTextureSlotUI() {
+            for (let i = 0; i < terrainTextureSlots.length; i++) {
+                const slot = terrainTextureSlots[i];
+                const card = terrainTextureCards[i];
+                const button = terrainTextureButtons[i];
+                if (!card || !button) continue;
+
+                card.classList.toggle('active', i === terrainActiveTextureSlotIndex);
+                button.style.backgroundImage = slot.url ? `url('${slot.url}')` : '';
+                button.classList.toggle('texture-slot-empty', !slot.url);
+                const label = button.querySelector('span');
+                if (label) label.textContent = slot.label;
+            }
+        }
+
+        function applyTerrainTextureSlot(index) {
+            const slot = terrainTextureSlots[index];
+            if (!slot) return;
+
+            terrainActiveTextureSlotIndex = index;
+            if (terrain?.material) {
+                terrain.material.map = loadTerrainTextureFromUrl(slot.url);
+                terrain.material.color.set(terrainTintColor);
+                terrain.material.needsUpdate = true;
+            }
+            refreshTerrainTextureSlotUI();
+        }
+
+        function editTerrainTextureSlot(index) {
+            const slot = terrainTextureSlots[index];
+            if (!slot) return;
+
+            const nextUrl = window.prompt(`Cola a URL da textura para ${slot.label}:`, slot.url || '');
+            if (nextUrl === null) return;
+
+            slot.url = nextUrl.trim();
+            if (index === terrainActiveTextureSlotIndex) {
+                applyTerrainTextureSlot(index);
+            } else {
+                refreshTerrainTextureSlotUI();
+            }
+        }
+
+        window.setTerrainTextureSlot = applyTerrainTextureSlot;
+        window.editTerrainTextureSlot = editTerrainTextureSlot;
+        window.setTerrainTexture = function(textureRef) {
+            if (typeof textureRef === 'number') {
+                applyTerrainTextureSlot(textureRef);
+                return;
+            }
+
+            const legacyMap = {
+                thyme: 0,
+                grass: 0,
+                stone: 1,
+                rocky: 1,
+                sand: 2,
+                mixed: 3,
+            };
+
+            if (Object.prototype.hasOwnProperty.call(legacyMap, textureRef)) {
+                applyTerrainTextureSlot(legacyMap[textureRef]);
+            }
+        };
+
+        function updateBushToggleButton() {
+            if (!bushToggleButton) return;
+
+            bushToggleButton.textContent = `Bushes no Mapa: ${bushEffectEnabled ? 'ON' : 'OFF'}`;
+            bushToggleButton.classList.toggle('active', bushEffectEnabled);
+        }
+
+        function clearAmbientBushes() {
+            for (const bush of bushes) {
+                scene?.remove(bush);
+            }
+            bushes.length = 0;
+        }
+
+        function spawnAmbientBush(options = {}) {
+            const {
+                normalizedX = Math.random(),
+                normalizedZ = Math.random(),
+            } = options;
+            const position2D = mapNormalizedToTerrainXZ(
+                normalizedX,
+                normalizedZ,
+                BUSH_EFFECT_SETTINGS.edgeMargin
+            );
+            if (!position2D || !scene) return null;
+
+            const bush = createBush();
+            bush.position.set(position2D.x, 0, position2D.y);
+            bush.rotation.y = Math.random() * Math.PI * 2;
+            bush.userData.draggable = false;
+            bush.userData.ignoreSceneTools = true;
+
+            applyShadowSettings(bush);
+            scene.add(bush);
+            snapObjectToTerrain(bush);
+            bushes.push(bush);
+            return bush;
+        }
+
+        function seedAmbientBushes() {
+            for (let i = 0; i < BUSH_EFFECT_SETTINGS.count; i++) {
+                spawnAmbientBush({
+                    normalizedX: jitterNormalized(getHaltonValue(i + 1, 2), BUSH_EFFECT_SETTINGS.positionJitter),
+                    normalizedZ: jitterNormalized(getHaltonValue(i + 1, 3), BUSH_EFFECT_SETTINGS.positionJitter),
+                });
+            }
+        }
+
+        function setBushEffectEnabled(enabled) {
+            bushEffectEnabled = Boolean(enabled);
+            clearAmbientBushes();
+
+            if (bushEffectEnabled) {
+                seedAmbientBushes();
+            }
+
+            updateBushToggleButton();
+        }
+
+        const GRASS_EFFECT_SETTINGS = {
+            count: 128,
+            edgeMargin: 90,
+            positionJitter: 0.16,
+        };
+
+        function updateGrassToggleButton() {
+            if (!grassToggleButton) return;
+
+            grassToggleButton.textContent = `Erva no Mapa: ${grassEffectEnabled ? 'ON' : 'OFF'}`;
+            grassToggleButton.classList.toggle('active', grassEffectEnabled);
+        }
+
+        function clearAmbientGrasses() {
+            for (const grass of grasses.filter(g => g.userData?.isAmbientGrass)) {
+                scene?.remove(grass);
+            }
+            grasses = grasses.filter(g => !g.userData?.isAmbientGrass);
+        }
+
+        function spawnAmbientGrass(options = {}) {
+            const {
+                normalizedX = Math.random(),
+                normalizedZ = Math.random(),
+            } = options;
+            const position2D = mapNormalizedToTerrainXZ(
+                normalizedX,
+                normalizedZ,
+                GRASS_EFFECT_SETTINGS.edgeMargin
+            );
+            if (!position2D || !scene) return null;
+
+            const grass = createForestGrass();
+            grass.position.set(position2D.x, 0, position2D.y);
+            grass.rotation.y = Math.random() * Math.PI * 2;
+            grass.userData.draggable = false;
+            grass.userData.ignoreSceneTools = true;
+            grass.userData.isAmbientGrass = true;
+
+            applyShadowSettings(grass);
+            scene.add(grass);
+            snapObjectToTerrain(grass);
+            grasses.push(grass);
+            return grass;
+        }
+
+        function seedAmbientGrasses() {
+            for (let i = 0; i < GRASS_EFFECT_SETTINGS.count * 3; i++) {
+                spawnAmbientGrass({
+                    normalizedX: jitterNormalized(getHaltonValue(i + 1, 2), GRASS_EFFECT_SETTINGS.positionJitter),
+                    normalizedZ: jitterNormalized(getHaltonValue(i + 1, 3), GRASS_EFFECT_SETTINGS.positionJitter),
+                });
+            }
+        }
+
+        function setGrassEffectEnabled(enabled) {
+            grassEffectEnabled = Boolean(enabled);
+            clearAmbientGrasses();
+
+            if (grassEffectEnabled) {
+                seedAmbientGrasses();
+            }
+
+            updateGrassToggleButton();
+        }
+
+        function getDistributedTumbleweedLateralBias(index, total) {
+            if (total <= 1) return 0;
+
+            // Sequência quase-uniforme para evitar concentrações visíveis na mesma faixa.
+            const goldenRatioConjugate = 0.61803398875;
+            const normalized = (index * goldenRatioConjugate) % 1;
+            return normalized * 2 - 1;
+        }
+
+        function updateTumbleweedToggleButton() {
+            if (!tumbleweedToggleButton) return;
+
+            tumbleweedToggleButton.textContent = `Tumbleweeds no Mapa: ${tumbleweedEffectEnabled ? 'ON' : 'OFF'}`;
+            tumbleweedToggleButton.classList.toggle('active', tumbleweedEffectEnabled);
+        }
+
+        function clearAmbientTumbleweeds() {
+            for (const tw of tumbleweeds) {
+                scene?.remove(tw);
+            }
+            tumbleweeds.length = 0;
+        }
+
+        function spawnAmbientTumbleweed(options = {}) {
+            const {
+                progressRatio = 0,
+                progressJitterRatio = 0,
+                lateralBias = null,
+                lateralJitter = 0,
+            } = options;
+            const flow = getTumbleweedFlow();
+            if (!flow || !scene) return null;
+
+            const tw = createTumbleweed();
+            const normalizedProgress = THREE.MathUtils.clamp(
+                progressRatio + (Math.random() - 0.5) * progressJitterRatio,
+                0,
+                1
+            );
+            const normalizedLateral = lateralBias === null
+                ? (Math.random() * 2 - 1)
+                : THREE.MathUtils.clamp(
+                    lateralBias + (Math.random() - 0.5) * lateralJitter,
+                    -1,
+                    1
+                );
+            const lateralOffset = normalizedLateral * flow.lateralSpread;
+            const pathJitter = (Math.random() - 0.5) * TUMBLEWEED_EFFECT_SETTINGS.pathDistanceJitter;
+            const distanceAlongPath = THREE.MathUtils.clamp(
+                flow.pathLength * normalizedProgress + pathJitter,
+                0,
+                flow.pathLength
+            );
+            const spawnPosition = flow.start.clone()
+                .addScaledVector(flow.direction, distanceAlongPath)
+                .addScaledVector(flow.lateral, lateralOffset);
+            clampPointToTerrainBounds(spawnPosition, TUMBLEWEED_EFFECT_SETTINGS.spawnBoundsInset);
+
+            const baseSpeed = 1.55 + Math.random() * 0.8;
+            const sideDrift = (Math.random() - 0.5) * 0.08;
+            const drift2D = flow.direction.clone().multiplyScalar(baseSpeed)
+                .addScaledVector(flow.lateral, sideDrift);
+
+            tw.position.set(spawnPosition.x, 0, spawnPosition.y);
+            tw.userData.draggable = false;
+            tw.userData.ignoreSceneTools = true;
+            tw.userData.flowStart = flow.start.clone();
+            tw.userData.flowDirection2D = flow.direction.clone();
+            tw.userData.pathLength = flow.pathLength;
+            tw.userData.despawnPadding = TUMBLEWEED_EFFECT_SETTINGS.despawnPadding;
+            tw.userData.wind = drift2D;
+            tw.userData.rollAxis = new THREE.Vector3(flow.direction.y, 0, -flow.direction.x)
+                .add(new THREE.Vector3((Math.random() - 0.5) * 0.15, 0, (Math.random() - 0.5) * 0.15))
+                .normalize();
+            tw.userData.rollSpeed = 0.08 + Math.random() * 0.04;
+            tw.userData.jumpHeight = 0;
+            tw.userData.jumpVelocity = 0;
+            tw.userData.nextJumpAt = Date.now() + 600 + Math.random() * 2200;
+
+            applyShadowSettings(tw);
+            scene.add(tw);
+            snapObjectToTerrain(tw);
+            tumbleweeds.push(tw);
+            return tw;
+        }
+
+        function seedAmbientTumbleweeds() {
+            const count = TUMBLEWEED_EFFECT_SETTINGS.initialSeedCount;
+
+            for (let i = 0; i < count; i++) {
+                spawnAmbientTumbleweed({
+                    progressRatio: (i + 0.5) / count,
+                    progressJitterRatio: TUMBLEWEED_EFFECT_SETTINGS.seedProgressJitter,
+                    lateralBias: getDistributedTumbleweedLateralBias(i, count),
+                    lateralJitter: TUMBLEWEED_EFFECT_SETTINGS.seedLateralJitter,
+                });
+            }
+        }
+
+        function setTumbleweedEffectEnabled(enabled) {
+            tumbleweedEffectEnabled = Boolean(enabled);
+            tumbleweedSpawnTimer = tumbleweedEffectEnabled ? randomTumbleweedSpawnInterval() : 0;
+            clearAmbientTumbleweeds();
+
+            if (tumbleweedEffectEnabled) {
+                seedAmbientTumbleweeds();
+            }
+
+            updateTumbleweedToggleButton();
+        }
+
+        window.setBushEffectEnabled = setBushEffectEnabled;
+        window.toggleBushEffect = function() {
+            setBushEffectEnabled(!bushEffectEnabled);
+        };
+        window.setGrassEffectEnabled = setGrassEffectEnabled;
+        window.toggleGrassEffect = function() {
+            setGrassEffectEnabled(!grassEffectEnabled);
+        };
+        window.setTumbleweedEffectEnabled = setTumbleweedEffectEnabled;
+        window.toggleTumbleweedEffect = function() {
+            setTumbleweedEffectEnabled(!tumbleweedEffectEnabled);
+        };
 
         function applyShadowSettings(object3D) {
             object3D.traverse(obj => {
@@ -265,13 +911,13 @@
                 scene.remove(dinoData.model);
                 dinoData = null;
             }
-
             removeGroupFromScene(trees);
             removeGroupFromScene(grasses);
-            removeGroupFromScene(bushes);
             removeGroupFromScene(rocks);
-            removeGroupFromScene(tumbleweeds);
             removeGroupFromScene(humans);
+            removeGroupFromScene(cacts);
+            setBushEffectEnabled(false);
+            setTumbleweedEffectEnabled(false);
         }
 
         function removeObjectFromArray(groupArray, object) {
@@ -291,32 +937,13 @@
                 dinoData = null;
                 return true;
             }
-
-            if (removeObjectFromArray(trees, object)) {
-                scene.remove(object);
-                return true;
-            }
-            if (removeObjectFromArray(grasses, object)) {
-                scene.remove(object);
-                return true;
-            }
-            if (removeObjectFromArray(bushes, object)) {
-                scene.remove(object);
-                return true;
-            }
-            if (removeObjectFromArray(rocks, object)) {
-                scene.remove(object);
-                return true;
-            }
-            if (removeObjectFromArray(tumbleweeds, object)) {
-                scene.remove(object);
-                return true;
-            }
-            if (removeObjectFromArray(humans, object)) {
-                scene.remove(object);
-                return true;
-            }
-
+            if (removeObjectFromArray(trees, object)) { scene.remove(object); return true; }
+            if (removeObjectFromArray(grasses, object)) { scene.remove(object); return true; }
+            if (removeObjectFromArray(bushes, object)) { scene.remove(object); return true; }
+            if (removeObjectFromArray(rocks, object)) { scene.remove(object); return true; }
+            if (removeObjectFromArray(tumbleweeds, object)) { scene.remove(object); return true; }
+            if (removeObjectFromArray(humans, object)) { scene.remove(object); return true; }
+            if (removeObjectFromArray(cacts, object)) { scene.remove(object); return true; }
             return false;
         }
 
@@ -328,19 +955,28 @@
             }
 
             trees.forEach(obj => objects.push({ type: 'tree', ...toTransformData(obj) }));
-            grasses.forEach(obj => objects.push({ type: 'grass', ...toTransformData(obj) }));
-            bushes.forEach(obj => objects.push({ type: 'bush', ...toTransformData(obj) }));
+            grasses.forEach(obj => {
+                if (!obj.userData?.isAmbientGrass) {
+                    objects.push({ type: 'grass', ...toTransformData(obj) });
+                }
+            });
             rocks.forEach(obj => objects.push({
                 type: 'rock',
                 rockSize: obj.userData.rockSize || 'large',
                 ...toTransformData(obj)
             }));
-            tumbleweeds.forEach(obj => objects.push({ type: 'tumbleweed', ...toTransformData(obj) }));
             humans.forEach(obj => objects.push({ type: 'human', ...toTransformData(obj) }));
+            cacts.forEach(obj => objects.push({ type: 'cact', ...toTransformData(obj) }));
 
             return {
                 version: SCENE_EXPORT_VERSION,
                 terrainColor: `#${terrain.material.color.getHexString()}`,
+                terrainTintColor,
+                terrainTextureSlots: terrainTextureSlots.map(slot => ({ label: slot.label, url: slot.url })),
+                terrainActiveTextureSlotIndex,
+                bushEffectEnabled,
+                grassEffectEnabled,
+                tumbleweedEffectEnabled,
                 objects
             };
         }
@@ -355,11 +991,36 @@
             }
 
             clearScenarioObjects();
+            let hasLegacyBushes = false;
+            let hasLegacyTumbleweeds = false;
 
-            if (isValidHexColor(data.terrainColor)) {
-                terrain.material.color.set(data.terrainColor);
-                const bgInput = document.getElementById('bgColor');
-                if (bgInput) bgInput.value = data.terrainColor;
+            if (Array.isArray(data.terrainTextureSlots)) {
+                data.terrainTextureSlots.slice(0, terrainTextureSlots.length).forEach((slot, index) => {
+                    if (typeof slot?.label === 'string') {
+                        terrainTextureSlots[index].label = slot.label;
+                    }
+                    if (typeof slot?.url === 'string') {
+                        terrainTextureSlots[index].url = slot.url;
+                    }
+                });
+            }
+
+            if (isValidHexColor(data.terrainTintColor)) {
+                applyTerrainTintColor(data.terrainTintColor);
+            } else if (isValidHexColor(data.terrainColor)) {
+                applyTerrainTintColor(data.terrainColor);
+            } else {
+                applyTerrainTintColor('#ffffff');
+            }
+
+            refreshTerrainTextureSlotUI();
+
+            if (typeof data.terrainActiveTextureSlotIndex === 'number') {
+                applyTerrainTextureSlot(THREE.MathUtils.clamp(data.terrainActiveTextureSlotIndex, 0, terrainTextureSlots.length - 1));
+            } else if (typeof data.terrainTextureType === 'string') {
+                window.setTerrainTexture(data.terrainTextureType);
+            } else {
+                applyTerrainTextureSlot(0);
             }
 
             for (const entry of data.objects) {
@@ -376,13 +1037,16 @@
                         window.addGrass(entry);
                         break;
                     case 'bush':
-                        window.addBush(entry);
+                        hasLegacyBushes = true;
                         break;
                     case 'rock':
                         window.addRock(entry.rockSize || 'large', entry);
                         break;
                     case 'tumbleweed':
-                        window.addTumbleweed(entry);
+                        hasLegacyTumbleweeds = true;
+                        break;
+                    case 'cact':
+                        window.addCact(entry);
                         break;
                     case 'human':
                         window.addHuman(entry);
@@ -390,6 +1054,22 @@
                     default:
                         console.warn('Tipo de objeto não suportado no JSON:', entry.type);
                 }
+            }
+
+            if (typeof data.bushEffectEnabled === 'boolean') {
+                setBushEffectEnabled(data.bushEffectEnabled);
+            } else {
+                setBushEffectEnabled(hasLegacyBushes);
+            }
+
+            if (typeof data.grassEffectEnabled === 'boolean') {
+                setGrassEffectEnabled(data.grassEffectEnabled);
+            }
+
+            if (typeof data.tumbleweedEffectEnabled === 'boolean') {
+                setTumbleweedEffectEnabled(data.tumbleweedEffectEnabled);
+            } else {
+                setTumbleweedEffectEnabled(hasLegacyTumbleweeds);
             }
         }
 
@@ -476,40 +1156,6 @@
             return newGrass;
         };
 
-        window.addBush = function(transform = null) {
-            const newBush = createBush();
-            if (transform) {
-                applyTransform(newBush, transform);
-            } else {
-                newBush.position.set(Math.random() * 100 - 50, 0, Math.random() * 100 - 50);
-            }
-            applyShadowSettings(newBush);
-            scene.add(newBush);
-            if (!transform) {
-                snapObjectToTerrain(newBush);
-            }
-            bushes.push(newBush);
-            console.log("Arbusto adicionado!");
-            return newBush;
-        };
-
-        window.addTumbleweed = function(transform = null) {
-            const tw = createTumbleweed();
-            if (transform) {
-                applyTransform(tw, transform);
-            } else {
-                tw.position.set(Math.random() * 100 - 50, 0, Math.random() * 100 - 50);
-            }
-            applyShadowSettings(tw);
-            scene.add(tw);
-            if (!transform) {
-                snapObjectToTerrain(tw);
-            }
-            tumbleweeds.push(tw);
-            console.log("Tumbleweed adicionado!");
-            return tw;
-        };
-
         window.addHuman = function(transform = null) {
             const newHuman = createHuman();
             if (transform) {
@@ -527,6 +1173,23 @@
             return newHuman;
         };
 
+        window.addCact = function(transform = null) {
+            const newCact = createCact();
+            if (transform) {
+                applyTransform(newCact, transform);
+            } else {
+                newCact.position.set(Math.random() * 100 - 50, 0, Math.random() * 100 - 50);
+            }
+            applyShadowSettings(newCact);
+            scene.add(newCact);
+            if (!transform) {
+                snapObjectToTerrain(newCact);
+            }
+            cacts.push(newCact);
+            console.log("Cacto adicionado!");
+            return newCact;
+        };
+
 function init() {
     const container = document.getElementById('viewport');
     scene = new THREE.Scene();
@@ -536,12 +1199,24 @@ function init() {
     terrain.position.y = 0;
     terrain.receiveShadow = true;
     scene.add(terrain);
+    terrainTextureCards[0] = document.getElementById('terrainTextureSlot0Card');
+    terrainTextureCards[1] = document.getElementById('terrainTextureSlot1Card');
+    terrainTextureCards[2] = document.getElementById('terrainTextureSlot2Card');
+    terrainTextureCards[3] = document.getElementById('terrainTextureSlot3Card');
+    terrainTextureButtons[0] = document.getElementById('terrainTextureSlot0Button');
+    terrainTextureButtons[1] = document.getElementById('terrainTextureSlot1Button');
+    terrainTextureButtons[2] = document.getElementById('terrainTextureSlot2Button');
+    terrainTextureButtons[3] = document.getElementById('terrainTextureSlot3Button');
+    const terrainTintInput = document.getElementById('terrainTintColor');
+    if (terrainTintInput) {
+        terrainTintInput.addEventListener('input', (event) => {
+            applyTerrainTintColor(event.target.value);
+        });
+    }
 
-    // --- MUDAR COR DO CENÁRIO ---
-    document.getElementById('bgColor').addEventListener('input', (e) => {
-        const color = e.target.value;
-        terrain.material.color.set(color); // Muda a cor do chão
-    });
+    applyTerrainTintColor('#ffffff');
+    refreshTerrainTextureSlotUI();
+    applyTerrainTextureSlot(0);
 
     // --- CAMERA ---
      const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 5000);
@@ -641,6 +1316,9 @@ function init() {
     }
 
     const deleteModeButton = document.getElementById('deleteModeButton');
+    bushToggleButton = document.getElementById('bushToggleButton');
+    grassToggleButton = document.getElementById('grassToggleButton');
+    tumbleweedToggleButton = document.getElementById('tumbleweedToggleButton');
 
     function updateDeleteModeButton() {
         deleteModeButton.textContent = `Modo Apagar: ${deleteMode ? 'ON' : 'OFF'}`;
@@ -652,7 +1330,22 @@ function init() {
         updateDeleteModeButton();
     });
 
+    bushToggleButton.addEventListener('click', () => {
+        setBushEffectEnabled(!bushEffectEnabled);
+    });
+
+    grassToggleButton.addEventListener('click', () => {
+        setGrassEffectEnabled(!grassEffectEnabled);
+    });
+
+    tumbleweedToggleButton.addEventListener('click', () => {
+        setTumbleweedEffectEnabled(!tumbleweedEffectEnabled);
+    });
+
     updateDeleteModeButton();
+    updateBushToggleButton();
+    updateGrassToggleButton();
+    updateTumbleweedToggleButton();
 
     function resizeViewport() {
         camera.aspect = container.clientWidth / container.clientHeight;
@@ -672,6 +1365,25 @@ function init() {
         humanControlButton.textContent = humanControlMode
             ? 'Sair do Humano (Esc / F)'
             : 'Entrar no Humano (F)';
+    }
+
+    function getSceneRootObject(object) {
+        let root = object;
+        while (root.parent && root.parent !== scene) {
+            root = root.parent;
+        }
+        return root;
+    }
+
+    function getInteractiveObjectFromIntersections(intersections) {
+        for (const hit of intersections) {
+            const rootObject = getSceneRootObject(hit.object);
+            if (rootObject === terrain) continue;
+            if (rootObject.userData?.draggable === false) continue;
+            if (rootObject.userData?.ignoreSceneTools) continue;
+            return rootObject;
+        }
+        return null;
     }
 
     function resetHumanMoveState() {
@@ -726,7 +1438,7 @@ function init() {
 
         humanVerticalVelocity = 0;
         humanCanJump = true;
-        sidebar.style.display = 'none';
+        sidebar.classList.add('hidden');
         setHumanControlButtonLabel();
         scheduleViewportResize();
 
@@ -747,7 +1459,7 @@ function init() {
             document.exitPointerLock();
         }
 
-        sidebar.style.display = 'flex';
+        sidebar.classList.remove('hidden');
         setHumanControlButtonLabel();
         scheduleViewportResize();
 
@@ -843,36 +1555,27 @@ function init() {
 
         // Verificamos todos os objectos da cena
         const intersects = raycaster.intersectObjects(scene.children, true);
+        const object = getInteractiveObjectFromIntersections(intersects);
+        if (!object) return;
 
-        if (intersects.length > 0) {
-            // Subir até ao Grupo raiz (Dino ou Árvore)
-            let object = intersects[0].object;
-            while (object.parent && object.parent !== scene) {
-                object = object.parent;
+        lastPickedObject = object;
+
+        if (deleteMode) {
+            const removed = removeScenarioObject(object);
+            if (removed) {
+                console.log('Objeto removido do cenário.');
             }
-
-            // Ignorar o terreno
-            if (object !== terrain) {
-                lastPickedObject = object;
-
-                if (deleteMode) {
-                    const removed = removeScenarioObject(object);
-                    if (removed) {
-                        console.log('Objeto removido do cenário.');
-                    }
-                    return;
-                }
-
-                selectedObject = object;
-                isDragging = true;
-                movementSpeed = 4.0;
-                controls.enabled = false;
-
-                // Levantar ligeiramente o objecto ao pegá-lo
-                selectedObject.position.y += 30;
-                dragPlane.constant = -selectedObject.position.y;
-            }
+            return;
         }
+
+        selectedObject = object;
+        isDragging = true;
+        movementSpeed = 4.0;
+        controls.enabled = false;
+
+        // Levantar ligeiramente o objecto ao pegá-lo
+        selectedObject.position.y += 30;
+        dragPlane.constant = -selectedObject.position.y;
     });
 
     window.addEventListener('mousemove', (event) => {
@@ -908,6 +1611,13 @@ function init() {
         selectedObject = null;
         movementSpeed = 1.0;
         controls.enabled = true;
+    });
+
+    window.addEventListener('wheel', (event) => {
+        if (!selectedObject) return;
+        // Roda para a esquerda/direita consoante o scroll
+        const delta = event.deltaY > 0 ? 0.2 : -0.2;
+        selectedObject.rotation.y += delta;
     });
 
     window.addEventListener('keydown', (event) => {
@@ -959,8 +1669,8 @@ function init() {
         if (!humanControlMode) return;
 
         switch (event.code) {
-            case 'KeyW': humanMoveState.forward = true; event.preventDefault(); break;
-            case 'KeyS': humanMoveState.backward = true; event.preventDefault(); break;
+            case 'KeyW': humanMoveState.backward = true; event.preventDefault(); break;
+            case 'KeyS': humanMoveState.forward = true; event.preventDefault(); break;
             case 'KeyA': humanMoveState.left = true; event.preventDefault(); break;
             case 'KeyD': humanMoveState.right = true; event.preventDefault(); break;
             case 'Space':
@@ -977,8 +1687,8 @@ function init() {
         if (!humanControlMode) return;
 
         switch (event.code) {
-            case 'KeyW': humanMoveState.forward = false; break;
-            case 'KeyS': humanMoveState.backward = false; break;
+            case 'KeyW': humanMoveState.backward = false; break;
+            case 'KeyS': humanMoveState.forward = false; break;
             case 'KeyA': humanMoveState.left = false; break;
             case 'KeyD': humanMoveState.right = false; break;
         }
@@ -1000,6 +1710,86 @@ function init() {
     }
 
     const clock = new THREE.Clock();
+
+    function updateAmbientTumbleweeds(deltaTime) {
+        const bounds = getTerrainBounds();
+
+        for (let i = tumbleweeds.length - 1; i >= 0; i--) {
+            const tw = tumbleweeds[i];
+            const axis = tw.userData.rollAxis;
+            const speed = tw.userData.rollSpeed;
+            const wind = tw.userData.wind;
+
+            tw.rotateOnWorldAxis(axis, speed);
+            tw.position.x += wind.x;
+            tw.position.z += wind.y;
+
+            const origin = new THREE.Vector3(tw.position.x, 500, tw.position.z);
+            const downRay = new THREE.Raycaster(origin, new THREE.Vector3(0, -1, 0));
+            const hit = downRay.intersectObject(terrain);
+            if (hit.length > 0) {
+                const nowMs = Date.now();
+                const groundOffset = tw.userData.groundOffset ?? 0;
+
+                if (tw.userData.jumpHeight <= 0.0001 && nowMs >= (tw.userData.nextJumpAt ?? 0)) {
+                    const isBigJump = Math.random() < (tw.userData.bigJumpChance ?? 0.2);
+                    tw.userData.jumpVelocity = isBigJump
+                        ? (1.9 + Math.random() * 0.8)
+                        : (1.0 + Math.random() * 0.6);
+                    tw.userData.nextJumpAt = isBigJump
+                        ? (nowMs + 4200 + Math.random() * 6500)
+                        : (nowMs + 2500 + Math.random() * 5500);
+                }
+
+                tw.userData.jumpVelocity -= (tw.userData.gravity ?? 0.08);
+                tw.userData.jumpHeight = Math.max(0, (tw.userData.jumpHeight ?? 0) + tw.userData.jumpVelocity);
+
+                if (tw.userData.jumpHeight === 0 && tw.userData.jumpVelocity < 0) {
+                    tw.userData.jumpVelocity = 0;
+                }
+
+                tw.position.y = hit[0].point.y + groundOffset + tw.userData.jumpHeight;
+
+                const twBox = new THREE.Box3().setFromObject(tw);
+                const minAllowedY = hit[0].point.y + groundOffset;
+                if (twBox.min.y < minAllowedY) {
+                    tw.position.y += (minAllowedY - twBox.min.y);
+                }
+            }
+
+            const flowStart = tw.userData.flowStart;
+            const flowDirection2D = tw.userData.flowDirection2D;
+            const despawnPadding = tw.userData.despawnPadding ?? 0;
+            const relativePosition = new THREE.Vector2(
+                tw.position.x - flowStart.x,
+                tw.position.z - flowStart.y
+            );
+            const distanceAlongPath = relativePosition.dot(flowDirection2D);
+            const isPastPath = distanceAlongPath > (tw.userData.pathLength ?? 0) + despawnPadding;
+            const isOutsideBounds = bounds && (
+                tw.position.x < bounds.min.x - despawnPadding ||
+                tw.position.x > bounds.max.x + despawnPadding ||
+                tw.position.z < bounds.min.z - despawnPadding ||
+                tw.position.z > bounds.max.z + despawnPadding
+            );
+
+            if (isPastPath || isOutsideBounds) {
+                scene.remove(tw);
+                tumbleweeds.splice(i, 1);
+            }
+        }
+
+        if (!tumbleweedEffectEnabled) return;
+
+        tumbleweedSpawnTimer -= deltaTime;
+        while (
+            tumbleweeds.length < TUMBLEWEED_EFFECT_SETTINGS.maxActive &&
+            tumbleweedSpawnTimer <= 0
+        ) {
+            spawnAmbientTumbleweed();
+            tumbleweedSpawnTimer += randomTumbleweedSpawnInterval();
+        }
+    }
 
             document.getElementById('downloadSceneJsonButton').addEventListener('click', () => {
                 const output = JSON.stringify(serializeScenario(), null, 2);
@@ -1156,51 +1946,7 @@ function init() {
 
         }
 
-        // Rolagem simples para lembrar bolas de feno a mover com o vento.
-        for (const tw of tumbleweeds) {
-            if (tw === selectedObject) continue;
-            const axis = tw.userData.rollAxis;
-            const speed = tw.userData.rollSpeed;
-            const wind = tw.userData.wind;
-
-            tw.rotateOnWorldAxis(axis, speed);
-            tw.position.x += wind.x;
-            tw.position.z += wind.y;
-
-            const origin = new THREE.Vector3(tw.position.x, 500, tw.position.z);
-            const downRay = new THREE.Raycaster(origin, new THREE.Vector3(0, -1, 0));
-            const hit = downRay.intersectObject(terrain);
-            if (hit.length > 0) {
-                const nowMs = Date.now();
-                const groundOffset = tw.userData.groundOffset ?? 0;
-
-                if (tw.userData.jumpHeight <= 0.0001 && nowMs >= (tw.userData.nextJumpAt ?? 0)) {
-                    const isBigJump = Math.random() < (tw.userData.bigJumpChance ?? 0.2);
-                    tw.userData.jumpVelocity = isBigJump
-                        ? (1.9 + Math.random() * 0.8)
-                        : (1.0 + Math.random() * 0.6);
-                    tw.userData.nextJumpAt = isBigJump
-                        ? (nowMs + 4200 + Math.random() * 6500)
-                        : (nowMs + 2500 + Math.random() * 5500);
-                }
-
-                tw.userData.jumpVelocity -= (tw.userData.gravity ?? 0.08);
-                tw.userData.jumpHeight = Math.max(0, (tw.userData.jumpHeight ?? 0) + tw.userData.jumpVelocity);
-
-                if (tw.userData.jumpHeight === 0 && tw.userData.jumpVelocity < 0) {
-                    tw.userData.jumpVelocity = 0;
-                }
-
-                tw.position.y = hit[0].point.y + groundOffset + tw.userData.jumpHeight;
-
-                // Garante que toda a malha fica acima do terreno, mesmo quando roda.
-                const twBox = new THREE.Box3().setFromObject(tw);
-                const minAllowedY = hit[0].point.y + groundOffset;
-                if (twBox.min.y < minAllowedY) {
-                    tw.position.y += (minAllowedY - twBox.min.y);
-                }
-            }
-        }
+        updateAmbientTumbleweeds(deltaTime);
 
         if (!humanControlMode) {
             controls.update();

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export function createTerrain() {
+export function createTerrain(textureType = 'grass') {
     // 1. Dimensões: Mais largo pros dois lados (ex: 2000x1200)
     const worldWidth = 3000;  
     const worldDepth = 3000;  
@@ -47,11 +47,39 @@ export function createTerrain() {
 
     geometry.computeVertexNormals();
 
+    // Definir material com base no tipo de textura
+    const textureConfigs = {
+        grass: {
+            color: 0x55aa55,
+            roughness: 0.8,
+            name: 'Relvosa'
+        },
+        sand: {
+            color: 0xd4a574,
+            roughness: 0.95,
+            name: 'Areosa'
+        },
+        rocky: {
+            color: 0x6b6b6b,
+            roughness: 0.75,
+            name: 'Pedrosa'
+        },
+        mixed: {
+            color: 0x8b8b4e,
+            roughness: 0.85,
+            name: 'Mista'
+        }
+    };
+
+    const config = textureConfigs[textureType] || textureConfigs.grass;
+
     const material = new THREE.MeshStandardMaterial({ 
-        color: 0x55aa55, 
-        roughness: 0.8,
+        color: config.color, 
+        roughness: config.roughness,
         flatShading: false // Para as montanhas parecerem suaves
     });
     
-    return new THREE.Mesh(geometry, material);
+    const terrainMesh = new THREE.Mesh(geometry, material);
+    terrainMesh.userData.textureType = textureType;
+    return terrainMesh;
 }
