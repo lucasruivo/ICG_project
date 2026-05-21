@@ -2532,7 +2532,7 @@
                     p.grupoCabeca.position.y = breatheOffset;
 
                     // Mover a cauda com clava (efeito chicote ondulado)
-                    const tailSwingSpeed = 1.6;
+                    const tailSwingSpeed = 1.2;
                     const tailSwingAmp = 0.22;
                     const tailSwing = Math.sin(time * tailSwingSpeed) * tailSwingAmp;
                     p.grupoCauda1.rotation.y = tailSwing;
@@ -2544,10 +2544,35 @@
                     const walkSpeed = time * 0.8 * movementSpeed;
                     const legSwing = Math.sin(walkSpeed) * 0.35;
 
-                    p.grupoPernaFL.rotation.z = legSwing;
-                    p.grupoPernaBR.rotation.z = legSwing;
-                    p.grupoPernaFR.rotation.z = -legSwing;
-                    p.grupoPernaBL.rotation.z = -legSwing;
+                    // As coxas rodam (limitando a rotação para trás para ser mais realista e evitar clipar com o corpo)
+                    let swingFL_BR = legSwing;
+                    if (swingFL_BR > 0) swingFL_BR *= 0.25;
+
+                    let swingFR_BL = -legSwing;
+                    if (swingFR_BL > 0) swingFR_BL *= 0.25;
+
+                    if (p.grupoCoxaFL) {
+                        p.grupoCoxaFL.rotation.z = swingFL_BR;
+                        p.grupoCoxaBR.rotation.z = swingFL_BR;
+                        p.grupoCoxaFR.rotation.z = swingFR_BL;
+                        p.grupoCoxaBL.rotation.z = swingFR_BL;
+
+                        p.grupoCoxaFL.position.y = 18 + breatheOffset;
+                        p.grupoCoxaBR.position.y = 18 + breatheOffset;
+                        p.grupoCoxaFR.position.y = 18 + breatheOffset;
+                        p.grupoCoxaBL.position.y = 18 + breatheOffset;
+                    }
+
+                    // As canelas, pés e garras ficam retos (sem rodar) e apenas transladam em X e Y
+                    p.grupoPernaFL.rotation.z = 0;
+                    p.grupoPernaBR.rotation.z = 0;
+                    p.grupoPernaFR.rotation.z = 0;
+                    p.grupoPernaBL.rotation.z = 0;
+
+                    p.grupoPernaFL.position.x = -35 + Math.sin(swingFL_BR) * 24;
+                    p.grupoPernaBR.position.x = 30 + Math.sin(swingFL_BR) * 24;
+                    p.grupoPernaFR.position.x = -35 + Math.sin(swingFR_BL) * 24;
+                    p.grupoPernaBL.position.x = 30 + Math.sin(swingFR_BL) * 24;
 
                     const liftFL = Math.max(0, -Math.cos(walkSpeed)) * 4.5;
                     const liftBR = Math.max(0, -Math.cos(walkSpeed)) * 4.5;

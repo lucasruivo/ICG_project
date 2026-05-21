@@ -12,6 +12,11 @@ export function createDino2() {
     const grupoPernaBL = new THREE.Group(); // Back Left
     const grupoPernaBR = new THREE.Group(); // Back Right
 
+    const grupoCoxaFL = new THREE.Group(); // Front Left Thigh
+    const grupoCoxaFR = new THREE.Group(); // Front Right Thigh
+    const grupoCoxaBL = new THREE.Group(); // Back Left Thigh
+    const grupoCoxaBR = new THREE.Group(); // Back Right Thigh
+
     // Cauda hierárquica
     const grupoCauda1 = new THREE.Group();
     const grupoCauda2 = new THREE.Group();
@@ -19,6 +24,7 @@ export function createDino2() {
     const grupoCauda4 = new THREE.Group();
 
     dino2.add(grupoCabeca, grupoPernaFL, grupoPernaFR, grupoPernaBL, grupoPernaBR, grupoCauda1);
+    dino2.add(grupoCoxaFL, grupoCoxaFR, grupoCoxaBL, grupoCoxaBR);
     grupoCauda1.add(grupoCauda2);
     grupoCauda2.add(grupoCauda3);
     grupoCauda3.add(grupoCauda4);
@@ -125,7 +131,7 @@ export function createDino2() {
     const neckGeo = new THREE.BoxGeometry(22, 22, 32);
     const neck = new THREE.Mesh(neckGeo, bodyMaterial);
     neck.position.set(-62, 22, 0);
-    dino2.add(neck);
+    grupoCabeca.add(neck);
 
     // Crânio do Anquilossauro (Largo e Achatado)
     const skullGeo = new THREE.BoxGeometry(32, 20, 32);
@@ -144,27 +150,27 @@ export function createDino2() {
     hornGeo.rotateX(Math.PI / 2);
 
     const hornL = new THREE.Mesh(hornGeo, spikeMaterial);
-    hornL.position.set(12, 6, 14);
-    hornL.rotation.y = Math.PI / 3;
-    hornL.rotation.x = Math.PI / 12;
+    hornL.position.set(12, 11, 17);
+    hornL.rotation.y = Math.PI / 2 + Math.PI / 3;
+    hornL.rotation.x = Math.PI / 2 + Math.PI / 3;
     skull.add(hornL);
 
     const hornR = new THREE.Mesh(hornGeo, spikeMaterial);
-    hornR.position.set(12, 6, -14);
-    hornR.rotation.y = -Math.PI / 3;
-    hornR.rotation.x = -Math.PI / 12;
+    hornR.position.set(12, 11, -17);
+    hornR.rotation.y =  -Math.PI / 2 - Math.PI / 3 + Math.PI;
+    hornR.rotation.x =  -Math.PI / 2 - Math.PI / 3;
     skull.add(hornR);
 
     // Chifres das Bochechas
     const cheekL = new THREE.Mesh(hornGeo, spikeMaterial);
-    cheekL.position.set(-4, -6, 15);
-    cheekL.rotation.y = Math.PI / 2;
+    cheekL.position.set(10, -10, 17);
+    cheekL.rotation.y = Math.PI /6;
     cheekL.rotation.x = Math.PI / 6;
     skull.add(cheekL);
 
     const cheekR = new THREE.Mesh(hornGeo, spikeMaterial);
-    cheekR.position.set(-4, -6, -15);
-    cheekR.rotation.y = -Math.PI / 2;
+    cheekR.position.set(10, -10, -17);
+    cheekR.rotation.y = Math.PI -Math.PI / 6;
     cheekR.rotation.x = -Math.PI / 6;
     skull.add(cheekR);
 
@@ -192,27 +198,27 @@ export function createDino2() {
 
     // Segmento 1
     const tail1 = new THREE.Mesh(tailSegGeo, bodyMaterial);
-    tail1.position.set(10, 0, 0);
+    tail1.position.set(8, 0, 0);
     grupoCauda1.add(tail1);
     grupoCauda1.position.set(55, 22, 0); // Junta-se à traseira do torso
 
     // Segmento 2
     const tail2 = new THREE.Mesh(tailSegGeo, bodyMaterial);
-    tail2.position.set(18, 0, 0);
+    tail2.position.set(7, 0, 0);
     tail2.scale.set(0.85, 0.85, 0.85);
     grupoCauda2.add(tail2);
     grupoCauda2.position.set(18, 0, 0);
 
     // Segmento 3
     const tail3 = new THREE.Mesh(tailSegGeo, bodyMaterial);
-    tail3.position.set(16, 0, 0);
+    tail3.position.set(4, 0, 0);
     tail3.scale.set(0.7, 0.7, 0.7);
     grupoCauda3.add(tail3);
     grupoCauda3.position.set(16, 0, 0);
 
     // Segmento 4 (Base da Clava)
     const tail4 = new THREE.Mesh(tailSegGeo, bodyMaterial);
-    tail4.position.set(14, 0, 0);
+    tail4.position.set(1, 0, 0);
     tail4.scale.set(0.55, 0.55, 0.55);
     grupoCauda4.add(tail4);
     grupoCauda4.position.set(14, 0, 0);
@@ -222,16 +228,15 @@ export function createDino2() {
     clubLoboGeo.scale(1.3, 0.7, 0.9); // Alongada e achatada
 
     const clubL = new THREE.Mesh(clubLoboGeo, boneMaterial);
-    clubL.position.set(24, 0, 6);
+    clubL.position.set(12, 0, 6);
     grupoCauda4.add(clubL);
 
     const clubR = new THREE.Mesh(clubLoboGeo, boneMaterial);
-    clubR.position.set(24, 0, -6);
+    clubR.position.set(12, 0, -6);
     grupoCauda4.add(clubR);
 
     // Picos protetores da cauda (Pequenos cones ao longo dos segmentos)
     const smallSpikeGeo = new THREE.ConeGeometry(2, 6, 4);
-    smallSpikeGeo.rotateX(Math.PI / 2);
 
     [tail1, tail2, tail3].forEach(seg => {
         const sp1 = new THREE.Mesh(smallSpikeGeo, spikeMaterial);
@@ -246,23 +251,24 @@ export function createDino2() {
     const footGeo = new THREE.BoxGeometry(22, 6, 24);
 
     // Função auxiliar para montar uma perna
-    function buildLeg(group, x, z) {
-        group.position.set(x, 18, z);
+    function buildLeg(groupThigh, groupShin, x, z) {
+        groupThigh.position.set(x, 18, z);
+        groupShin.position.set(x, 18, z);
 
         // Coxa (Thigh)
         const thigh = new THREE.Mesh(thighGeo, bodyMaterial);
         thigh.position.y = -6;
-        group.add(thigh);
+        groupThigh.add(thigh);
 
         // Canela (Shin)
         const shin = new THREE.Mesh(shinGeo, bodyMaterial);
         shin.position.y = -22;
-        group.add(shin);
+        groupShin.add(shin);
 
         // Pé (Foot)
         const foot = new THREE.Mesh(footGeo, boneMaterial);
         foot.position.set(-2, -30, 0);
-        group.add(foot);
+        groupShin.add(foot);
 
         // Garras/Unhas (3 cones à frente)
         const clawGeo = new THREE.ConeGeometry(2.5, 6, 4);
@@ -271,16 +277,16 @@ export function createDino2() {
         const zOffsets = [-7, 0, 7];
         zOffsets.forEach(zo => {
             const claw = new THREE.Mesh(clawGeo, boneMaterial);
-            claw.position.set(-11, -3, zo);
+            claw.position.set(-11, 0.5, zo);
             claw.rotation.y = -Math.PI / 2;
             foot.add(claw);
         });
     }
 
-    buildLeg(grupoPernaFL, -35, 32);
-    buildLeg(grupoPernaFR, -35, -32);
-    buildLeg(grupoPernaBL, 30, 32);
-    buildLeg(grupoPernaBR, 30, -32);
+    buildLeg(grupoCoxaFL, grupoPernaFL, -35, 32);
+    buildLeg(grupoCoxaFR, grupoPernaFR, -35, -32);
+    buildLeg(grupoCoxaBL, grupoPernaBL, 30, 32);
+    buildLeg(grupoCoxaBR, grupoPernaBR, 30, -32);
 
     // --- POSICIONAMENTO E ESCALA ---
     // Centraliza o modelo no chão de forma que a base fique em y = 0
@@ -300,6 +306,10 @@ export function createDino2() {
             grupoPernaFR,
             grupoPernaBL,
             grupoPernaBR,
+            grupoCoxaFL,
+            grupoCoxaFR,
+            grupoCoxaBL,
+            grupoCoxaBR,
             grupoCauda1,
             grupoCauda2,
             grupoCauda3,
