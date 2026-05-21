@@ -295,7 +295,9 @@ export function createDino2() {
 
     dino2.userData.draggable = true;
     dino2.userData.collisionCircles = [
-        { x: 0, z: 0, r: 58 }
+        { x: -25, z: 0, r: 35 }, // Head and shoulders
+        { x: 5, z: 0, r: 42 },   // Main body
+        { x: 35, z: 0, r: 25 }   // Tail
     ];
 
     return {

@@ -57,5 +57,19 @@ export function createRock(size = 'medium') {
     rockGroup.userData.draggable = true;
     rockGroup.name = 'Rock';
 
+    // Define hitboxes matching each chunk's position and scale
+    const collisionCircles = [];
+    if (size === 'small') {
+        collisionCircles.push({ x: -9, z: -1, r: 16.2 });
+    } else if (size === 'medium') {
+        collisionCircles.push({ x: -9, z: -1, r: 16.2 });
+        collisionCircles.push({ x: 9, z: 2, r: 14.4 });
+    } else {
+        collisionCircles.push({ x: -9, z: -1, r: 16.2 });
+        collisionCircles.push({ x: 9, z: 2, r: 14.4 });
+        collisionCircles.push({ x: 0, z: 5.8, r: 9.5 });
+    }
+    rockGroup.userData.collisionCircles = collisionCircles;
+
     return rockGroup;
 }

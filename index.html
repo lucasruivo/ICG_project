@@ -311,6 +311,7 @@
             <!-- <div class="model-item" onclick="addGrass()">Ervinhas</div> -->
             <div class="model-item" onclick="addHuman()">Ser Humano</div>
             <div class="model-item" onclick="addCact()">Cacto</div>
+            <div class="model-item" onclick="addPond()">Charco</div>
 
             <div class="accordion-header" onclick="toggleRockAccordion(this)">
                 <span>Pedra</span>
@@ -326,6 +327,7 @@
         <button id="bushToggleButton" class="action-button tertiary">Bushes no Mapa: OFF</button>
         <button id="grassToggleButton" class="action-button tertiary">Erva no Mapa: OFF</button>
         <button id="tumbleweedToggleButton" class="action-button">Tumbleweeds no Mapa: OFF</button>
+        <button id="hitboxToggleButton" class="action-button tertiary">Ver Hitboxes: OFF</button>
 
         <button id="clearSceneButton" class="action-button danger">Limpar Cenário</button>
 
@@ -386,6 +388,7 @@
         const { createTumbleweed } = await import(`./tumbleweed.js?v=${v}`);
         const { createHuman } = await import(`./human.js?v=${v}`);
         const { createCact } = await import(`./cact.js?v=${v}`);
+        const { createPond } = await import(`./pond.js?v=${v}`);
 
         let dinoData;
         let dino2Data;
@@ -401,6 +404,7 @@
         let tumbleweeds = [];
         let humans = [];
         let cacts = [];
+        let ponds = [];
         const humanWorldScale = new THREE.Vector3();
         const collisionWorldScale = new THREE.Vector3();
         const collisionFallbackCenter = new THREE.Vector3();
@@ -409,6 +413,12 @@
         const collisionUseScreenScale = true;
         const collisionScreenRefDistance = 420; // reference distance where scale==1
         const SCENE_EXPORT_VERSION = 1;
+        let showHitboxes = false;
+        let hitboxToggleButton = null;
+        let hitboxGroup = null;
+        let hitboxCircleGeo = null;
+        let hitboxMaterial = null;
+
         let bushEffectEnabled = false;
         let bushToggleButton = null;
         let grassEffectEnabled = false;
@@ -493,6 +503,39 @@
 
             terrain.updateMatrixWorld(true);
             return new THREE.Box3().setFromObject(terrain);
+        }
+
+        function updateHitboxHelpers() {
+            if (!hitboxGroup) return;
+            while(hitboxGroup.children.length > 0) {
+                hitboxGroup.remove(hitboxGroup.children[0]);
+            }
+
+            if (!showHitboxes) return;
+
+            // Gather all collidable objects
+            const objects = [];
+            trees.forEach(o => objects.push(o));
+            rocks.forEach(o => objects.push(o));
+            cacts.forEach(o => objects.push(o));
+            humans.forEach(o => objects.push(o));
+            ponds.forEach(o => objects.push(o));
+            if (dinoData?.model) objects.push(dinoData.model);
+            if (dino2Data?.model) objects.push(dino2Data.model);
+
+            // Draw a red ring for each collision circle
+            objects.forEach(obj => {
+                if (!obj) return;
+                const circles = getWorldCollisionCircles(obj);
+                circles.forEach(circle => {
+                    if (!hitboxCircleGeo || !hitboxMaterial) return;
+                    const line = new THREE.Line(hitboxCircleGeo, hitboxMaterial);
+                    const groundY = getTerrainHeightAt(circle.x, circle.z) ?? obj.position.y;
+                    line.position.set(circle.x, groundY + 0.5, circle.z);
+                    line.scale.set(circle.r, 1, circle.r);
+                    hitboxGroup.add(line);
+                });
+            });
         }
 
         function getHaltonValue(index, base) {
@@ -931,8 +974,13 @@
                 if (obj.isMesh) {
                     // Proteger meshes de olhos/íris: já têm configurações próprias
                     if (obj.userData?.isEyeMesh) return;
-                    obj.castShadow = true;
-                    obj.receiveShadow = true;
+                    if (obj.material && obj.material.transparent) {
+                        obj.castShadow = false;
+                        obj.receiveShadow = true;
+                    } else {
+                        obj.castShadow = true;
+                        obj.receiveShadow = true;
+                    }
                 }
             });
         }
@@ -987,6 +1035,73 @@
             return bbox ? bbox.min.y : null;
         }
 
+        function getOriginalTerrainHeight(x, z) {
+            const dist = Math.sqrt(x * x + z * z);
+            const valleyRadius = 800;
+            const maxRadius = 1500;
+            const maxElevation = 180;
+            let elevation = 0;
+
+            if (dist > valleyRadius) {
+                const t = Math.min(1, (dist - valleyRadius) / (maxRadius - valleyRadius));
+                const intensity = t * t;
+                elevation = (
+                    Math.sin(x * 0.02) * Math.cos(z * 0.02) * 40 +
+                    Math.sin(x * 0.05) * 20 +
+                    Math.cos(z * 0.08) * 10
+                ) * intensity;
+                elevation += intensity * maxElevation;
+            }
+            return elevation;
+        }
+
+        function updateAllObjectSnapping() {
+            if (typeof dinoData !== 'undefined' && dinoData?.model) snapObjectToTerrain(dinoData.model);
+            if (typeof dino2Data !== 'undefined' && dino2Data?.model) snapObjectToTerrain(dino2Data.model);
+            if (typeof trees !== 'undefined') trees.forEach(snapObjectToTerrain);
+            if (typeof grasses !== 'undefined') grasses.forEach(snapObjectToTerrain);
+            if (typeof rocks !== 'undefined') rocks.forEach(snapObjectToTerrain);
+            if (typeof humans !== 'undefined') humans.forEach(snapObjectToTerrain);
+            if (typeof cacts !== 'undefined') cacts.forEach(snapObjectToTerrain);
+        }
+
+        window.updateTerrainHeights = function () {
+            if (!terrain) return;
+            const geometry = terrain.geometry;
+            const posAttr = geometry.attributes.position;
+            const count = posAttr.count;
+
+            for (let i = 0; i < count; i++) {
+                const x = posAttr.getX(i);
+                const z = posAttr.getZ(i);
+                let y = getOriginalTerrainHeight(x, z);
+
+                if (typeof ponds !== 'undefined') {
+                    for (const pond of ponds) {
+                        const dx = x - pond.position.x;
+                        const dz = z - pond.position.z;
+                        const dist = Math.sqrt(dx * dx + dz * dz);
+                        const r = pond.userData?.pondRadius || 80;
+                        if (dist < r) {
+                            const maxDepth = pond.userData?.pondDepth || 18;
+                            const factor = 1 - (dist / r);
+                            const holeDepth = maxDepth * Math.sin(factor * Math.PI / 2);
+                            y -= holeDepth;
+                        }
+                    }
+                }
+                posAttr.setY(i, y);
+            }
+
+            posAttr.needsUpdate = true;
+            geometry.computeVertexNormals();
+            geometry.computeBoundingBox();
+            geometry.computeBoundingSphere();
+
+            // Re-encaixar todos os objectos no terreno agora deformado
+            updateAllObjectSnapping();
+        };
+
         function getTerrainHeightAt(x, z, raycasterInstance = null) {
             if (!terrain) return null;
 
@@ -1024,6 +1139,14 @@
 
         function snapObjectToTerrain(object3D) {
             if (!object3D || !terrain) return;
+
+            if (object3D.name === 'Pond') {
+                const groundY = getOriginalTerrainHeight(object3D.position.x, object3D.position.z);
+                if (groundY === null) return;
+                object3D.position.y = groundY + 30;
+                object3D.updateMatrixWorld(true);
+                return;
+            }
 
             const groundY = getTerrainHeightAt(object3D.position.x, object3D.position.z);
             if (groundY === null) return;
@@ -1124,19 +1247,46 @@
             });
         }
 
-        function objectsCollideByFootprint(objectA, objectB, translationA = null) {
-            const circlesA = getWorldCollisionCircles(objectA, translationA);
-            const circlesB = getWorldCollisionCircles(objectB);
+        function getMeshesInObject(object, list = []) {
+            if (!object) return list;
+            if (object.isMesh) {
+                if (object.visible && 
+                    object.name !== 'Water' && 
+                    object.name !== 'PondBowl' && 
+                    !object.userData?.isWater && 
+                    !object.userData?.isTerrain &&
+                    object.geometry) {
+                    list.push(object);
+                }
+            }
+            if (object.children) {
+                object.children.forEach(child => getMeshesInObject(child, list));
+            }
+            return list;
+        }
 
-            for (const circleA of circlesA) {
-                for (const circleB of circlesB) {
-                    const dx = circleA.x - circleB.x;
-                    const dz = circleA.z - circleB.z;
-                    const minDistance = circleA.r + circleB.r;
+        function objectsCollide3D(objectA, objectB, translationA = null) {
+            const boxA = new THREE.Box3().setFromObject(objectA);
+            if (translationA) {
+                boxA.min.add(translationA);
+                boxA.max.add(translationA);
+            }
 
-                    if ((dx * dx) + (dz * dz) <= minDistance * minDistance) {
-                        return true;
-                    }
+            const meshesB = [];
+            getMeshesInObject(objectB, meshesB);
+
+            const meshBox = new THREE.Box3();
+            for (const mesh of meshesB) {
+                mesh.updateMatrixWorld(true);
+                meshBox.setFromObject(mesh);
+
+                // If the character is standing on top of the mesh, ignore collision
+                if (boxA.min.y >= meshBox.max.y - 1.0) {
+                    continue;
+                }
+
+                if (boxA.intersectsBox(meshBox)) {
+                    return true;
                 }
             }
 
@@ -1184,14 +1334,18 @@
             removeGroupFromScene(rocks);
             removeGroupFromScene(humans);
             removeGroupFromScene(cacts);
+            removeGroupFromScene(ponds);
             setBushEffectEnabled(false);
             setTumbleweedEffectEnabled(false);
 
             if (window.clearPickedObject) window.clearPickedObject();
 
+            // Restaurar a elevação original do terreno
+            updateTerrainHeights();
+
             try {
                 localStorage.removeItem('tabletop_autosave');
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function removeObjectFromArray(groupArray, object) {
@@ -1222,6 +1376,11 @@
             else if (removeObjectFromArray(tumbleweeds, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(humans, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(cacts, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(ponds, object)) {
+                scene.remove(object);
+                removed = true;
+                updateTerrainHeights();
+            }
 
             if (removed) {
                 if (typeof autoSaveScenario === 'function') autoSaveScenario();
@@ -1252,6 +1411,7 @@
             }));
             humans.forEach(obj => objects.push({ type: 'human', ...toTransformData(obj) }));
             cacts.forEach(obj => objects.push({ type: 'cact', ...toTransformData(obj) }));
+            ponds.forEach(obj => objects.push({ type: 'pond', ...toTransformData(obj) }));
 
             return {
                 version: SCENE_EXPORT_VERSION,
@@ -1345,6 +1505,9 @@
                         case 'cact':
                             window.addCact(entry);
                             break;
+                        case 'pond':
+                            window.addPond(entry);
+                            break;
                         case 'human':
                             window.addHuman(entry);
                             break;
@@ -1369,6 +1532,7 @@
                     setTumbleweedEffectEnabled(hasLegacyTumbleweeds);
                 }
             } finally {
+                updateTerrainHeights();
                 isLoadingScenario = false;
             }
 
@@ -1523,11 +1687,46 @@
             return newCact;
         };
 
+        window.addPond = function (transform = null) {
+            const newPond = createPond();
+            if (transform) {
+                applyTransform(newPond, transform);
+            } else {
+                newPond.position.set(Math.random() * 100 - 50, 0, Math.random() * 100 - 50);
+            }
+            applyShadowSettings(newPond);
+            scene.add(newPond);
+            if (!transform) {
+                snapObjectToTerrain(newPond);
+            }
+            ponds.push(newPond);
+            if (!isLoadingScenario) {
+                updateTerrainHeights();
+            }
+            console.log("Charco adicionado!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            return newPond;
+        };
+
         function init() {
             const container = document.getElementById('viewport');
             scene = new THREE.Scene();
             window.scene = scene;
             scene.background = new THREE.Color(0x3e7ab6);
+
+            hitboxGroup = new THREE.Group();
+            scene.add(hitboxGroup);
+
+            // Reusable circle geometry for hitboxes
+            const segments = 32;
+            hitboxCircleGeo = new THREE.BufferGeometry();
+            const positions = [];
+            for (let i = 0; i <= segments; i++) {
+                const theta = (i / segments) * Math.PI * 2;
+                positions.push(Math.cos(theta), 0, Math.sin(theta));
+            }
+            hitboxCircleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            hitboxMaterial = new THREE.LineBasicMaterial({ color: 0xff3b30, linewidth: 2 });
 
             terrain = createTerrain();
             terrain.position.y = 0;
@@ -1652,6 +1851,7 @@
             bushToggleButton = document.getElementById('bushToggleButton');
             grassToggleButton = document.getElementById('grassToggleButton');
             tumbleweedToggleButton = document.getElementById('tumbleweedToggleButton');
+            hitboxToggleButton = document.getElementById('hitboxToggleButton');
 
             // --- LÓGICA DO MENU DE CONTEXTO FLUTUANTE ---
             const contextMenu = document.getElementById('contextMenu');
@@ -1745,6 +1945,12 @@
 
             bushToggleButton.addEventListener('click', () => {
                 setBushEffectEnabled(!bushEffectEnabled);
+            });
+
+            hitboxToggleButton.addEventListener('click', () => {
+                showHitboxes = !showHitboxes;
+                hitboxToggleButton.textContent = `Ver Hitboxes: ${showHitboxes ? 'ON' : 'OFF'}`;
+                hitboxToggleButton.classList.toggle('active', showHitboxes);
             });
 
             grassToggleButton.addEventListener('click', () => {
@@ -1951,8 +2157,8 @@
                 if (humanMoveVector.lengthSq() > 0) {
                     humanMoveVector.normalize().multiplyScalar(humanControlSettings.speed * deltaTime);
                     let collision = false;
-                    // Checar colisão com árvores, pedras, cactos, humanos, dino
-                    const checkGroups = [trees, rocks, cacts, humans];
+                    // Checar colisão com árvores, pedras, cactos, humanos, dino, charcos
+                    const checkGroups = [trees, rocks, cacts, humans, ponds];
                     if (dinoData?.model) checkGroups.push([dinoData.model]);
                     if (dino2Data?.model) checkGroups.push([dino2Data.model]);
                     for (const group of checkGroups) {
@@ -1962,8 +2168,8 @@
 
                             // Só bloqueia se o humano NÃO está já a colidir com esse objecto.
                             // Isto evita que ele fique preso num objecto grande onde começou (como o dino).
-                            const alreadyInside = objectsCollideByFootprint(controlledHuman, obj);
-                            if (!alreadyInside && objectsCollideByFootprint(controlledHuman, obj, humanMoveVector)) {
+                            const alreadyInside = objectsCollide3D(controlledHuman, obj);
+                            if (!alreadyInside && objectsCollide3D(controlledHuman, obj, humanMoveVector)) {
                                 collision = true;
                                 break;
                             }
@@ -1976,6 +2182,7 @@
                     }
                 }
 
+                const previousY = controlledHuman.position.y;
                 humanVerticalVelocity -= humanControlSettings.gravity * deltaTime;
                 controlledHuman.position.y += humanVerticalVelocity * deltaTime;
 
@@ -1983,9 +2190,36 @@
                     new THREE.Vector3(controlledHuman.position.x, 500, controlledHuman.position.z),
                     new THREE.Vector3(0, -1, 0)
                 );
-                const groundHit = humanGroundRay.intersectObject(terrain);
-                if (groundHit.length > 0) {
-                    const groundY = groundHit[0].point.y + getPlacementClearance(controlledHuman);
+
+                // Build dynamic list of all collidable surfaces: terrain + trees + rocks + cacts + humans + ponds + dinos
+                const collidables = [terrain];
+                trees.forEach(o => collidables.push(o));
+                rocks.forEach(o => collidables.push(o));
+                cacts.forEach(o => collidables.push(o));
+                humans.forEach(o => { if (o !== controlledHuman) collidables.push(o); });
+                ponds.forEach(o => collidables.push(o));
+                if (dinoData?.model) collidables.push(dinoData.model);
+                if (dino2Data?.model) collidables.push(dino2Data.model);
+
+                let groundY = -9999;
+                const groundHits = humanGroundRay.intersectObjects(collidables, true);
+                for (const hit of groundHits) {
+                    if (hit.object.name === 'Water' || hit.object.name === 'PondBowl') continue;
+
+                    const isTerrain = (hit.object === terrain);
+                    const clearance = isTerrain ? getPlacementClearance(controlledHuman) : 0;
+                    const surfaceY = hit.point.y + clearance;
+
+                    // Always allow terrain, and allow steps/objects if they are not too high above our feet
+                    const stepHeight = 8.0;
+                    if (isTerrain || surfaceY <= previousY + stepHeight) {
+                        if (surfaceY > groundY) {
+                            groundY = surfaceY;
+                        }
+                    }
+                }
+
+                if (groundY > -9999) {
                     if (controlledHuman.position.y <= groundY) {
                         controlledHuman.position.y = groundY;
                         humanVerticalVelocity = 0;
@@ -2108,6 +2342,9 @@
                 if (isDragging && selectedObject && event.button === 2) {
                     // Ao largar, encaixar o objecto no terreno
                     snapObjectToTerrain(selectedObject);
+                    if (selectedObject.name === 'Pond') {
+                        updateTerrainHeights();
+                    }
                     if (selectedObject.name === 'Tumbleweed') {
                         selectedObject.userData.jumpHeight = 0;
                         selectedObject.userData.jumpVelocity = 0;
@@ -2406,6 +2643,27 @@
 
             renderer.render(scene, camera);
 
+            function updatePondWaves() {
+                const time = Date.now() * 0.003;
+                if (typeof ponds === 'undefined') return;
+                for (const pond of ponds) {
+                    const waterGeo = pond.userData?.waterGeometry;
+                    if (!waterGeo) continue;
+                    const posAttr = waterGeo.attributes.position;
+                    if (!posAttr) continue;
+                    for (let i = 0; i < posAttr.count; i++) {
+                        const px = posAttr.getX(i);
+                        const pz = posAttr.getZ(i);
+                        const distFromCenter = Math.sqrt(px * px + pz * pz);
+                        // Ondas dinâmicas a propagar-se a partir do centro
+                        const wave = Math.sin(distFromCenter * 0.15 - time * 1.5) * 0.5;
+                        posAttr.setY(i, wave);
+                    }
+                    posAttr.needsUpdate = true;
+                    waterGeo.computeVertexNormals();
+                }
+            }
+
             // --- ANIMATION LOOP ---
             function animate() {
                 requestAnimationFrame(animate);
@@ -2413,6 +2671,7 @@
                 const deltaTime = Math.min(clock.getDelta(), 0.05);
                 updateHumanControl(deltaTime);
                 updateSunShadowFocus();
+                updatePondWaves();
 
                 const time = Date.now() * 0.003;
 
@@ -2591,6 +2850,8 @@
                 if (selectionOutline && selectionOutline.visible && selectedObject) {
                     // Os outlines agora são filhos dos meshes e herdam transformações automaticamente
                 }
+
+                updateHitboxHelpers();
 
                 if (!humanControlMode) {
                     controls.update();

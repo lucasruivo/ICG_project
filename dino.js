@@ -514,6 +514,13 @@ export function createDino() {
     iris2.position.z = -21
     grupoCabecaSuperior.add(iris2);
 
+    dino.userData.draggable = true;
+    dino.userData.collisionCircles = [
+        { x: -45, z: 0, r: 35 }, // Head and chest area
+        { x: 0, z: 0, r: 45 },   // Main torso and hips
+        { x: 45, z: 0, r: 25 }   // Tail base
+    ];
+
     return {
         model: dino,
         parts: {

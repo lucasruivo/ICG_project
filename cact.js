@@ -126,6 +126,9 @@ export function createCact() {
     // Configurações finais para o raycaster funcionar
     cact.name = "Cacto";
     cact.userData.draggable = true;
+    cact.userData.collisionCircles = [
+        { x: 0, z: 0, r: 8 }
+    ];
 
     return cact;
 }
