@@ -66,7 +66,7 @@ export function createTumbleweed() {
     tumbleweed.userData.rollSpeed = 0.03 + Math.random() * 0.03;
     tumbleweed.userData.wind = new THREE.Vector2(0.22 + Math.random() * 0.16, (Math.random() - 0.5) * 0.09);
     // Ligeiramente enterrada no terreno para evitar efeito de flutuar.
-    tumbleweed.userData.groundOffset = -3.0;
+    tumbleweed.userData.terrainSurfaceOffset = -3.0;
     tumbleweed.userData.jumpHeight = 0;
     tumbleweed.userData.jumpVelocity = 0;
     tumbleweed.userData.gravity = 0.08;

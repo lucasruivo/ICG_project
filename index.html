@@ -1,25 +1,17 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
-<!--
-
-		threejs_ex_01_05_lighting_animation.html
-
-		Simple example: adding simple lighting and animation
-
-		J. Madeira - February 2026
-
-		An example provided by Google Gemini, based on ex_01_03.
-
--->
 
 <head>
     <title>3D Tabletop Editor</title>
     <meta charset="utf-8">
     <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; background: #1b2632; }
-        
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+            background: #1b2632;
+        }
+
         /* Barra Lateral */
         #sidebar {
             position: fixed;
@@ -64,9 +56,17 @@
             inset: 0;
         }
 
-        .menu-section { border-bottom: 1px solid #555; padding-bottom: 15px; }
-        h3 { margin-top: 0; color: #ecf0f1; font-size: 18px; }
-        
+        .menu-section {
+            border-bottom: 1px solid #555;
+            padding-bottom: 15px;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #ecf0f1;
+            font-size: 18px;
+        }
+
         .model-item {
             background: hsl(210, 49%, 48%);
             padding: 10px;
@@ -76,9 +76,17 @@
             text-align: center;
             transition: background 0.2s;
         }
-        .model-item:hover { background: #45a049; }
 
-        input[type="color"] { width: 100%; height: 40px; cursor: pointer; border: none; }
+        .model-item:hover {
+            background: #45a049;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            cursor: pointer;
+            border: none;
+        }
 
         .terrain-tone-control {
             margin-top: 10px;
@@ -142,7 +150,7 @@
         }
 
         .texture-slot-empty {
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.08) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.08) 75%, transparent 75%, transparent);
+            background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.08) 75%, transparent 75%, transparent);
             background-size: 18px 18px;
         }
 
@@ -163,7 +171,7 @@
         .texture-slot-edit:hover {
             background: rgba(0, 0, 0, 0.78);
         }
-        
+
         .action-button {
             padding: 10px;
             background: #e67e22;
@@ -173,15 +181,19 @@
             cursor: pointer;
             margin-top: 8px;
         }
+
         .action-button.secondary {
             background: #2980b9;
         }
+
         .action-button.tertiary {
             background: #16a085;
         }
+
         .action-button.danger {
             background: #c0392b;
         }
+
         .action-button.active {
             outline: 2px solid #f1c40f;
             box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.35);
@@ -204,6 +216,7 @@
             font-size: 14px;
             padding: 12px;
         }
+
         .accordion-header {
             background: hsl(210, 49%, 48%);
             padding: 10px;
@@ -216,15 +229,32 @@
             transition: background 0.2s;
             user-select: none;
         }
-        .accordion-header:hover { background: #45a049; }
-        .accordion-chevron { font-size: 11px; transition: transform 0.2s; }
-        .accordion-chevron.open { transform: rotate(90deg); }
+
+        .accordion-header:hover {
+            background: #45a049;
+        }
+
+        .accordion-chevron {
+            font-size: 11px;
+            transition: transform 0.2s;
+        }
+
+        .accordion-chevron.open {
+            transform: rotate(90deg);
+        }
+
         .accordion-body {
             display: none;
             padding-left: 8px;
         }
-        .accordion-body.open { display: block; }
-        .accordion-body .model-item { font-size: 13px; }
+
+        .accordion-body.open {
+            display: block;
+        }
+
+        .accordion-body .model-item {
+            font-size: 13px;
+        }
     </style>
 </head>
 
@@ -235,28 +265,36 @@
             <label>Texturas do Terreno:</label>
             <div class="texture-grid">
                 <div class="texture-slot active" id="terrainTextureSlot0Card">
-                    <button type="button" class="texture-slot-main" id="terrainTextureSlot0Button" onclick="setTerrainTextureSlot(0)">
+                    <button type="button" class="texture-slot-main" id="terrainTextureSlot0Button"
+                        onclick="setTerrainTextureSlot(0)">
                         <span>Textura 1</span>
                     </button>
-                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(0)">Editar URL</button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(0)">Editar
+                        URL</button>
                 </div>
                 <div class="texture-slot" id="terrainTextureSlot1Card">
-                    <button type="button" class="texture-slot-main" id="terrainTextureSlot1Button" onclick="setTerrainTextureSlot(1)">
+                    <button type="button" class="texture-slot-main" id="terrainTextureSlot1Button"
+                        onclick="setTerrainTextureSlot(1)">
                         <span>Textura 2</span>
                     </button>
-                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(1)">Editar URL</button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(1)">Editar
+                        URL</button>
                 </div>
                 <div class="texture-slot" id="terrainTextureSlot2Card">
-                    <button type="button" class="texture-slot-main texture-slot-empty" id="terrainTextureSlot2Button" onclick="setTerrainTextureSlot(2)">
+                    <button type="button" class="texture-slot-main texture-slot-empty" id="terrainTextureSlot2Button"
+                        onclick="setTerrainTextureSlot(2)">
                         <span>Textura 3</span>
                     </button>
-                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(2)">Editar URL</button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(2)">Editar
+                        URL</button>
                 </div>
                 <div class="texture-slot" id="terrainTextureSlot3Card">
-                    <button type="button" class="texture-slot-main texture-slot-empty" id="terrainTextureSlot3Button" onclick="setTerrainTextureSlot(3)">
+                    <button type="button" class="texture-slot-main texture-slot-empty" id="terrainTextureSlot3Button"
+                        onclick="setTerrainTextureSlot(3)">
                         <span>Textura 4</span>
                     </button>
-                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(3)">Editar URL</button>
+                    <button type="button" class="texture-slot-edit" onclick="editTerrainTextureSlot(3)">Editar
+                        URL</button>
                 </div>
             </div>
             <div class="terrain-tone-control">
@@ -268,12 +306,12 @@
         <div class="menu-section">
             <h3>Modelos</h3>
             <div class="model-item" onclick="addDino()">Dinossauro T-Rex</div>
+            <div class="model-item" onclick="addDino2()">Dinossauro Ankylosaurus</div>
             <div class="model-item" onclick="addTree()">Árvore</div>
-            <div class="model-item" onclick="addGrass()">Ervinhas</div>
+            <!-- <div class="model-item" onclick="addGrass()">Ervinhas</div> -->
             <div class="model-item" onclick="addHuman()">Ser Humano</div>
             <div class="model-item" onclick="addCact()">Cacto</div>
 
-            <!-- Acordeão Pedra -->
             <div class="accordion-header" onclick="toggleRockAccordion(this)">
                 <span>Pedra</span>
                 <span class="accordion-chevron">&#9654;</span>
@@ -289,6 +327,8 @@
         <button id="grassToggleButton" class="action-button tertiary">Erva no Mapa: OFF</button>
         <button id="tumbleweedToggleButton" class="action-button">Tumbleweeds no Mapa: OFF</button>
 
+        <button id="clearSceneButton" class="action-button danger">Limpar Cenário</button>
+
         <button id="downloadSceneJsonButton" class="action-button secondary">Download Cenário JSON</button>
         <button id="loadSceneJsonButton" class="action-button tertiary">Load Cenário JSON</button>
         <button id="deleteModeButton" class="action-button danger">Modo Apagar: OFF</button>
@@ -296,35 +336,63 @@
         <input type="file" id="sceneJsonFileInput" accept="application/json" style="display: none;">
     </div>
 
+    <div id="contextMenu"
+        style="display: none; position: absolute; background: rgba(44, 62, 80, 0.95); border: 1px solid #f1c40f; border-radius: 8px; padding: 15px; width: 220px; z-index: 1000; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
+        <h3 id="contextTitle"
+            style="color: #f1c40f; font-size: 14px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 5px;">
+            Editar Objeto</h3>
+
+        <div class="terrain-control">
+            <label>Tamanho: <span id="ctxScaleValue">1.0</span>x</label>
+            <input type="range" id="ctxScaleSlider" min="0.1" max="5" step="0.1" value="1" style="width: 100%;">
+        </div>
+
+        <div class="terrain-control" style="margin-top: 10px;">
+            <label>Rotação (Eixo Y): <span id="ctxRotationValue">0</span>°</label>
+            <input type="range" id="ctxRotationSlider" min="0" max="360" step="1" value="0" style="width: 100%;">
+        </div>
+
+        <button id="ctxCloseBtn"
+            style="margin-top: 15px; width: 100%; padding: 6px; background: #c0392b; color: white; border: none; border-radius: 4px; cursor: pointer;">Fechar
+            Menu</button>
+    </div>
+
     <div id="viewport"></div>
-	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
-	<script type="importmap">
-		{
-    		"imports": {
-     			 "three": "https://threejs.org/build/three.module.js",
+    <script type="importmap">
+        {
+            "imports": {
+                 "three": "https://threejs.org/build/three.module.js",
                  "three/addons/": "https://threejs.org/examples/jsm/"
-    		}
-  		}
-	</script>
+            }
+        }
+    </script>
 
-	<script type="module">
+    <script type="module">
 
-		import * as THREE from 'three';
+        import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { createDino } from './dino.js';
-        import { createTerrain } from './terrain.js';
-        import { createTree } from './tree.js';
-        import { createForestGrass } from './grass.js';
-        import { createBush } from './bush.js';
-        import { createRock } from './lrock.js';
-        import { createTumbleweed } from './tumbleweed.js';
-        import { createHuman } from './human.js';
-        import { createCact } from './cact.js';
+
+        // Cache-busting dynamic imports for local modules to prevent browser caching issues in Live Server
+        const v = Date.now();
+        const { createDino } = await import(`./dino.js?v=${v}`);
+        const { createDino2 } = await import(`./dino2.js?v=${v}`);
+        const { createTerrain } = await import(`./terrain.js?v=${v}`);
+        const { createTree } = await import(`./tree.js?v=${v}`);
+        const { createForestGrass } = await import(`./grass.js?v=${v}`);
+        const { createBush } = await import(`./bush.js?v=${v}`);
+        const { createRock } = await import(`./lrock.js?v=${v}`);
+        const { createTumbleweed } = await import(`./tumbleweed.js?v=${v}`);
+        const { createHuman } = await import(`./human.js?v=${v}`);
+        const { createCact } = await import(`./cact.js?v=${v}`);
 
         let dinoData;
+        let dino2Data;
+        let isInitializing = true;
+        let isLoadingScenario = false;
         let scene;
-        let terrain; // Variável para o novo chão
+        let terrain;
         let auraLight;
         let trees = [];
         let grasses = [];
@@ -333,6 +401,13 @@
         let tumbleweeds = [];
         let humans = [];
         let cacts = [];
+        const humanWorldScale = new THREE.Vector3();
+        const collisionWorldScale = new THREE.Vector3();
+        const collisionFallbackCenter = new THREE.Vector3();
+        // When true, adjust collision radii so they match the model's apparent
+        // screen size (reduces perceived overlap when camera is far).
+        const collisionUseScreenScale = true;
+        const collisionScreenRefDistance = 420; // reference distance where scale==1
         const SCENE_EXPORT_VERSION = 1;
         let bushEffectEnabled = false;
         let bushToggleButton = null;
@@ -341,6 +416,15 @@
         let tumbleweedEffectEnabled = false;
         let tumbleweedSpawnTimer = 0;
         let tumbleweedToggleButton = null;
+        let deleteMode = false;
+        let isDragging = false;
+        let movementSpeed = 1.0;
+        let humanControlMode = false;
+        let controlledHuman = null;
+        let humanYaw = 0;
+        let humanPitch = 0;
+        let humanVerticalVelocity = 0;
+        let humanCanJump = false;
         const terrainTextureLoader = new THREE.TextureLoader();
         terrainTextureLoader.setCrossOrigin('anonymous');
         const terrainTextureCache = new Map();
@@ -531,6 +615,7 @@
                 terrain.material.needsUpdate = true;
             }
             refreshTerrainTextureSlotUI();
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
         }
 
         function editTerrainTextureSlot(index) {
@@ -546,11 +631,12 @@
             } else {
                 refreshTerrainTextureSlotUI();
             }
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
         }
 
         window.setTerrainTextureSlot = applyTerrainTextureSlot;
         window.editTerrainTextureSlot = editTerrainTextureSlot;
-        window.setTerrainTexture = function(textureRef) {
+        window.setTerrainTexture = function (textureRef) {
             if (typeof textureRef === 'number') {
                 applyTerrainTextureSlot(textureRef);
                 return;
@@ -602,7 +688,7 @@
             bush.userData.draggable = false;
             bush.userData.ignoreSceneTools = true;
 
-            applyShadowSettings(bush);
+            disableShadows(bush);
             scene.add(bush);
             snapObjectToTerrain(bush);
             bushes.push(bush);
@@ -627,6 +713,7 @@
             }
 
             updateBushToggleButton();
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
         }
 
         const GRASS_EFFECT_SETTINGS = {
@@ -668,7 +755,7 @@
             grass.userData.ignoreSceneTools = true;
             grass.userData.isAmbientGrass = true;
 
-            applyShadowSettings(grass);
+            disableShadows(grass);
             scene.add(grass);
             snapObjectToTerrain(grass);
             grasses.push(grass);
@@ -693,12 +780,12 @@
             }
 
             updateGrassToggleButton();
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
         }
 
         function getDistributedTumbleweedLateralBias(index, total) {
             if (total <= 1) return 0;
 
-            // Sequência quase-uniforme para evitar concentrações visíveis na mesma faixa.
             const goldenRatioConjugate = 0.61803398875;
             const normalized = (index * goldenRatioConjugate) % 1;
             return normalized * 2 - 1;
@@ -774,7 +861,7 @@
             tw.userData.jumpVelocity = 0;
             tw.userData.nextJumpAt = Date.now() + 600 + Math.random() * 2200;
 
-            applyShadowSettings(tw);
+            disableShadows(tw);
             scene.add(tw);
             snapObjectToTerrain(tw);
             tumbleweeds.push(tw);
@@ -804,26 +891,57 @@
             }
 
             updateTumbleweedToggleButton();
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
         }
 
         window.setBushEffectEnabled = setBushEffectEnabled;
-        window.toggleBushEffect = function() {
+        window.toggleBushEffect = function () {
             setBushEffectEnabled(!bushEffectEnabled);
         };
         window.setGrassEffectEnabled = setGrassEffectEnabled;
-        window.toggleGrassEffect = function() {
+        window.toggleGrassEffect = function () {
             setGrassEffectEnabled(!grassEffectEnabled);
         };
         window.setTumbleweedEffectEnabled = setTumbleweedEffectEnabled;
-        window.toggleTumbleweedEffect = function() {
+        window.toggleTumbleweedEffect = function () {
             setTumbleweedEffectEnabled(!tumbleweedEffectEnabled);
         };
+
+        function createModelOutline(mesh) {
+            // Criar outline que segue o contorno real do modelo
+            if (!mesh.geometry) return null;
+
+            const edges = new THREE.EdgesGeometry(mesh.geometry, 10); // 10 graus de threshold
+            const material = new THREE.LineBasicMaterial({
+                color: 0xFFFFFF,  // Vermelho
+                linewidth: 4,
+                transparent: true,
+                opacity: 0.9,
+                fog: false,
+                depthTest: true,
+                depthWrite: false
+            });
+            const outline = new THREE.LineSegments(edges, material);
+            outline.userData.isBillboard = true;
+            return outline;
+        }
 
         function applyShadowSettings(object3D) {
             object3D.traverse(obj => {
                 if (obj.isMesh) {
+                    // Proteger meshes de olhos/íris: já têm configurações próprias
+                    if (obj.userData?.isEyeMesh) return;
                     obj.castShadow = true;
                     obj.receiveShadow = true;
+                }
+            });
+        }
+
+        function disableShadows(object3D) {
+            object3D.traverse(obj => {
+                if (obj.isMesh) {
+                    obj.castShadow = false;
+                    obj.receiveShadow = false;
                 }
             });
         }
@@ -856,27 +974,173 @@
             }
         }
 
-        function getPlacementClearance(object3D) {
+        function getObjectBounds(object3D) {
+            if (!object3D) return null;
+
+            object3D.updateMatrixWorld(true);
+            const bbox = new THREE.Box3().setFromObject(object3D);
+            return bbox.isEmpty() ? null : bbox;
+        }
+
+        function getObjectBottomY(object3D) {
+            const bbox = getObjectBounds(object3D);
+            return bbox ? bbox.min.y : null;
+        }
+
+        function getTerrainHeightAt(x, z, raycasterInstance = null) {
+            if (!terrain) return null;
+
+            const downRay = raycasterInstance ?? new THREE.Raycaster();
+            downRay.set(
+                new THREE.Vector3(x, 500, z),
+                new THREE.Vector3(0, -1, 0)
+            );
+
+            const hit = downRay.intersectObject(terrain);
+            return hit.length > 0 ? hit[0].point.y : null;
+        }
+
+        function getTerrainSurfaceOffset(object3D) {
             if (!object3D) return 0;
 
-            return object3D.name === 'Dino' ? (object3D.userData.groundOffset ?? 25)
-                : object3D.name === 'Tumbleweed' ? (object3D.userData.groundOffset ?? -1.0)
-                : object3D.name === 'Human' ? (object3D.userData.groundOffset ?? 1.0)
-                : 0;
+            return object3D.userData.terrainSurfaceOffset
+                ?? (object3D.name === 'Tumbleweed' ? (object3D.userData.groundOffset ?? 0) : 0);
+        }
+
+        function alignObjectBottomToWorldY(object3D, targetBottomY) {
+            const currentBottomY = getObjectBottomY(object3D);
+            if (currentBottomY === null) return;
+
+            object3D.position.y += targetBottomY - currentBottomY;
+            object3D.updateMatrixWorld(true);
+        }
+
+        function getPlacementClearance(object3D) {
+            const currentBottomY = getObjectBottomY(object3D);
+            if (currentBottomY === null) return 0;
+
+            return (object3D.position.y - currentBottomY) + getTerrainSurfaceOffset(object3D);
         }
 
         function snapObjectToTerrain(object3D) {
             if (!object3D || !terrain) return;
 
-            object3D.updateMatrixWorld(true);
-            const origin = new THREE.Vector3(object3D.position.x, 500, object3D.position.z);
-            const downRay = new THREE.Raycaster(origin, new THREE.Vector3(0, -1, 0));
-            const hit = downRay.intersectObject(terrain);
-            if (hit.length === 0) return;
+            const groundY = getTerrainHeightAt(object3D.position.x, object3D.position.z);
+            if (groundY === null) return;
 
-            const groundY = hit[0].point.y;
-            const clearance = getPlacementClearance(object3D);
-            object3D.position.y = groundY + clearance;
+            alignObjectBottomToWorldY(object3D, groundY + getTerrainSurfaceOffset(object3D));
+        }
+
+        function getHumanCameraEyeWorldPosition(human, target) {
+            if (!human) return target;
+
+            const cameraAnchor = human.userData?.cameraAnchor;
+            if (cameraAnchor?.getWorldPosition) {
+                human.updateMatrixWorld(true);
+                cameraAnchor.getWorldPosition(target);
+                return target;
+            }
+
+            const humanBounds = getObjectBounds(human);
+            if (!humanBounds) {
+                target.copy(human.position);
+                return target;
+            }
+
+            const height = humanBounds.max.y - humanBounds.min.y;
+            target.set(
+                human.position.x,
+                humanBounds.min.y + height * 0.78,
+                human.position.z
+            );
+            return target;
+        }
+
+        function getHumanCameraForwardOffset(human) {
+            if (!human) return 1.5;
+
+            human.getWorldScale(humanWorldScale);
+            return Math.max(1.2, Math.abs(humanWorldScale.z) * 0.8);
+        }
+
+        function getWorldCollisionCircles(object3D, translation = null) {
+            if (!object3D) return [];
+
+            const collisionCircles = Array.isArray(object3D.userData?.collisionCircles)
+                ? object3D.userData.collisionCircles
+                : null;
+
+            if (!collisionCircles || collisionCircles.length === 0) {
+                const bbox = getObjectBounds(object3D);
+                if (!bbox) return [];
+
+                const halfWidth = (bbox.max.x - bbox.min.x) * 0.5;
+                const halfDepth = (bbox.max.z - bbox.min.z) * 0.5;
+                const radius = Math.sqrt(Math.max(halfWidth, 0.01) * Math.max(halfDepth, 0.01));
+                bbox.getCenter(collisionFallbackCenter);
+
+                // compute optional screen-scale based on camera distance
+                let screenScale = 1;
+                if (collisionUseScreenScale && typeof camera !== 'undefined' && !humanControlMode) {
+                    const pos = new THREE.Vector3();
+                    object3D.getWorldPosition(pos);
+                    const dist = pos.distanceTo(camera.position) || 1;
+                    screenScale = collisionScreenRefDistance / Math.max(dist, 1);
+                }
+
+                return [{
+                    x: collisionFallbackCenter.x + (translation?.x ?? 0),
+                    z: collisionFallbackCenter.z + (translation?.z ?? 0),
+                    r: radius * screenScale
+                }];
+            }
+
+            object3D.updateMatrixWorld(true);
+            const worldScale = new THREE.Vector3();
+            object3D.getWorldScale(worldScale);
+            const radiusScale = (Math.abs(worldScale.x) + Math.abs(worldScale.z)) * 0.5;
+            const translatedX = translation?.x ?? 0;
+            const translatedZ = translation?.z ?? 0;
+
+            // compute optional screen-scale based on camera distance
+            let screenScale = 1;
+            if (collisionUseScreenScale && typeof camera !== 'undefined' && !humanControlMode) {
+                const pos = new THREE.Vector3();
+                object3D.getWorldPosition(pos);
+                const dist = pos.distanceTo(camera.position) || 1;
+                screenScale = collisionScreenRefDistance / Math.max(dist, 1);
+            }
+
+            return collisionCircles.map(circle => {
+                const localCenter = new THREE.Vector3(circle.x ?? 0, circle.y ?? 0, circle.z ?? 0);
+                const worldCenter = localCenter.clone();
+                object3D.localToWorld(worldCenter);
+
+                return {
+                    x: worldCenter.x + translatedX,
+                    z: worldCenter.z + translatedZ,
+                    r: (circle.r ?? 0) * radiusScale * screenScale
+                };
+            });
+        }
+
+        function objectsCollideByFootprint(objectA, objectB, translationA = null) {
+            const circlesA = getWorldCollisionCircles(objectA, translationA);
+            const circlesB = getWorldCollisionCircles(objectB);
+
+            for (const circleA of circlesA) {
+                for (const circleB of circlesB) {
+                    const dx = circleA.x - circleB.x;
+                    const dz = circleA.z - circleB.z;
+                    const minDistance = circleA.r + circleB.r;
+
+                    if ((dx * dx) + (dz * dz) <= minDistance * minDistance) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         function toTransformData(object3D) {
@@ -911,6 +1175,10 @@
                 scene.remove(dinoData.model);
                 dinoData = null;
             }
+            if (dino2Data?.model) {
+                scene.remove(dino2Data.model);
+                dino2Data = null;
+            }
             removeGroupFromScene(trees);
             removeGroupFromScene(grasses);
             removeGroupFromScene(rocks);
@@ -918,6 +1186,12 @@
             removeGroupFromScene(cacts);
             setBushEffectEnabled(false);
             setTumbleweedEffectEnabled(false);
+
+            if (window.clearPickedObject) window.clearPickedObject();
+
+            try {
+                localStorage.removeItem('tabletop_autosave');
+            } catch (e) {}
         }
 
         function removeObjectFromArray(groupArray, object) {
@@ -932,19 +1206,27 @@
         function removeScenarioObject(object) {
             if (!object || object === terrain) return false;
 
+            let removed = false;
             if (dinoData?.model === object) {
                 scene.remove(dinoData.model);
                 dinoData = null;
-                return true;
+                removed = true;
+            } else if (dino2Data?.model === object) {
+                scene.remove(dino2Data.model);
+                dino2Data = null;
+                removed = true;
+            } else if (removeObjectFromArray(trees, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(grasses, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(bushes, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(rocks, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(tumbleweeds, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(humans, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(cacts, object)) { scene.remove(object); removed = true; }
+
+            if (removed) {
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
             }
-            if (removeObjectFromArray(trees, object)) { scene.remove(object); return true; }
-            if (removeObjectFromArray(grasses, object)) { scene.remove(object); return true; }
-            if (removeObjectFromArray(bushes, object)) { scene.remove(object); return true; }
-            if (removeObjectFromArray(rocks, object)) { scene.remove(object); return true; }
-            if (removeObjectFromArray(tumbleweeds, object)) { scene.remove(object); return true; }
-            if (removeObjectFromArray(humans, object)) { scene.remove(object); return true; }
-            if (removeObjectFromArray(cacts, object)) { scene.remove(object); return true; }
-            return false;
+            return removed;
         }
 
         function serializeScenario() {
@@ -952,6 +1234,9 @@
 
             if (dinoData?.model) {
                 objects.push({ type: 'dino', ...toTransformData(dinoData.model) });
+            }
+            if (dino2Data?.model) {
+                objects.push({ type: 'dino2', ...toTransformData(dino2Data.model) });
             }
 
             trees.forEach(obj => objects.push({ type: 'tree', ...toTransformData(obj) }));
@@ -981,6 +1266,16 @@
             };
         }
 
+        function autoSaveScenario() {
+            if (isInitializing || isLoadingScenario) return;
+            try {
+                const data = serializeScenario();
+                localStorage.setItem('tabletop_autosave', JSON.stringify(data));
+            } catch (e) {
+                console.warn('Erro ao auto-guardar o cenário:', e);
+            }
+        }
+
         function isValidHexColor(value) {
             return typeof value === 'string' && /^#([0-9A-F]{3}|[0-9A-F]{6})$/i.test(value);
         }
@@ -990,97 +1285,104 @@
                 throw new Error('JSON inválido: falta o array "objects".');
             }
 
-            clearScenarioObjects();
-            let hasLegacyBushes = false;
-            let hasLegacyTumbleweeds = false;
+            isLoadingScenario = true;
+            try {
+                clearScenarioObjects();
+                let hasLegacyBushes = false;
+                let hasLegacyTumbleweeds = false;
 
-            if (Array.isArray(data.terrainTextureSlots)) {
-                data.terrainTextureSlots.slice(0, terrainTextureSlots.length).forEach((slot, index) => {
-                    if (typeof slot?.label === 'string') {
-                        terrainTextureSlots[index].label = slot.label;
-                    }
-                    if (typeof slot?.url === 'string') {
-                        terrainTextureSlots[index].url = slot.url;
-                    }
-                });
-            }
-
-            if (isValidHexColor(data.terrainTintColor)) {
-                applyTerrainTintColor(data.terrainTintColor);
-            } else if (isValidHexColor(data.terrainColor)) {
-                applyTerrainTintColor(data.terrainColor);
-            } else {
-                applyTerrainTintColor('#ffffff');
-            }
-
-            refreshTerrainTextureSlotUI();
-
-            if (typeof data.terrainActiveTextureSlotIndex === 'number') {
-                applyTerrainTextureSlot(THREE.MathUtils.clamp(data.terrainActiveTextureSlotIndex, 0, terrainTextureSlots.length - 1));
-            } else if (typeof data.terrainTextureType === 'string') {
-                window.setTerrainTexture(data.terrainTextureType);
-            } else {
-                applyTerrainTextureSlot(0);
-            }
-
-            for (const entry of data.objects) {
-                if (!entry?.type) continue;
-
-                switch (entry.type) {
-                    case 'dino':
-                        window.addDino({ transform: entry, silent: true });
-                        break;
-                    case 'tree':
-                        window.addTree(entry);
-                        break;
-                    case 'grass':
-                        window.addGrass(entry);
-                        break;
-                    case 'bush':
-                        hasLegacyBushes = true;
-                        break;
-                    case 'rock':
-                        window.addRock(entry.rockSize || 'large', entry);
-                        break;
-                    case 'tumbleweed':
-                        hasLegacyTumbleweeds = true;
-                        break;
-                    case 'cact':
-                        window.addCact(entry);
-                        break;
-                    case 'human':
-                        window.addHuman(entry);
-                        break;
-                    default:
-                        console.warn('Tipo de objeto não suportado no JSON:', entry.type);
+                if (Array.isArray(data.terrainTextureSlots)) {
+                    data.terrainTextureSlots.slice(0, terrainTextureSlots.length).forEach((slot, index) => {
+                        if (slot && typeof slot.url === 'string') {
+                            terrainTextureSlots[index].url = slot.url;
+                        }
+                    });
                 }
+
+                if (isValidHexColor(data.terrainTintColor)) {
+                    applyTerrainTintColor(data.terrainTintColor);
+                } else if (isValidHexColor(data.terrainColor)) {
+                    applyTerrainTintColor(data.terrainColor);
+                } else {
+                    applyTerrainTintColor('#ffffff');
+                }
+
+                refreshTerrainTextureSlotUI();
+
+                if (typeof data.terrainActiveTextureSlotIndex === 'number') {
+                    applyTerrainTextureSlot(THREE.MathUtils.clamp(data.terrainActiveTextureSlotIndex, 0, terrainTextureSlots.length - 1));
+                } else if (typeof data.terrainTextureType === 'string') {
+                    window.setTerrainTexture(data.terrainTextureType);
+                } else {
+                    applyTerrainTextureSlot(0);
+                }
+
+                for (const entry of data.objects) {
+                    if (!entry?.type) continue;
+
+                    switch (entry.type) {
+                        case 'dino':
+                            window.addDino({ transform: entry, silent: true });
+                            break;
+                        case 'dino2':
+                            window.addDino2({ transform: entry, silent: true });
+                            break;
+                        case 'tree':
+                            window.addTree(entry);
+                            break;
+                        case 'grass':
+                            window.addGrass(entry);
+                            break;
+                        case 'bush':
+                            hasLegacyBushes = true;
+                            break;
+                        case 'rock':
+                            window.addRock(entry.rockSize || 'large', entry);
+                            break;
+                        case 'tumbleweed':
+                            hasLegacyTumbleweeds = true;
+                            break;
+                        case 'cact':
+                            window.addCact(entry);
+                            break;
+                        case 'human':
+                            window.addHuman(entry);
+                            break;
+                        default:
+                            console.warn('Tipo de objeto não suportado no JSON:', entry.type);
+                    }
+                }
+
+                if (typeof data.bushEffectEnabled === 'boolean') {
+                    setBushEffectEnabled(data.bushEffectEnabled);
+                } else {
+                    setBushEffectEnabled(hasLegacyBushes);
+                }
+
+                if (typeof data.grassEffectEnabled === 'boolean') {
+                    setGrassEffectEnabled(data.grassEffectEnabled);
+                }
+
+                if (typeof data.tumbleweedEffectEnabled === 'boolean') {
+                    setTumbleweedEffectEnabled(data.tumbleweedEffectEnabled);
+                } else {
+                    setTumbleweedEffectEnabled(hasLegacyTumbleweeds);
+                }
+            } finally {
+                isLoadingScenario = false;
             }
 
-            if (typeof data.bushEffectEnabled === 'boolean') {
-                setBushEffectEnabled(data.bushEffectEnabled);
-            } else {
-                setBushEffectEnabled(hasLegacyBushes);
-            }
-
-            if (typeof data.grassEffectEnabled === 'boolean') {
-                setGrassEffectEnabled(data.grassEffectEnabled);
-            }
-
-            if (typeof data.tumbleweedEffectEnabled === 'boolean') {
-                setTumbleweedEffectEnabled(data.tumbleweedEffectEnabled);
-            } else {
-                setTumbleweedEffectEnabled(hasLegacyTumbleweeds);
-            }
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
         }
 
-        window.toggleRockAccordion = function(header) {
+        window.toggleRockAccordion = function (header) {
             const body = document.getElementById('rockAccordion');
             const chevron = header.querySelector('.accordion-chevron');
             body.classList.toggle('open');
             chevron.classList.toggle('open');
         };
 
-        window.addRock = function(size, transform = null) {
+        window.addRock = function (size, transform = null) {
             const rock = createRock(size);
             if (transform) {
                 applyTransform(rock, transform);
@@ -1095,17 +1397,18 @@
             }
             rocks.push(rock);
             console.log('Pedra ' + size + ' adicionada!');
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
             return rock;
         };
 
-        window.addDino = function(options = {}) {
+        window.addDino = function (options = {}) {
             const { transform = null, silent = false } = options;
             if (!dinoData) {
                 dinoData = createDino();
                 if (transform) {
                     applyTransform(dinoData.model, transform);
                 } else {
-                    dinoData.model.position.y = 25;
+                    dinoData.model.position.y = 0;
                 }
                 applyShadowSettings(dinoData.model);
                 scene.add(dinoData.model);
@@ -1113,6 +1416,7 @@
                     snapObjectToTerrain(dinoData.model);
                 }
                 console.log("Dino adicionado!");
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
                 return dinoData.model;
             } else {
                 if (!silent) {
@@ -1122,7 +1426,32 @@
             }
         };
 
-        window.addTree = function(transform = null) {
+        window.addDino2 = function (options = {}) {
+            const { transform = null, silent = false } = options;
+            if (!dino2Data) {
+                dino2Data = createDino2();
+                if (transform) {
+                    applyTransform(dino2Data.model, transform);
+                } else {
+                    dino2Data.model.position.y = 0;
+                }
+                applyShadowSettings(dino2Data.model);
+                scene.add(dino2Data.model);
+                if (!transform) {
+                    snapObjectToTerrain(dino2Data.model);
+                }
+                console.log("Ankylosaurus adicionado!");
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
+                return dino2Data.model;
+            } else {
+                if (!silent) {
+                    alert("O Ankylosaurus já está na cena!");
+                }
+                return dino2Data.model;
+            }
+        };
+
+        window.addTree = function (transform = null) {
             const newTree = createTree();
             if (transform) {
                 applyTransform(newTree, transform);
@@ -1136,10 +1465,11 @@
             }
             trees.push(newTree);
             console.log("Árvore adicionada!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
             return newTree;
         };
 
-        window.addGrass = function(transform = null) {
+        window.addGrass = function (transform = null) {
             const newGrass = createForestGrass();
             if (transform) {
                 applyTransform(newGrass, transform);
@@ -1153,10 +1483,11 @@
             }
             grasses.push(newGrass);
             console.log("Ervinhas adicionadas!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
             return newGrass;
         };
 
-        window.addHuman = function(transform = null) {
+        window.addHuman = function (transform = null) {
             const newHuman = createHuman();
             if (transform) {
                 applyTransform(newHuman, transform);
@@ -1170,10 +1501,11 @@
             }
             humans.push(newHuman);
             console.log("Ser humano adicionado!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
             return newHuman;
         };
 
-        window.addCact = function(transform = null) {
+        window.addCact = function (transform = null) {
             const newCact = createCact();
             if (transform) {
                 applyTransform(newCact, transform);
@@ -1187,609 +1519,835 @@
             }
             cacts.push(newCact);
             console.log("Cacto adicionado!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
             return newCact;
         };
 
-function init() {
-    const container = document.getElementById('viewport');
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x3e7ab6);
+        function init() {
+            const container = document.getElementById('viewport');
+            scene = new THREE.Scene();
+            window.scene = scene;
+            scene.background = new THREE.Color(0x3e7ab6);
 
-    terrain = createTerrain();
-    terrain.position.y = 0;
-    terrain.receiveShadow = true;
-    scene.add(terrain);
-    terrainTextureCards[0] = document.getElementById('terrainTextureSlot0Card');
-    terrainTextureCards[1] = document.getElementById('terrainTextureSlot1Card');
-    terrainTextureCards[2] = document.getElementById('terrainTextureSlot2Card');
-    terrainTextureCards[3] = document.getElementById('terrainTextureSlot3Card');
-    terrainTextureButtons[0] = document.getElementById('terrainTextureSlot0Button');
-    terrainTextureButtons[1] = document.getElementById('terrainTextureSlot1Button');
-    terrainTextureButtons[2] = document.getElementById('terrainTextureSlot2Button');
-    terrainTextureButtons[3] = document.getElementById('terrainTextureSlot3Button');
-    const terrainTintInput = document.getElementById('terrainTintColor');
-    if (terrainTintInput) {
-        terrainTintInput.addEventListener('input', (event) => {
-            applyTerrainTintColor(event.target.value);
-        });
-    }
+            terrain = createTerrain();
+            terrain.position.y = 0;
+            terrain.receiveShadow = true;
+            scene.add(terrain);
+            terrainTextureCards[0] = document.getElementById('terrainTextureSlot0Card');
+            terrainTextureCards[1] = document.getElementById('terrainTextureSlot1Card');
+            terrainTextureCards[2] = document.getElementById('terrainTextureSlot2Card');
+            terrainTextureCards[3] = document.getElementById('terrainTextureSlot3Card');
+            terrainTextureButtons[0] = document.getElementById('terrainTextureSlot0Button');
+            terrainTextureButtons[1] = document.getElementById('terrainTextureSlot1Button');
+            terrainTextureButtons[2] = document.getElementById('terrainTextureSlot2Button');
+            terrainTextureButtons[3] = document.getElementById('terrainTextureSlot3Button');
+            const terrainTintInput = document.getElementById('terrainTintColor');
+            if (terrainTintInput) {
+                terrainTintInput.addEventListener('input', (event) => {
+                    applyTerrainTintColor(event.target.value);
+                });
+                terrainTintInput.addEventListener('change', () => {
+                    if (typeof autoSaveScenario === 'function') autoSaveScenario();
+                });
+            }
 
-    applyTerrainTintColor('#ffffff');
-    refreshTerrainTextureSlotUI();
-    applyTerrainTextureSlot(0);
+            applyTerrainTintColor('#ffffff');
+            refreshTerrainTextureSlotUI();
+            applyTerrainTextureSlot(0);
 
-    // --- CAMERA ---
-     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 5000);
-    camera.position.z = 300;
-    camera.lookAt(scene.position);
-    
-    scene.add(camera); 
+            // --- CAMERA ---
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 5000);
+            camera.position.set(420, 260, 420);
+            camera.lookAt(0, 40, 0);
+            camera.updateProjectionMatrix();
 
-    // --- LIGHTING ---
-    // Sol: DirectionalLight simula raios paralelos vindos de longe
-    const sunLight = new THREE.DirectionalLight(0xfff4e0, 2.5);
-    const sunLightOffset = new THREE.Vector3(600, 800, 400);
-    const shadowFocusPoint = new THREE.Vector3(0, 0, 0);
-    const shadowFrustumHalfSize = 550;
+            scene.add(camera);
 
-    sunLight.position.copy(sunLightOffset);
-    sunLight.target.position.set(0, 0, 0);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width  = 4096;
-    sunLight.shadow.mapSize.height = 4096;
-    sunLight.shadow.camera.near = 40;
-    sunLight.shadow.camera.far  = 2600;
-    // Frustum suficientemente grande para não cortar, mas ainda com bom detalhe.
-    sunLight.shadow.camera.left   = -shadowFrustumHalfSize;
-    sunLight.shadow.camera.right  =  shadowFrustumHalfSize;
-    sunLight.shadow.camera.top    =  shadowFrustumHalfSize;
-    sunLight.shadow.camera.bottom = -shadowFrustumHalfSize;
-    // Bias afinado para reduzir acne sem criar efeito de flutuação de sombra.
-    sunLight.shadow.bias = -0.00003;
-    sunLight.shadow.normalBias = 0.008;
-    sunLight.shadow.radius = 2;
-    scene.add(sunLight);
-    scene.add(sunLight.target);
+            // --- LIGHTING ---
+            // Sol: DirectionalLight simula raios paralelos vindos de longe
+            const sunLight = new THREE.DirectionalLight(0xfff4e0, 2.5);
+            const sunLightOffset = new THREE.Vector3(600, 800, 400);
+            const shadowFocusPoint = new THREE.Vector3(0, 0, 0);
+            const shadowFrustumHalfSize = 550;
 
-    // Luz ambiente suave para que as zonas de sombra não fiquem completamente escuras
-    const ambientLight = new THREE.AmbientLight(0x88aacc, 0.8);
-    scene.add(ambientLight);
+            sunLight.position.copy(sunLightOffset);
+            sunLight.target.position.set(0, 0, 0);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 4096;
+            sunLight.shadow.mapSize.height = 4096;
+            sunLight.shadow.camera.near = 40;
+            sunLight.shadow.camera.far = 2600;
+            // Frustum suficientemente grande para não cortar, mas ainda com bom detalhe.
+            sunLight.shadow.camera.left = -shadowFrustumHalfSize;
+            sunLight.shadow.camera.right = shadowFrustumHalfSize;
+            sunLight.shadow.camera.top = shadowFrustumHalfSize;
+            sunLight.shadow.camera.bottom = -shadowFrustumHalfSize;
+            // Bias afinado para reduzir acne sem criar efeito de flutuação de sombra.
+            sunLight.shadow.bias = -0.00003;
+            sunLight.shadow.normalBias = 0.008;
+            sunLight.shadow.radius = 2;
+            scene.add(sunLight);
+            scene.add(sunLight.target);
 
-    // --- RENDERER ---
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    container.appendChild(renderer.domElement);
+            // Luz ambiente suave para que as zonas de sombra não fiquem completamente escuras
+            const ambientLight = new THREE.AmbientLight(0x88aacc, 0.8);
+            scene.add(ambientLight);
 
-    // --- VARIÁVEIS DE CONTROLO ---
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const sidebar = document.getElementById('sidebar');
-    const humanControlButton = document.getElementById('humanControlButton');
-    let selectedObject = null;
-    let lastPickedObject = null;
-    let isDragging = false;
-    let movementSpeed = 1.0;
-    let deleteMode = false;
-    let humanControlMode = false;
-    let controlledHuman = null;
-    let humanVerticalVelocity = 0;
-    let humanCanJump = false;
-    let humanYaw = Math.PI;
-    let humanPitch = 0;
+            // --- RENDERER ---
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.domElement.tabIndex = 0;
+            renderer.domElement.style.outline = 'none'; // remove o anel de foco visual
+            container.appendChild(renderer.domElement);
 
-    const humanMoveState = {
-        forward: false,
-        backward: false,
-        left: false,
-        right: false,
-    };
+            // --- VARIÁVEIS DE CONTROLO ---
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            const sidebar = document.getElementById('sidebar');
+            const humanControlButton = document.getElementById('humanControlButton');
+            let selectedObject = null;
+            let lastPickedObject = null;
+            let selectionBox = null;
+            let selectionOutline = null;
 
-    const humanControlSettings = {
-        speed: 120,
-        jumpSpeed: 48,
-        gravity: 120,
-        mouseSensitivity: 0.0022,
-        maxPitch: Math.PI / 2 - 0.1,
-        cameraForwardOffset: 4.5,
-    };
+            const humanMoveState = {
+                forward: false,
+                backward: false,
+                left: false,
+                right: false,
+            };
 
-    const humanGroundRay = new THREE.Raycaster();
-    const humanForward = new THREE.Vector3();
-    const humanRight = new THREE.Vector3();
-    const humanMoveVector = new THREE.Vector3();
-    const humanEyePosition = new THREE.Vector3();
-    const humanLookDirection = new THREE.Vector3();
-    const humanLookTarget = new THREE.Vector3();
-    const cameraDirection = new THREE.Vector3();
+            const humanControlSettings = {
+                speed: 250,        // terreno 3000x3000 — velocidade proporcional
+                jumpSpeed: 400,
+                gravity: 700,
+                mouseSensitivity: 0.0022,
+                maxPitch: Math.PI / 2 - 0.1,
+                cameraForwardOffset: 4.5,
+            };
 
-    // Plano horizontal usado durante o drag (actualizado para a altura do objecto)
-    const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const intersectionPoint = new THREE.Vector3();
+            const humanGroundRay = new THREE.Raycaster();
+            const humanForward = new THREE.Vector3();
+            const humanRight = new THREE.Vector3();
+            const humanMoveVector = new THREE.Vector3();
+            const humanEyePosition = new THREE.Vector3();
+            const humanLookDirection = new THREE.Vector3();
+            const humanLookTarget = new THREE.Vector3();
+            const cameraDirection = new THREE.Vector3();
 
-    // Helper: calcula coordenadas NDC correctas relativas ao canvas do renderer
-    function getMouseNDC(event) {
-        const rect = renderer.domElement.getBoundingClientRect();
-        mouse.x =  ((event.clientX - rect.left) / rect.width)  * 2 - 1;
-        mouse.y = -((event.clientY - rect.top)  / rect.height) * 2 + 1;
-    }
+            // Plano horizontal usado durante o drag (actualizado para a altura do objecto)
+            const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+            const intersectionPoint = new THREE.Vector3();
 
-    const deleteModeButton = document.getElementById('deleteModeButton');
-    bushToggleButton = document.getElementById('bushToggleButton');
-    grassToggleButton = document.getElementById('grassToggleButton');
-    tumbleweedToggleButton = document.getElementById('tumbleweedToggleButton');
+            // Helper: calcula coordenadas NDC correctas relativas ao canvas do renderer
+            function getMouseNDC(event) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            }
 
-    function updateDeleteModeButton() {
-        deleteModeButton.textContent = `Modo Apagar: ${deleteMode ? 'ON' : 'OFF'}`;
-        deleteModeButton.classList.toggle('active', deleteMode);
-    }
+            const deleteModeButton = document.getElementById('deleteModeButton');
+            bushToggleButton = document.getElementById('bushToggleButton');
+            grassToggleButton = document.getElementById('grassToggleButton');
+            tumbleweedToggleButton = document.getElementById('tumbleweedToggleButton');
 
-    deleteModeButton.addEventListener('click', () => {
-        deleteMode = !deleteMode;
-        updateDeleteModeButton();
-    });
+            // --- LÓGICA DO MENU DE CONTEXTO FLUTUANTE ---
+            const contextMenu = document.getElementById('contextMenu');
+            const contextTitle = document.getElementById('contextTitle');
+            const ctxScaleSlider = document.getElementById('ctxScaleSlider');
+            const ctxRotationSlider = document.getElementById('ctxRotationSlider');
+            const ctxScaleValue = document.getElementById('ctxScaleValue');
+            const ctxRotationValue = document.getElementById('ctxRotationValue');
+            const ctxCloseBtn = document.getElementById('ctxCloseBtn');
+            let contextTargetObject = null;
 
-    bushToggleButton.addEventListener('click', () => {
-        setBushEffectEnabled(!bushEffectEnabled);
-    });
+            function syncContextRotationControls(object) {
+                if (contextTargetObject !== object || contextMenu.style.display !== 'block') return;
 
-    grassToggleButton.addEventListener('click', () => {
-        setGrassEffectEnabled(!grassEffectEnabled);
-    });
+                let currentRotDeg = THREE.MathUtils.radToDeg(object.rotation.y) % 360;
+                if (currentRotDeg < 0) currentRotDeg += 360;
+                ctxRotationSlider.value = currentRotDeg;
+                ctxRotationValue.textContent = Math.round(currentRotDeg);
+            }
 
-    tumbleweedToggleButton.addEventListener('click', () => {
-        setTumbleweedEffectEnabled(!tumbleweedEffectEnabled);
-    });
+            function scaleObjectPreservingBottom(object3D, applyScale, options = {}) {
+                if (!object3D || typeof applyScale !== 'function') return;
 
-    updateDeleteModeButton();
-    updateBushToggleButton();
-    updateGrassToggleButton();
-    updateTumbleweedToggleButton();
+                const currentBottomY = getObjectBottomY(object3D);
+                applyScale(object3D);
 
-    function resizeViewport() {
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
-    }
+                if (currentBottomY !== null) {
+                    alignObjectBottomToWorldY(object3D, currentBottomY);
+                }
 
-    function scheduleViewportResize() {
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                resizeViewport();
+                if (options.updateDragPlane) {
+                    dragPlane.constant = -object3D.position.y;
+                }
+            }
+
+            window.clearPickedObject = () => {
+                lastPickedObject = null;
+                contextTargetObject = null;
+                if (contextMenu) contextMenu.style.display = 'none';
+            };
+
+            // Detetar o Botão Direito do Rato (contextmenu)
+            renderer.domElement.addEventListener('contextmenu', (event) => {
+                event.preventDefault(); // Impede o menu do browser de aparecer
             });
-        });
-    }
 
-    function setHumanControlButtonLabel() {
-        humanControlButton.textContent = humanControlMode
-            ? 'Sair do Humano (Esc / F)'
-            : 'Entrar no Humano (F)';
-    }
+            ctxScaleSlider.addEventListener('input', (e) => {
+                if (!contextTargetObject) return;
+                const val = parseFloat(e.target.value);
+                const isScalingDraggedObject = isDragging && selectedObject === contextTargetObject;
+                scaleObjectPreservingBottom(contextTargetObject, (object3D) => {
+                    object3D.scale.set(val, val, val);
+                }, {
+                    updateDragPlane: isScalingDraggedObject
+                });
+                if (!isScalingDraggedObject) {
+                    snapObjectToTerrain(contextTargetObject);
+                }
+                ctxScaleValue.textContent = val.toFixed(1);
+            });
 
-    function getSceneRootObject(object) {
-        let root = object;
-        while (root.parent && root.parent !== scene) {
-            root = root.parent;
-        }
-        return root;
-    }
+            ctxRotationSlider.addEventListener('input', (e) => {
+                if (!contextTargetObject) return;
+                const val = parseFloat(e.target.value);
+                contextTargetObject.rotation.y = THREE.MathUtils.degToRad(val);
+                ctxRotationValue.textContent = Math.round(val);
+            });
 
-    function getInteractiveObjectFromIntersections(intersections) {
-        for (const hit of intersections) {
-            const rootObject = getSceneRootObject(hit.object);
-            if (rootObject === terrain) continue;
-            if (rootObject.userData?.draggable === false) continue;
-            if (rootObject.userData?.ignoreSceneTools) continue;
-            return rootObject;
-        }
-        return null;
-    }
+            ctxScaleSlider.addEventListener('change', () => {
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            });
 
-    function resetHumanMoveState() {
-        humanMoveState.forward = false;
-        humanMoveState.backward = false;
-        humanMoveState.left = false;
-        humanMoveState.right = false;
-    }
+            ctxRotationSlider.addEventListener('change', () => {
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            });
 
-    function getHumanForControl() {
-        if (lastPickedObject && lastPickedObject.name === 'Human') {
-            return lastPickedObject;
-        }
-        if (humans.length > 0) {
-            return humans[humans.length - 1];
-        }
-        return null;
-    }
+            ctxCloseBtn.addEventListener('click', () => {
+                contextMenu.style.display = 'none';
+                contextTargetObject = null;
+            });
 
-    function enterHumanControlMode(targetHuman = null) {
-        const human = targetHuman || getHumanForControl();
-        if (!human) {
-            alert('Adiciona e seleciona um ser humano para entrar no modo de controlo.');
-            return;
-        }
+            function updateDeleteModeButton() {
+                deleteModeButton.textContent = `Modo Apagar: ${deleteMode ? 'ON' : 'OFF'}`;
+                deleteModeButton.classList.toggle('active', deleteMode);
+            }
 
-        controlledHuman = human;
-        humanControlMode = true;
-        deleteMode = false;
-        updateDeleteModeButton();
+            deleteModeButton.addEventListener('click', () => {
+                deleteMode = !deleteMode;
+                updateDeleteModeButton();
+            });
 
-        if (isDragging) {
-            isDragging = false;
-            selectedObject = null;
-        }
+            bushToggleButton.addEventListener('click', () => {
+                setBushEffectEnabled(!bushEffectEnabled);
+            });
 
-        controls.enabled = false;
-        movementSpeed = 1.0;
-        snapObjectToTerrain(controlledHuman);
+            grassToggleButton.addEventListener('click', () => {
+                setGrassEffectEnabled(!grassEffectEnabled);
+            });
 
-        const humanBounds = new THREE.Box3().setFromObject(controlledHuman);
-        const height = Math.max(10, humanBounds.max.y - humanBounds.min.y);
-        controlledHuman.userData.eyeHeight = height * 0.72;
+            tumbleweedToggleButton.addEventListener('click', () => {
+                setTumbleweedEffectEnabled(!tumbleweedEffectEnabled);
+            });
 
-        camera.getWorldDirection(cameraDirection);
-        humanYaw = Math.atan2(cameraDirection.x, cameraDirection.z);
-        humanPitch = THREE.MathUtils.clamp(
-            Math.asin(THREE.MathUtils.clamp(cameraDirection.y, -0.95, 0.95)),
-            -humanControlSettings.maxPitch,
-            humanControlSettings.maxPitch
-        );
+            updateDeleteModeButton();
+            updateBushToggleButton();
+            updateGrassToggleButton();
+            updateTumbleweedToggleButton();
 
-        humanVerticalVelocity = 0;
-        humanCanJump = true;
-        sidebar.classList.add('hidden');
-        setHumanControlButtonLabel();
-        scheduleViewportResize();
+            // Botão de limpar cenário
+            const clearSceneButton = document.getElementById('clearSceneButton');
+            if (clearSceneButton) {
+                clearSceneButton.addEventListener('click', () => {
+                    if (confirm('Tem certeza que deseja limpar todo o cenário?')) {
+                        clearScenarioObjects();
+                    }
+                });
+            }
 
-        if (renderer.domElement.requestPointerLock) {
-            renderer.domElement.requestPointerLock();
-        }
-    }
+            function resizeViewport() {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
 
-    function exitHumanControlMode() {
-        if (!humanControlMode) return;
+            function scheduleViewportResize() {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        resizeViewport();
+                    });
+                });
+            }
 
-        humanControlMode = false;
-        resetHumanMoveState();
-        humanVerticalVelocity = 0;
-        humanCanJump = false;
+            function setHumanControlButtonLabel() {
+                humanControlButton.textContent = humanControlMode
+                    ? 'Sair do Humano (Esc / F)'
+                    : 'Entrar no Humano (F)';
+            }
 
-        if (document.pointerLockElement === renderer.domElement && document.exitPointerLock) {
-            document.exitPointerLock();
-        }
+            function getSceneRootObject(object) {
+                let root = object;
+                while (root.parent && root.parent !== scene) {
+                    root = root.parent;
+                }
+                return root;
+            }
 
-        sidebar.classList.remove('hidden');
-        setHumanControlButtonLabel();
-        scheduleViewportResize();
+            function getInteractiveObjectFromIntersections(intersections) {
+                for (const hit of intersections) {
+                    const rootObject = getSceneRootObject(hit.object);
+                    if (rootObject === terrain) continue;
+                    if (rootObject.userData?.draggable === false) continue;
+                    if (rootObject.userData?.ignoreSceneTools) continue;
+                    return rootObject;
+                }
+                return null;
+            }
 
-        if (controlledHuman) {
-            controls.target.copy(controlledHuman.position);
-            camera.position.set(
-                controlledHuman.position.x + 90,
-                controlledHuman.position.y + 60,
-                controlledHuman.position.z + 90
-            );
-        }
+            function resetHumanMoveState() {
+                humanMoveState.forward = false;
+                humanMoveState.backward = false;
+                humanMoveState.left = false;
+                humanMoveState.right = false;
+            }
 
-        controls.enabled = true;
-        controls.update();
-        updateSunShadowFocus();
-        controlledHuman = null;
-    }
+            function getHumanForControl() {
+                if (lastPickedObject && lastPickedObject.name === 'Human') {
+                    return lastPickedObject;
+                }
+                if (humans.length > 0) {
+                    return humans[humans.length - 1];
+                }
+                return null;
+            }
 
-    function updateHumanControl(deltaTime) {
-        if (!humanControlMode || !controlledHuman) return;
+            function enterHumanControlMode(targetHuman = null) {
+                const human = targetHuman || getHumanForControl();
+                if (!human) {
+                    alert('Adiciona e seleciona um ser humano para entrar no modo de controlo.');
+                    return;
+                }
 
-        humanForward.set(Math.sin(humanYaw), 0, Math.cos(humanYaw));
-        humanRight.set(humanForward.z, 0, -humanForward.x);
+                console.log('Entrando no modo humano, humano:', human);
+                controlledHuman = human;
+                humanControlMode = true;
+                deleteMode = false;
+                updateDeleteModeButton();
 
-        humanMoveVector.set(0, 0, 0);
-        if (humanMoveState.forward) humanMoveVector.add(humanForward);
-        if (humanMoveState.backward) humanMoveVector.sub(humanForward);
-        if (humanMoveState.left) humanMoveVector.sub(humanRight);
-        if (humanMoveState.right) humanMoveVector.add(humanRight);
+                if (isDragging) {
+                    isDragging = false;
+                    selectedObject = null;
+                }
 
-        if (humanMoveVector.lengthSq() > 0) {
-            humanMoveVector.normalize().multiplyScalar(humanControlSettings.speed * deltaTime);
-            controlledHuman.position.add(humanMoveVector);
-            controlledHuman.rotation.y = Math.atan2(humanForward.x, humanForward.z);
-        }
+                window.clearPickedObject();
 
-        humanVerticalVelocity -= humanControlSettings.gravity * deltaTime;
-        controlledHuman.position.y += humanVerticalVelocity * deltaTime;
+                controls.enabled = false;
+                movementSpeed = 1.0;
+                snapObjectToTerrain(controlledHuman);
 
-        humanGroundRay.set(
-            new THREE.Vector3(controlledHuman.position.x, 500, controlledHuman.position.z),
-            new THREE.Vector3(0, -1, 0)
-        );
-        const groundHit = humanGroundRay.intersectObject(terrain);
-        if (groundHit.length > 0) {
-            const groundY = groundHit[0].point.y + getPlacementClearance(controlledHuman);
-            if (controlledHuman.position.y <= groundY) {
-                controlledHuman.position.y = groundY;
+                camera.getWorldDirection(cameraDirection);
+                humanYaw = Math.atan2(cameraDirection.x, cameraDirection.z);
+                humanPitch = THREE.MathUtils.clamp(
+                    Math.asin(THREE.MathUtils.clamp(cameraDirection.y, -0.95, 0.95)),
+                    -humanControlSettings.maxPitch,
+                    humanControlSettings.maxPitch
+                );
+
+                humanForward.set(Math.sin(humanYaw), 0, Math.cos(humanYaw));
+                getHumanCameraEyeWorldPosition(controlledHuman, humanEyePosition);
+
+                // Aumentar o offset para frente para evitar clipping dentro do modelo
+                const initialOffset = getHumanCameraForwardOffset(controlledHuman) + 1.0;
+                camera.position.copy(humanEyePosition).addScaledVector(
+                    humanForward,
+                    initialOffset
+                );
+
+                // Apontar a câmera para a direção correta
+                humanLookDirection.set(
+                    Math.sin(humanYaw) * Math.cos(humanPitch),
+                    Math.sin(humanPitch),
+                    Math.cos(humanYaw) * Math.cos(humanPitch)
+                );
+                humanLookTarget.copy(camera.position).add(humanLookDirection);
+                camera.lookAt(humanLookTarget);
+
                 humanVerticalVelocity = 0;
                 humanCanJump = true;
-            } else {
+                sidebar.classList.add('hidden');
+                setHumanControlButtonLabel();
+                scheduleViewportResize();
+
+                // Retirar foco de qualquer elemento HTML (ex: botão que foi clicado)
+                // para garantir que os eventos de teclado chegam ao listener do window.
+                if (document.activeElement && document.activeElement !== document.body) {
+                    document.activeElement.blur();
+                }
+                renderer.domElement.focus();
+
+                if (renderer.domElement.requestPointerLock) {
+                    renderer.domElement.requestPointerLock();
+                }
+            }
+
+            function exitHumanControlMode() {
+                if (!humanControlMode) return;
+
+                console.log('Saindo do modo humano');
+                humanControlMode = false;
+                resetHumanMoveState();
+                humanVerticalVelocity = 0;
                 humanCanJump = false;
-            }
-        }
 
-        const eyeHeight = controlledHuman.userData.eyeHeight ?? 24;
-        humanEyePosition.set(
-            controlledHuman.position.x,
-            controlledHuman.position.y + eyeHeight,
-            controlledHuman.position.z
-        );
-        const faceOffset = humanControlSettings.cameraForwardOffset;
-        camera.position.set(
-            humanEyePosition.x + humanForward.x * faceOffset,
-            humanEyePosition.y,
-            humanEyePosition.z + humanForward.z * faceOffset
-        );
-
-        humanLookDirection.set(
-            Math.sin(humanYaw) * Math.cos(humanPitch),
-            Math.sin(humanPitch),
-            Math.cos(humanYaw) * Math.cos(humanPitch)
-        );
-        humanLookTarget.copy(humanEyePosition).add(humanLookDirection);
-        camera.lookAt(humanLookTarget);
-    }
-
-    humanControlButton.addEventListener('click', () => {
-        if (humanControlMode) {
-            exitHumanControlMode();
-        } else {
-            enterHumanControlMode();
-        }
-    });
-
-    setHumanControlButtonLabel();
-
-    renderer.domElement.addEventListener('mousedown', (event) => {
-        if (humanControlMode) return;
-
-        getMouseNDC(event);
-        raycaster.setFromCamera(mouse, camera);
-
-        // Verificamos todos os objectos da cena
-        const intersects = raycaster.intersectObjects(scene.children, true);
-        const object = getInteractiveObjectFromIntersections(intersects);
-        if (!object) return;
-
-        lastPickedObject = object;
-
-        if (deleteMode) {
-            const removed = removeScenarioObject(object);
-            if (removed) {
-                console.log('Objeto removido do cenário.');
-            }
-            return;
-        }
-
-        selectedObject = object;
-        isDragging = true;
-        movementSpeed = 4.0;
-        controls.enabled = false;
-
-        // Levantar ligeiramente o objecto ao pegá-lo
-        selectedObject.position.y += 30;
-        dragPlane.constant = -selectedObject.position.y;
-    });
-
-    window.addEventListener('mousemove', (event) => {
-        if (humanControlMode) return;
-        if (!isDragging || !selectedObject) return;
-
-        getMouseNDC(event);
-        raycaster.setFromCamera(mouse, camera);
-
-        // Intersetar o plano horizontal fixo — nunca falha independentemente do ângulo
-        if (raycaster.ray.intersectPlane(dragPlane, intersectionPoint)) {
-            selectedObject.position.x = intersectionPoint.x;
-            selectedObject.position.z = intersectionPoint.z;
-            // Y mantém-se fixo (o plano está à altura do objecto)
-        }
-    });
-
-    window.addEventListener('mouseup', () => {
-        if (humanControlMode) return;
-
-        if (isDragging && selectedObject) {
-            // Ao largar, encaixar o objecto no terreno
-            snapObjectToTerrain(selectedObject);
-            if (selectedObject.name === 'Tumbleweed') {
-                selectedObject.userData.jumpHeight = 0;
-                selectedObject.userData.jumpVelocity = 0;
-                selectedObject.userData.nextJumpAt = Date.now() + 1000 + Math.random() * 2500;
-            }
-            // Actualizar o plano para a próxima vez
-            dragPlane.constant = -selectedObject.position.y;
-        }
-        isDragging = false;
-        selectedObject = null;
-        movementSpeed = 1.0;
-        controls.enabled = true;
-    });
-
-    window.addEventListener('wheel', (event) => {
-        if (!selectedObject) return;
-        // Roda para a esquerda/direita consoante o scroll
-        const delta = event.deltaY > 0 ? 0.2 : -0.2;
-        selectedObject.rotation.y += delta;
-    });
-
-    window.addEventListener('keydown', (event) => {
-        if (humanControlMode) return;
-
-        const isDeleteKey = event.key === 'Delete' || event.key === 'Backspace';
-        if (!isDeleteKey) return;
-
-        if (isDragging) return;
-        if (!lastPickedObject) return;
-
-        const removed = removeScenarioObject(lastPickedObject);
-        if (removed) {
-            console.log('Objeto removido por teclado.');
-            lastPickedObject = null;
-        }
-    });
-
-    window.addEventListener('mousemove', (event) => {
-        if (!humanControlMode) return;
-        if (document.pointerLockElement !== renderer.domElement) return;
-
-        humanYaw -= event.movementX * humanControlSettings.mouseSensitivity;
-        humanPitch -= event.movementY * humanControlSettings.mouseSensitivity;
-        humanPitch = THREE.MathUtils.clamp(
-            humanPitch,
-            -humanControlSettings.maxPitch,
-            humanControlSettings.maxPitch
-        );
-    });
-
-    window.addEventListener('keydown', (event) => {
-        if (event.code === 'KeyF') {
-            if (humanControlMode) {
-                exitHumanControlMode();
-            } else {
-                enterHumanControlMode();
-            }
-            event.preventDefault();
-            return;
-        }
-
-        if (event.code === 'Escape' && humanControlMode) {
-            exitHumanControlMode();
-            event.preventDefault();
-            return;
-        }
-
-        if (!humanControlMode) return;
-
-        switch (event.code) {
-            case 'KeyW': humanMoveState.backward = true; event.preventDefault(); break;
-            case 'KeyS': humanMoveState.forward = true; event.preventDefault(); break;
-            case 'KeyA': humanMoveState.left = true; event.preventDefault(); break;
-            case 'KeyD': humanMoveState.right = true; event.preventDefault(); break;
-            case 'Space':
-                if (humanCanJump) {
-                    humanVerticalVelocity = humanControlSettings.jumpSpeed;
-                    humanCanJump = false;
+                if (document.pointerLockElement === renderer.domElement && document.exitPointerLock) {
+                    document.exitPointerLock();
                 }
+
+                sidebar.classList.remove('hidden');
+                setHumanControlButtonLabel();
+                scheduleViewportResize();
+
+                if (controlledHuman) {
+                    controls.target.copy(controlledHuman.position);
+                    camera.position.set(
+                        controlledHuman.position.x + 90,
+                        controlledHuman.position.y + 60,
+                        controlledHuman.position.z + 90
+                    );
+                }
+
+                controls.enabled = true;
+                controls.update();
+                updateSunShadowFocus();
+                controlledHuman = null;
+            }
+
+            function updateHumanControl(deltaTime) {
+                if (!humanControlMode || !controlledHuman) {
+                    return;
+                }
+
+                if (deltaTime === undefined || deltaTime === null) {
+                    console.warn('deltaTime undefined!');
+                    return;
+                }
+
+                humanForward.set(Math.sin(humanYaw), 0, Math.cos(humanYaw));
+                humanRight.set(humanForward.z, 0, -humanForward.x);
+
+                humanMoveVector.set(0, 0, 0);
+                if (humanMoveState.forward) humanMoveVector.add(humanForward);
+                if (humanMoveState.backward) humanMoveVector.sub(humanForward);
+                if (humanMoveState.left) humanMoveVector.add(humanRight);
+                if (humanMoveState.right) humanMoveVector.sub(humanRight);
+
+
+                // Colisão com objetos (exceto grass, bush e tumbleweed)
+                if (humanMoveVector.lengthSq() > 0) {
+                    humanMoveVector.normalize().multiplyScalar(humanControlSettings.speed * deltaTime);
+                    let collision = false;
+                    // Checar colisão com árvores, pedras, cactos, humanos, dino
+                    const checkGroups = [trees, rocks, cacts, humans];
+                    if (dinoData?.model) checkGroups.push([dinoData.model]);
+                    if (dino2Data?.model) checkGroups.push([dino2Data.model]);
+                    for (const group of checkGroups) {
+                        for (const obj of group) {
+                            if (obj === controlledHuman) continue;
+                            if (!obj || obj.name === 'Grass' || obj.name === 'Bush' || obj.name === 'Tumbleweed') continue;
+
+                            // Só bloqueia se o humano NÃO está já a colidir com esse objecto.
+                            // Isto evita que ele fique preso num objecto grande onde começou (como o dino).
+                            const alreadyInside = objectsCollideByFootprint(controlledHuman, obj);
+                            if (!alreadyInside && objectsCollideByFootprint(controlledHuman, obj, humanMoveVector)) {
+                                collision = true;
+                                break;
+                            }
+                        }
+                        if (collision) break;
+                    }
+                    if (!collision) {
+                        controlledHuman.position.add(humanMoveVector);
+                        controlledHuman.rotation.y = Math.atan2(humanForward.x, humanForward.z);
+                    }
+                }
+
+                humanVerticalVelocity -= humanControlSettings.gravity * deltaTime;
+                controlledHuman.position.y += humanVerticalVelocity * deltaTime;
+
+                humanGroundRay.set(
+                    new THREE.Vector3(controlledHuman.position.x, 500, controlledHuman.position.z),
+                    new THREE.Vector3(0, -1, 0)
+                );
+                const groundHit = humanGroundRay.intersectObject(terrain);
+                if (groundHit.length > 0) {
+                    const groundY = groundHit[0].point.y + getPlacementClearance(controlledHuman);
+                    if (controlledHuman.position.y <= groundY) {
+                        controlledHuman.position.y = groundY;
+                        humanVerticalVelocity = 0;
+                        humanCanJump = true;
+                    } else {
+                        humanCanJump = false;
+                    }
+                }
+
+                getHumanCameraEyeWorldPosition(controlledHuman, humanEyePosition);
+                const faceOffset = getHumanCameraForwardOffset(controlledHuman) + 1.0;
+                camera.position.copy(humanEyePosition).addScaledVector(humanForward, faceOffset);
+
+                humanLookDirection.set(
+                    Math.sin(humanYaw) * Math.cos(humanPitch),
+                    Math.sin(humanPitch),
+                    Math.cos(humanYaw) * Math.cos(humanPitch)
+                );
+                humanLookTarget.copy(camera.position).add(humanLookDirection);
+                camera.lookAt(humanLookTarget);
+            }
+
+            humanControlButton.addEventListener('click', () => {
+                if (humanControlMode) {
+                    exitHumanControlMode();
+                } else {
+                    enterHumanControlMode();
+                }
+            });
+
+            setHumanControlButtonLabel();
+
+            renderer.domElement.addEventListener('mousedown', (event) => {
+                if (humanControlMode) return;
+
+                if (event.button === 0) {
+                    if (contextMenu) contextMenu.style.display = 'none';
+                }
+
+                getMouseNDC(event);
+                raycaster.setFromCamera(mouse, camera);
+
+                // Verificamos todos os objectos da cena
+                const intersects = raycaster.intersectObjects(scene.children, true);
+                const object = getInteractiveObjectFromIntersections(intersects);
+
+                if (!object) {
+                    if (event.button === 2) lastPickedObject = null;
+                    return;
+                }
+
+                if (event.button === 2) {
+                    lastPickedObject = object;
+
+                    if (deleteMode) {
+                        const removed = removeScenarioObject(object);
+                        if (removed) {
+                            console.log('Objeto removido do cenário.');
+                            if (lastPickedObject === object) {
+                                window.clearPickedObject();
+                            }
+                        }
+                        return;
+                    }
+
+                    selectedObject = object;
+                    isDragging = true;
+                    movementSpeed = 4.0;
+                    controls.enabled = false;
+
+                    // Levantar ligeiramente o objecto ao pegá-lo
+                    selectedObject.position.y += 30;
+                    dragPlane.constant = -selectedObject.position.y;
+
+                    // Remover outline anterior se existe
+                    if (selectionOutline) {
+                        selectionOutline.traverse((child) => {
+                            if (child.userData.isOutline) {
+                                child.parent?.remove(child);
+                            }
+                        });
+                    }
+
+                    // Criar novo outline baseado no modelo selecionado
+                    selectionOutline = new THREE.Group();
+                    selectionOutline.userData.isSelectionOutline = true;
+                    selectedObject.traverse((child) => {
+                        if (child.isMesh) {
+                            const outline = createModelOutline(child);
+                            if (outline) {
+                                outline.userData.isOutline = true;
+                                // Adicionar como filho do child (mesh) para herdar transformações
+                                child.add(outline);
+                            }
+                        }
+                    });
+                    selectionOutline.visible = true;
+                    if (selectionBox) selectionBox.visible = false;
+                }
+            });
+
+            window.addEventListener('mousemove', (event) => {
+                if (humanControlMode) return;
+                if (!isDragging || !selectedObject) return;
+
+                getMouseNDC(event);
+                raycaster.setFromCamera(mouse, camera);
+
+                // Intersetar o plano horizontal fixo
+                if (raycaster.ray.intersectPlane(dragPlane, intersectionPoint)) {
+                    selectedObject.position.x = intersectionPoint.x;
+                    selectedObject.position.z = intersectionPoint.z;
+                    if (selectionBox) selectionBox.update();
+                }
+            });
+
+            window.addEventListener('mouseup', (event) => {
+                if (humanControlMode) return;
+
+                if (isDragging && selectedObject && event.button === 2) {
+                    // Ao largar, encaixar o objecto no terreno
+                    snapObjectToTerrain(selectedObject);
+                    if (selectedObject.name === 'Tumbleweed') {
+                        selectedObject.userData.jumpHeight = 0;
+                        selectedObject.userData.jumpVelocity = 0;
+                        selectedObject.userData.nextJumpAt = Date.now() + 1000 + Math.random() * 2500;
+                    }
+                    dragPlane.constant = -selectedObject.position.y;
+                    if (selectionOutline) {
+                        // Remover os outlines
+                        selectedObject.traverse((child) => {
+                            if (child.isMesh) {
+                                for (let i = child.children.length - 1; i >= 0; i--) {
+                                    const subchild = child.children[i];
+                                    if (subchild.userData.isOutline) {
+                                        child.remove(subchild);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                isDragging = false;
+                selectedObject = null;
+                movementSpeed = 1.0;
+                controls.enabled = true;
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            });
+
+            window.addEventListener('wheel', (event) => {
+                if (humanControlMode) return;
+                if (!isDragging || !selectedObject) return;
+
+                const delta = event.deltaY > 0 ? 0.2 : -0.2;
+                selectedObject.rotation.y += delta;
+                syncContextRotationControls(selectedObject);
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
                 event.preventDefault();
-                break;
-        }
-    });
+            });
 
-    window.addEventListener('keyup', (event) => {
-        if (!humanControlMode) return;
+            window.addEventListener('keydown', (event) => {
+                if (humanControlMode) return;
 
-        switch (event.code) {
-            case 'KeyW': humanMoveState.backward = false; break;
-            case 'KeyS': humanMoveState.forward = false; break;
-            case 'KeyA': humanMoveState.left = false; break;
-            case 'KeyD': humanMoveState.right = false; break;
-        }
-    });
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-
-    function updateSunShadowFocus() {
-        if (humanControlMode && controlledHuman) {
-            shadowFocusPoint.copy(controlledHuman.position);
-        } else {
-            shadowFocusPoint.copy(controls.target);
-        }
-
-        shadowFocusPoint.y = 0;
-        sunLight.target.position.copy(shadowFocusPoint);
-        sunLight.position.copy(shadowFocusPoint).add(sunLightOffset);
-        sunLight.target.updateMatrixWorld();
-    }
-
-    const clock = new THREE.Clock();
-
-    function updateAmbientTumbleweeds(deltaTime) {
-        const bounds = getTerrainBounds();
-
-        for (let i = tumbleweeds.length - 1; i >= 0; i--) {
-            const tw = tumbleweeds[i];
-            const axis = tw.userData.rollAxis;
-            const speed = tw.userData.rollSpeed;
-            const wind = tw.userData.wind;
-
-            tw.rotateOnWorldAxis(axis, speed);
-            tw.position.x += wind.x;
-            tw.position.z += wind.y;
-
-            const origin = new THREE.Vector3(tw.position.x, 500, tw.position.z);
-            const downRay = new THREE.Raycaster(origin, new THREE.Vector3(0, -1, 0));
-            const hit = downRay.intersectObject(terrain);
-            if (hit.length > 0) {
-                const nowMs = Date.now();
-                const groundOffset = tw.userData.groundOffset ?? 0;
-
-                if (tw.userData.jumpHeight <= 0.0001 && nowMs >= (tw.userData.nextJumpAt ?? 0)) {
-                    const isBigJump = Math.random() < (tw.userData.bigJumpChance ?? 0.2);
-                    tw.userData.jumpVelocity = isBigJump
-                        ? (1.9 + Math.random() * 0.8)
-                        : (1.0 + Math.random() * 0.6);
-                    tw.userData.nextJumpAt = isBigJump
-                        ? (nowMs + 4200 + Math.random() * 6500)
-                        : (nowMs + 2500 + Math.random() * 5500);
+                // Controles de scale durante dragging
+                if (isDragging && selectedObject) {
+                    if (event.code === 'KeyW') {
+                        scaleObjectPreservingBottom(selectedObject, (object3D) => {
+                            object3D.scale.multiplyScalar(1.05);
+                        }, { updateDragPlane: true });
+                        event.preventDefault();
+                        return;
+                    }
+                    if (event.code === 'KeyS') {
+                        scaleObjectPreservingBottom(selectedObject, (object3D) => {
+                            object3D.scale.multiplyScalar(0.95);
+                        }, { updateDragPlane: true });
+                        event.preventDefault();
+                        return;
+                    }
+                    if (event.code === 'KeyA') {
+                        selectedObject.rotation.y -= 0.1;
+                        syncContextRotationControls(selectedObject);
+                        event.preventDefault();
+                        return;
+                    }
+                    if (event.code === 'KeyD') {
+                        selectedObject.rotation.y += 0.1;
+                        syncContextRotationControls(selectedObject);
+                        event.preventDefault();
+                        return;
+                    }
                 }
 
-                tw.userData.jumpVelocity -= (tw.userData.gravity ?? 0.08);
-                tw.userData.jumpHeight = Math.max(0, (tw.userData.jumpHeight ?? 0) + tw.userData.jumpVelocity);
+                const isDeleteKey = event.key === 'Delete' || event.key === 'Backspace';
+                if (!isDeleteKey) return;
 
-                if (tw.userData.jumpHeight === 0 && tw.userData.jumpVelocity < 0) {
-                    tw.userData.jumpVelocity = 0;
+                if (isDragging) return;
+                if (!lastPickedObject) return;
+
+                const removed = removeScenarioObject(lastPickedObject);
+                if (removed) {
+                    console.log('Objeto removido por teclado.');
+                    window.clearPickedObject();
+                }
+            });
+
+            window.addEventListener('mousemove', (event) => {
+                if (!humanControlMode) return;
+                if (document.pointerLockElement !== renderer.domElement) return;
+
+                humanYaw -= event.movementX * humanControlSettings.mouseSensitivity;
+                humanPitch -= event.movementY * humanControlSettings.mouseSensitivity;
+                humanPitch = THREE.MathUtils.clamp(
+                    humanPitch,
+                    -humanControlSettings.maxPitch,
+                    humanControlSettings.maxPitch
+                );
+            });
+
+            window.addEventListener('keydown', (event) => {
+                if (event.code === 'KeyF') {
+                    if (humanControlMode) {
+                        exitHumanControlMode();
+                    } else {
+                        enterHumanControlMode();
+                    }
+                    event.preventDefault();
+                    return;
                 }
 
-                tw.position.y = hit[0].point.y + groundOffset + tw.userData.jumpHeight;
-
-                const twBox = new THREE.Box3().setFromObject(tw);
-                const minAllowedY = hit[0].point.y + groundOffset;
-                if (twBox.min.y < minAllowedY) {
-                    tw.position.y += (minAllowedY - twBox.min.y);
+                if (event.code === 'Escape' && humanControlMode) {
+                    exitHumanControlMode();
+                    event.preventDefault();
+                    return;
                 }
+
+                if (!humanControlMode) return;
+
+                switch (event.code) {
+                    case 'KeyW': humanMoveState.forward = true; event.preventDefault(); break;
+                    case 'KeyS': humanMoveState.backward = true; event.preventDefault(); break;
+                    case 'KeyA': humanMoveState.left = true; event.preventDefault(); break;
+                    case 'KeyD': humanMoveState.right = true; event.preventDefault(); break;
+                    case 'Space':
+                        if (humanCanJump) {
+                            humanVerticalVelocity = humanControlSettings.jumpSpeed;
+                            humanCanJump = false;
+                        }
+                        event.preventDefault();
+                        break;
+                }
+            });
+
+            window.addEventListener('keyup', (event) => {
+                if (!humanControlMode) return;
+
+                switch (event.code) {
+                    case 'KeyW': humanMoveState.forward = false; break;
+                    case 'KeyS': humanMoveState.backward = false; break;
+                    case 'KeyA': humanMoveState.left = false; break;
+                    case 'KeyD': humanMoveState.right = false; break;
+                }
+            });
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.target.set(0, 40, 0);
+            controls.update();
+
+            function updateSunShadowFocus() {
+                if (humanControlMode && controlledHuman) {
+                    shadowFocusPoint.copy(controlledHuman.position);
+                } else {
+                    shadowFocusPoint.copy(controls.target);
+                }
+
+                shadowFocusPoint.y = 0;
+                sunLight.target.position.copy(shadowFocusPoint);
+                sunLight.position.copy(shadowFocusPoint).add(sunLightOffset);
+                sunLight.target.updateMatrixWorld();
             }
 
-            const flowStart = tw.userData.flowStart;
-            const flowDirection2D = tw.userData.flowDirection2D;
-            const despawnPadding = tw.userData.despawnPadding ?? 0;
-            const relativePosition = new THREE.Vector2(
-                tw.position.x - flowStart.x,
-                tw.position.z - flowStart.y
-            );
-            const distanceAlongPath = relativePosition.dot(flowDirection2D);
-            const isPastPath = distanceAlongPath > (tw.userData.pathLength ?? 0) + despawnPadding;
-            const isOutsideBounds = bounds && (
-                tw.position.x < bounds.min.x - despawnPadding ||
-                tw.position.x > bounds.max.x + despawnPadding ||
-                tw.position.z < bounds.min.z - despawnPadding ||
-                tw.position.z > bounds.max.z + despawnPadding
-            );
+            const clock = new THREE.Clock();
 
-            if (isPastPath || isOutsideBounds) {
-                scene.remove(tw);
-                tumbleweeds.splice(i, 1);
+            function updateAmbientTumbleweeds(deltaTime) {
+                const bounds = getTerrainBounds();
+
+                for (let i = tumbleweeds.length - 1; i >= 0; i--) {
+                    const tw = tumbleweeds[i];
+                    const axis = tw.userData.rollAxis;
+                    const speed = tw.userData.rollSpeed;
+                    const wind = tw.userData.wind;
+
+                    tw.rotateOnWorldAxis(axis, speed);
+                    tw.position.x += wind.x;
+                    tw.position.z += wind.y;
+
+                    const origin = new THREE.Vector3(tw.position.x, 500, tw.position.z);
+                    const downRay = new THREE.Raycaster(origin, new THREE.Vector3(0, -1, 0));
+                    const hit = downRay.intersectObject(terrain);
+                    if (hit.length > 0) {
+                        const nowMs = Date.now();
+                        const groundOffset = tw.userData.terrainSurfaceOffset ?? tw.userData.groundOffset ?? 0;
+
+                        if (tw.userData.jumpHeight <= 0.0001 && nowMs >= (tw.userData.nextJumpAt ?? 0)) {
+                            const isBigJump = Math.random() < (tw.userData.bigJumpChance ?? 0.2);
+                            tw.userData.jumpVelocity = isBigJump
+                                ? (1.9 + Math.random() * 0.8)
+                                : (1.0 + Math.random() * 0.6);
+                            tw.userData.nextJumpAt = isBigJump
+                                ? (nowMs + 4200 + Math.random() * 6500)
+                                : (nowMs + 2500 + Math.random() * 5500);
+                        }
+
+                        tw.userData.jumpVelocity -= (tw.userData.gravity ?? 0.08);
+                        tw.userData.jumpHeight = Math.max(0, (tw.userData.jumpHeight ?? 0) + tw.userData.jumpVelocity);
+
+                        if (tw.userData.jumpHeight === 0 && tw.userData.jumpVelocity < 0) {
+                            tw.userData.jumpVelocity = 0;
+                        }
+
+                        tw.position.y = hit[0].point.y + groundOffset + tw.userData.jumpHeight;
+
+                        const twBox = new THREE.Box3().setFromObject(tw);
+                        const minAllowedY = hit[0].point.y + groundOffset;
+                        if (twBox.min.y < minAllowedY) {
+                            tw.position.y += (minAllowedY - twBox.min.y);
+                        }
+                    }
+
+                    const flowStart = tw.userData.flowStart;
+                    const flowDirection2D = tw.userData.flowDirection2D;
+                    const despawnPadding = tw.userData.despawnPadding ?? 0;
+                    const relativePosition = new THREE.Vector2(
+                        tw.position.x - flowStart.x,
+                        tw.position.z - flowStart.y
+                    );
+                    const distanceAlongPath = relativePosition.dot(flowDirection2D);
+                    const isPastPath = distanceAlongPath > (tw.userData.pathLength ?? 0) + despawnPadding;
+                    const isOutsideBounds = bounds && (
+                        tw.position.x < bounds.min.x - despawnPadding ||
+                        tw.position.x > bounds.max.x + despawnPadding ||
+                        tw.position.z < bounds.min.z - despawnPadding ||
+                        tw.position.z > bounds.max.z + despawnPadding
+                    );
+
+                    if (isPastPath || isOutsideBounds) {
+                        scene.remove(tw);
+                        tumbleweeds.splice(i, 1);
+                    }
+                }
+
+                if (!tumbleweedEffectEnabled) return;
+
+                tumbleweedSpawnTimer -= deltaTime;
+                while (
+                    tumbleweeds.length < TUMBLEWEED_EFFECT_SETTINGS.maxActive &&
+                    tumbleweedSpawnTimer <= 0
+                ) {
+                    spawnAmbientTumbleweed();
+                    tumbleweedSpawnTimer += randomTumbleweedSpawnInterval();
+                }
             }
-        }
-
-        if (!tumbleweedEffectEnabled) return;
-
-        tumbleweedSpawnTimer -= deltaTime;
-        while (
-            tumbleweeds.length < TUMBLEWEED_EFFECT_SETTINGS.maxActive &&
-            tumbleweedSpawnTimer <= 0
-        ) {
-            spawnAmbientTumbleweed();
-            tumbleweedSpawnTimer += randomTumbleweedSpawnInterval();
-        }
-    }
 
             document.getElementById('downloadSceneJsonButton').addEventListener('click', () => {
                 const output = JSON.stringify(serializeScenario(), null, 2);
@@ -1827,139 +2385,203 @@ function init() {
                 reader.readAsText(file);
             });
 
-    // --- WINDOW RESIZING ---
-    window.addEventListener('resize', () => {
-        resizeViewport();
-    });
+            // --- WINDOW RESIZING ---
+            window.addEventListener('resize', () => {
+                resizeViewport();
+            });
 
-    renderer.render(scene, camera);
-
-    // --- ANIMATION LOOP ---
-    function animate() {
-        requestAnimationFrame(animate);
-
-        const deltaTime = Math.min(clock.getDelta(), 0.05);
-        updateHumanControl(deltaTime);
-        updateSunShadowFocus();
-
-        const time = Date.now() * 0.003;
-
-        if (dinoData) {
-            const p = dinoData.parts;
-
-            //Rugir
-            const breatheCycle = Math.sin(time * 0.5);
-            const breatheOffset = breatheCycle * 2;
-            const lookCycle = Math.sin(time * 0.3);
-
-            let roarFactor = Math.sin(time * 0.4) * 2; 
-            roarFactor = Math.max(0, Math.min(1, roarFactor));
-
-            p.grupoMandibula.rotation.z = roarFactor * 0.05;
-            p.grupoCabecaSuperior.rotation.z = -roarFactor * 0.1;
-
-            // Iris
-            let targetX = -75;
-            let targetZ1 = 21;
-            let targetZ2 = -21;
-
-            if (roarFactor > 0.5) {
-                targetX = -75 - 4;
-                targetZ1 = 21 - 1.5;
-                targetZ2 = -21 + 1.5;
+            // --- RESTORE AUTOSAVED SCENARIO ---
+            try {
+                const saved = localStorage.getItem('tabletop_autosave');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    loadScenario(data);
+                    console.log('Cenário auto-guardado restaurado.');
+                }
+            } catch (e) {
+                console.warn('Erro ao restaurar cenário auto-guardado:', e);
             }
 
-            p.iris.position.x = THREE.MathUtils.lerp(p.iris.position.x, targetX, 0.1);
-            p.iris.position.z = THREE.MathUtils.lerp(p.iris.position.z, targetZ1, 0.1);
+            isInitializing = false;
 
-            p.iris2.position.x = THREE.MathUtils.lerp(p.iris2.position.x, targetX, 0.1);
-            p.iris2.position.z = THREE.MathUtils.lerp(p.iris2.position.z, targetZ2, 0.1);
+            renderer.render(scene, camera);
 
-            // Cabeça abanar
-            p.grupoCabecaSuperior.rotation.y = lookCycle * 0.1;
-            p.grupoMandibula.rotation.y = lookCycle * 0.1;
-            p.grupoCabecaSuperior.position.y = breatheOffset;
-            p.grupoMandibula.position.y = breatheOffset;
-            p.pescoco.rotation.y = lookCycle * 0.2;
+            // --- ANIMATION LOOP ---
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const deltaTime = Math.min(clock.getDelta(), 0.05);
+                updateHumanControl(deltaTime);
+                updateSunShadowFocus();
+
+                const time = Date.now() * 0.003;
+
+                if (dinoData) {
+                    const p = dinoData.parts;
+
+                    //Rugir
+                    const breatheCycle = Math.sin(time * 0.5);
+                    const breatheOffset = breatheCycle * 2;
+                    const lookCycle = Math.sin(time * 0.3);
+
+                    let roarFactor = Math.sin(time * 0.4) * 2;
+                    roarFactor = Math.max(0, Math.min(1, roarFactor));
+
+                    p.grupoMandibula.rotation.z = roarFactor * 0.05;
+                    p.grupoCabecaSuperior.rotation.z = -roarFactor * 0.1;
+
+                    // Iris
+                    let targetX = -75;
+                    let targetZ1 = 21;
+                    let targetZ2 = -21;
+
+                    if (roarFactor > 0.5) {
+                        targetX = -75 - 4;
+                        targetZ1 = 21 - 1.5;
+                        targetZ2 = -21 + 1.5;
+                    }
+
+                    p.iris.position.x = THREE.MathUtils.lerp(p.iris.position.x, targetX, 0.1);
+                    p.iris.position.z = THREE.MathUtils.lerp(p.iris.position.z, targetZ1, 0.1);
+
+                    p.iris2.position.x = THREE.MathUtils.lerp(p.iris2.position.x, targetX, 0.1);
+                    p.iris2.position.z = THREE.MathUtils.lerp(p.iris2.position.z, targetZ2, 0.1);
+
+                    // Cabeça abanar
+                    p.grupoCabecaSuperior.rotation.y = lookCycle * 0.1;
+                    p.grupoMandibula.rotation.y = lookCycle * 0.1;
+                    p.grupoCabecaSuperior.position.y = breatheOffset;
+                    p.grupoMandibula.position.y = breatheOffset;
+                    p.pescoco.rotation.y = lookCycle * 0.2;
 
 
-            // Cauda
-            p.cauda.rotation.y  = Math.sin(time) * 0.02;
-            p.cauda.position.z  = Math.sin(time) * 0.5; 
-            p.cauda2.rotation.y = Math.sin(time - 0.2) * 0.05;
-            p.cauda2.position.z = Math.sin(time - 0.2) * 2;
-            p.cauda3.rotation.y = Math.sin(time - 0.4) * 0.1;
-            p.cauda3.position.z = Math.sin(time - 0.4) * 5;
-            p.cauda4.rotation.y = Math.sin(time - 0.6) * 0.2;
-            p.cauda4.position.z = Math.sin(time - 0.6) * 10;
-            p.cauda5.rotation.y = Math.sin(time - 0.8) * 0.3;
-            p.cauda5.position.z = Math.sin(time - 0.8) * 15;
-            p.cauda6.rotation.y = Math.sin(time - 1.0) * 0.3;
-            p.cauda6.position.z = Math.sin(time - 1.0) * 15;
+                    // Cauda
+                    p.cauda.rotation.y = Math.sin(time) * 0.02;
+                    p.cauda.position.z = Math.sin(time) * 0.5;
+                    p.cauda2.rotation.y = Math.sin(time - 0.2) * 0.05;
+                    p.cauda2.position.z = Math.sin(time - 0.2) * 2;
+                    p.cauda3.rotation.y = Math.sin(time - 0.4) * 0.1;
+                    p.cauda3.position.z = Math.sin(time - 0.4) * 5;
+                    p.cauda4.rotation.y = Math.sin(time - 0.6) * 0.2;
+                    p.cauda4.position.z = Math.sin(time - 0.6) * 10;
+                    p.cauda5.rotation.y = Math.sin(time - 0.8) * 0.3;
+                    p.cauda5.position.z = Math.sin(time - 0.8) * 15;
+                    p.cauda6.rotation.y = Math.sin(time - 1.0) * 0.3;
+                    p.cauda6.position.z = Math.sin(time - 1.0) * 15;
 
-            // Respiração
-            const breatheScale = 1 + (breatheCycle * 0.03); 
+                    // Respiração
+                    const breatheScale = 1 + (breatheCycle * 0.03);
 
-            p.corpo.scale.set(breatheScale, breatheScale, breatheScale);
-            p.corpo2.scale.set(breatheScale, breatheScale, breatheScale);
-            p.pescoco2.scale.set(breatheScale,breatheScale,breatheScale)
-            
-            p.corpo.position.y = 85 + breatheOffset; 
-            p.corpo2.position.y = 100 + breatheOffset;
-            p.pescoco.position.y = 50 + breatheOffset;
-            p.pescoco2.position.y = 65 + breatheOffset;
-            p.braco.position.y = 14 + breatheOffset;
-            p.braco2.position.y = 14 + breatheOffset;
-            p.bracoa.position.y = 32 + breatheOffset;
-            p.bracoa2.position.y = 32 + breatheOffset;
+                    p.corpo.scale.set(breatheScale, breatheScale, breatheScale);
+                    p.corpo2.scale.set(breatheScale, breatheScale, breatheScale);
+                    p.pescoco2.scale.set(breatheScale, breatheScale, breatheScale)
 
-            p.espinho.position.y  = 102 + breatheOffset;
-            p.espinho2.position.y = 130 + breatheOffset;
-            p.espinho3.position.y = 140 + breatheOffset;
-            p.espinho4.position.y = 140 + breatheOffset;
-            p.espinho5.position.y = 138 + breatheOffset;
-            p.espinho6.position.y = 110 + breatheOffset;
+                    p.corpo.position.y = 85 + breatheOffset;
+                    p.corpo2.position.y = 100 + breatheOffset;
+                    p.pescoco.position.y = 50 + breatheOffset;
+                    p.pescoco2.position.y = 65 + breatheOffset;
+                    p.braco.position.y = 14 + breatheOffset;
+                    p.braco2.position.y = 14 + breatheOffset;
+                    p.bracoa.position.y = 32 + breatheOffset;
+                    p.bracoa2.position.y = 32 + breatheOffset;
 
-            // Caminhar
-            const walkSpeed = time * 0.6 * movementSpeed;
-            const stepHeight = 15;
-            const strideLength = 15;
+                    p.espinho.position.y = 102 + breatheOffset;
+                    p.espinho2.position.y = 130 + breatheOffset;
+                    p.espinho3.position.y = 140 + breatheOffset;
+                    p.espinho4.position.y = 140 + breatheOffset;
+                    p.espinho5.position.y = 138 + breatheOffset;
+                    p.espinho6.position.y = 110 + breatheOffset;
 
-            const phaseRight = Math.sin(walkSpeed); 
-            const liftRight = Math.max(0, -Math.cos(walkSpeed)); 
+                    // Caminhar
+                    const walkSpeed = time * 0.6 * movementSpeed;
+                    const stepHeight = 15;
+                    const strideLength = 15;
 
-            const baseRotationCoxa = Math.PI / 2 + Math.PI / 4;
-            p.coxa2.rotation.z = baseRotationCoxa + (phaseRight * 0.4);
-            p.coxa4.rotation.z = baseRotationCoxa + (phaseRight * 0.4);
+                    const phaseRight = Math.sin(walkSpeed);
+                    const liftRight = Math.max(0, -Math.cos(walkSpeed));
 
-            p.grupopernab.position.x = (phaseRight * strideLength);
-            p.grupopernab.position.y = liftRight * stepHeight;
+                    const baseRotationCoxa = Math.PI / 2 + Math.PI / 4;
+                    p.coxa2.rotation.z = baseRotationCoxa + (phaseRight * 0.4);
+                    p.coxa4.rotation.z = baseRotationCoxa + (phaseRight * 0.4);
 
-            const phaseLeft = -Math.sin(walkSpeed);
-            const liftLeft = Math.max(0, Math.cos(walkSpeed));
+                    p.grupopernab.position.x = (phaseRight * strideLength);
+                    p.grupopernab.position.y = liftRight * stepHeight;
 
-            p.coxa.rotation.z = baseRotationCoxa + (phaseLeft * 0.4);
-            p.coxa3.rotation.z = baseRotationCoxa + (phaseLeft * 0.4);
+                    const phaseLeft = -Math.sin(walkSpeed);
+                    const liftLeft = Math.max(0, Math.cos(walkSpeed));
 
-            p.grupopernaa.position.x = (phaseLeft * strideLength-5);
-            p.grupopernaa.position.y = liftLeft * stepHeight;
+                    p.coxa.rotation.z = baseRotationCoxa + (phaseLeft * 0.4);
+                    p.coxa3.rotation.z = baseRotationCoxa + (phaseLeft * 0.4);
 
+                    p.grupopernaa.position.x = (phaseLeft * strideLength - 5);
+                    p.grupopernaa.position.y = liftLeft * stepHeight;
+
+                }
+
+                if (dino2Data) {
+                    const p = dino2Data.parts;
+
+                    // Respirar
+                    const breatheCycle = Math.sin(time * 0.5);
+                    const breatheOffset = breatheCycle * 0.8;
+                    p.torso.position.y = 25 + breatheOffset;
+
+                    // Abanar a cabeça
+                    const lookCycle = Math.sin(time * 0.3);
+                    p.grupoCabeca.rotation.y = lookCycle * 0.15;
+                    p.grupoCabeca.position.y = breatheOffset;
+
+                    // Mover a cauda com clava (efeito chicote ondulado)
+                    const tailSwingSpeed = 1.6;
+                    const tailSwingAmp = 0.22;
+                    const tailSwing = Math.sin(time * tailSwingSpeed) * tailSwingAmp;
+                    p.grupoCauda1.rotation.y = tailSwing;
+                    p.grupoCauda2.rotation.y = tailSwing * 0.8;
+                    p.grupoCauda3.rotation.y = tailSwing * 0.6;
+                    p.grupoCauda4.rotation.y = tailSwing * 0.45;
+
+                    // Caminhar (quadrúpede)
+                    const walkSpeed = time * 0.8 * movementSpeed;
+                    const legSwing = Math.sin(walkSpeed) * 0.35;
+
+                    p.grupoPernaFL.rotation.z = legSwing;
+                    p.grupoPernaBR.rotation.z = legSwing;
+                    p.grupoPernaFR.rotation.z = -legSwing;
+                    p.grupoPernaBL.rotation.z = -legSwing;
+
+                    const liftFL = Math.max(0, -Math.cos(walkSpeed)) * 4.5;
+                    const liftBR = Math.max(0, -Math.cos(walkSpeed)) * 4.5;
+                    const liftFR = Math.max(0, Math.cos(walkSpeed)) * 4.5;
+                    const liftBL = Math.max(0, Math.cos(walkSpeed)) * 4.5;
+
+                    p.grupoPernaFL.position.y = 18 + liftFL + breatheOffset;
+                    p.grupoPernaBR.position.y = 18 + liftBR + breatheOffset;
+                    p.grupoPernaFR.position.y = 18 + liftFR + breatheOffset;
+                    p.grupoPernaBL.position.y = 18 + liftBL + breatheOffset;
+                }
+
+                updateAmbientTumbleweeds(deltaTime);
+
+                // Atualizar outline para seguir o modelo selecionado
+                if (selectionOutline && selectionOutline.visible && selectedObject) {
+                    // Os outlines agora são filhos dos meshes e herdam transformações automaticamente
+                }
+
+                if (!humanControlMode) {
+                    controls.update();
+                }
+                renderer.render(scene, camera);
+            }
+
+            animate();
         }
 
-        updateAmbientTumbleweeds(deltaTime);
-
-        if (!humanControlMode) {
-            controls.update();
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        } else {
+            window.addEventListener('DOMContentLoaded', init);
         }
-        renderer.render(scene, camera);
-    }
-
-    animate();
-}
-
-window.onload = init;
-	</script>
-
+    </script>
 </body>
 
 </html>

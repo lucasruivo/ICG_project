@@ -36,6 +36,10 @@ export function createHuman() {
     head.scale.set(1.0, 1.12, 0.9);
     human.add(head);
 
+    const cameraAnchor = new THREE.Object3D();
+    cameraAnchor.position.set(0, 32.2, 5.5);
+    human.add(cameraAnchor);
+
     addJoint(1.05, 0, 27.6);
 
     // Torso and pelvis.
@@ -109,7 +113,10 @@ export function createHuman() {
     human.position.y -= bbox.min.y;
 
     human.userData.draggable = true;
-    human.userData.groundOffset = 19.0;
+    human.userData.cameraAnchor = cameraAnchor;
+    human.userData.collisionCircles = [
+        { x: 0, z: 0.2, r: 3.4 }
+    ];
     human.name = 'Human';
 
     return human;

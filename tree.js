@@ -250,8 +250,12 @@ export function createTree() {
     treeGroup.rotation.y = rand(0, Math.PI * 2);
 
     treeGroup.userData.draggable = true;
+    // Enterra ligeiramente a base para integrar melhor as raizes.
+    treeGroup.userData.terrainSurfaceOffset = -2.6;
+    treeGroup.userData.collisionCircles = [
+        { x: 0, z: 0, r: 24 }
+    ];
     treeGroup.name = "Tree";
 
     return treeGroup;
 }
-
