@@ -967,7 +967,7 @@
 
         function createModelOutline(mesh) {
             // Criar outline que segue o contorno real do modelo
-            if (!mesh.geometry) return null;
+            if (!mesh.geometry || mesh.isInstancedMesh) return null;
 
             const edges = new THREE.EdgesGeometry(mesh.geometry, 10); // 10 graus de threshold
             const material = new THREE.LineBasicMaterial({
@@ -1097,9 +1097,9 @@
                         const dx = x - pond.position.x;
                         const dz = z - pond.position.z;
                         const dist = Math.sqrt(dx * dx + dz * dz);
-                        const r = pond.userData?.pondRadius || 80;
+                        const r = (pond.userData?.pondRadius || 80) * pond.scale.x;
                         if (dist < r) {
-                            const maxDepth = pond.userData?.pondDepth || 18;
+                            const maxDepth = (pond.userData?.pondDepth || 18) * pond.scale.y;
                             const factor = 1 - (dist / r);
                             const holeDepth = maxDepth * Math.sin(factor * Math.PI / 2);
                             y -= holeDepth;
@@ -1159,7 +1159,7 @@
             if (object3D.name === 'Pond') {
                 const groundY = getOriginalTerrainHeight(object3D.position.x, object3D.position.z);
                 if (groundY === null) return;
-                object3D.position.y = groundY + 30;
+                object3D.position.y = groundY + 30 * object3D.scale.y;
                 object3D.updateMatrixWorld(true);
                 return;
             }
@@ -1798,8 +1798,11 @@
             sunLight.position.copy(sunLightOffset);
             sunLight.target.position.set(0, 0, 0);
             sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 4096;
-            sunLight.shadow.mapSize.height = 4096;
+
+            const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+            sunLight.shadow.mapSize.width = isMobileDevice ? 1024 : 2048;
+            sunLight.shadow.mapSize.height = isMobileDevice ? 1024 : 2048;
+
             sunLight.shadow.camera.near = 40;
             sunLight.shadow.camera.far = 2600;
             // Frustum suficientemente grande para não cortar, mas ainda com bom detalhe.
@@ -2075,6 +2078,16 @@
 
             function scaleObjectPreservingBottom(object3D, applyScale, options = {}) {
                 if (!object3D || typeof applyScale !== 'function') return;
+
+                if (object3D.name === 'Pond') {
+                    applyScale(object3D);
+                    snapObjectToTerrain(object3D);
+                    if (options.updateDragPlane) {
+                        dragPlane.constant = -object3D.position.y;
+                    }
+                    updateTerrainHeights();
+                    return;
+                }
 
                 const currentBottomY = getObjectBottomY(object3D);
                 applyScale(object3D);
