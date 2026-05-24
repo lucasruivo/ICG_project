@@ -263,11 +263,11 @@ Objetivo:
 
 ## 8. Melhorias futuras
 
-- menu de configuracao (velocidade do humano, altura salto, sensibilidade)
 - mais modelos de outros animais
 - mais animações
 - animações do ser humano e interações com outros objetos no meio 
-- secao de configuracao unica para manutencao
 - suporte para mobile
+- colocar coisas no Z
+- colocar musicas
 
 ## Deploy em: https://lucasruivo.github.io/ICG_project/index.html

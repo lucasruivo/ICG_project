@@ -599,6 +599,57 @@
             </div>
         </div>
 
+        <!-- === CONFIGURAÇÕES === -->
+        <div class="menu-section">
+            <div class="accordion-header" onclick="toggleConfigAccordion(this)" style="margin: 0; padding: 10px;">
+                <span style="font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; color: white;">
+                    &#9881; Configurações
+                </span>
+                <span class="accordion-chevron">&#9654;</span>
+            </div>
+            <div class="accordion-body" id="configAccordion" style="margin-top: 10px;">
+                <div class="config-control" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <label for="cfgSpeedSlider" style="font-size: 11px; color: #bdc3c7;">Velocidade:</label>
+                        <span id="cfgSpeedValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">250</span>
+                    </div>
+                    <input type="range" id="cfgSpeedSlider" min="50" max="800" step="10" value="250" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                </div>
+
+                <div class="config-control" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <label for="cfgJumpSlider" style="font-size: 11px; color: #bdc3c7;">Força do Salto:</label>
+                        <span id="cfgJumpValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">400</span>
+                    </div>
+                    <input type="range" id="cfgJumpSlider" min="100" max="1000" step="10" value="400" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                </div>
+
+                <div class="config-control" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <label for="cfgGravitySlider" style="font-size: 11px; color: #bdc3c7;">Gravidade:</label>
+                        <span id="cfgGravityValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">700</span>
+                    </div>
+                    <input type="range" id="cfgGravitySlider" min="200" max="2000" step="50" value="700" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                </div>
+
+                <div class="config-control" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <label for="cfgSensitivitySlider" style="font-size: 11px; color: #bdc3c7;">Sensibilidade:</label>
+                        <span id="cfgSensitivityValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">0.0022</span>
+                    </div>
+                    <input type="range" id="cfgSensitivitySlider" min="0.0005" max="0.0100" step="0.0005" value="0.0022" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                </div>
+
+                <div class="config-control" style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <label for="cfgTimeSpeedSlider" style="font-size: 11px; color: #bdc3c7;">Velocidade Tempo:</label>
+                        <span id="cfgTimeSpeedValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">1.0x</span>
+                    </div>
+                    <input type="range" id="cfgTimeSpeedSlider" min="0.1" max="10" step="0.1" value="1" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                </div>
+            </div>
+        </div>
+
         <!-- === GESTÃO DO CENÁRIO === -->
         <div class="menu-section no-border" style="border-bottom: none; padding-bottom: 0;">
             <h3>&#128190; Cenário</h3>
@@ -1874,6 +1925,13 @@
             chevron.classList.toggle('open');
         };
 
+        window.toggleConfigAccordion = function (header) {
+            const body = document.getElementById('configAccordion');
+            const chevron = header.querySelector('.accordion-chevron');
+            body.classList.toggle('open');
+            chevron.classList.toggle('open');
+        };
+
         window.addRock = function (size, transform = null) {
             saveHistoryState();
             const rock = createRock(size);
@@ -2158,8 +2216,7 @@
             // Hora do dia em minutos (0 = meia-noite, 720 = meio-dia, 1440 = meia-noite)
             let dayTimeMinutes = 720;
             let dayTimeCycleAuto = false;
-            // Velocidade do ciclo automático: 1 dia real = ~60s (1440 min / 60s = 24 min/s)
-            const DAY_CYCLE_SPEED = 1.0; // min/seg reais para avançar no ciclo
+            let dayCycleSpeedMultiplier = 1.0;
             // Paleta de cores do céu para horas chave (hora, skyHex, ambientHex)
             // Estrutura: [minutos, corCeuHex, corAmbienteHex, intensidadeAmbiente, corSolHex, intensidadeSol]
             const DAY_PALETTE = [
@@ -2897,6 +2954,57 @@
                 }
             }
 
+            // --- CONFIGURAÇÕES CONTROLOS EVENT LISTENERS ---
+            const cfgSpeedSlider = document.getElementById('cfgSpeedSlider');
+            const cfgSpeedValue = document.getElementById('cfgSpeedValue');
+            if (cfgSpeedSlider && cfgSpeedValue) {
+                cfgSpeedSlider.addEventListener('input', (e) => {
+                    const val = parseInt(e.target.value);
+                    humanControlSettings.speed = val;
+                    cfgSpeedValue.textContent = val;
+                });
+            }
+
+            const cfgJumpSlider = document.getElementById('cfgJumpSlider');
+            const cfgJumpValue = document.getElementById('cfgJumpValue');
+            if (cfgJumpSlider && cfgJumpValue) {
+                cfgJumpSlider.addEventListener('input', (e) => {
+                    const val = parseInt(e.target.value);
+                    humanControlSettings.jumpSpeed = val;
+                    cfgJumpValue.textContent = val;
+                });
+            }
+
+            const cfgGravitySlider = document.getElementById('cfgGravitySlider');
+            const cfgGravityValue = document.getElementById('cfgGravityValue');
+            if (cfgGravitySlider && cfgGravityValue) {
+                cfgGravitySlider.addEventListener('input', (e) => {
+                    const val = parseInt(e.target.value);
+                    humanControlSettings.gravity = val;
+                    cfgGravityValue.textContent = val;
+                });
+            }
+
+            const cfgSensitivitySlider = document.getElementById('cfgSensitivitySlider');
+            const cfgSensitivityValue = document.getElementById('cfgSensitivityValue');
+            if (cfgSensitivitySlider && cfgSensitivityValue) {
+                cfgSensitivitySlider.addEventListener('input', (e) => {
+                    const val = parseFloat(e.target.value);
+                    humanControlSettings.mouseSensitivity = val;
+                    cfgSensitivityValue.textContent = val.toFixed(4);
+                });
+            }
+
+            const cfgTimeSpeedSlider = document.getElementById('cfgTimeSpeedSlider');
+            const cfgTimeSpeedValue = document.getElementById('cfgTimeSpeedValue');
+            if (cfgTimeSpeedSlider && cfgTimeSpeedValue) {
+                cfgTimeSpeedSlider.addEventListener('input', (e) => {
+                    const val = parseFloat(e.target.value);
+                    dayCycleSpeedMultiplier = val;
+                    cfgTimeSpeedValue.textContent = val.toFixed(1) + 'x';
+                });
+            }
+
             const undoButton = document.getElementById('undoButton');
             if (undoButton) {
                 undoButton.addEventListener('click', () => {
@@ -2991,18 +3099,60 @@
                 }
             }
 
+            function updateHumanAnimations(deltaTime) {
+                if (typeof humans === 'undefined' || !humans) return;
+                for (const human of humans) {
+                    if (human.userData.walkCycle === undefined) {
+                        human.userData.walkCycle = 0;
+                        human.userData.swingAmount = 0;
+                    }
+
+                    const isControlled = (humanControlMode && controlledHuman === human);
+                    const isMoving = isControlled && 
+                        (humanMoveState.forward || humanMoveState.backward || humanMoveState.left || humanMoveState.right) &&
+                        (typeof humanCanJump !== 'undefined' ? humanCanJump : true);
+
+                    const targetSwing = isMoving ? 1.0 : 0.0;
+                    human.userData.swingAmount = THREE.MathUtils.lerp(human.userData.swingAmount, targetSwing, 10 * deltaTime);
+
+                    if (isMoving) {
+                        const speedFactor = (humanControlSettings ? (humanControlSettings.speed / 250) : 1.0);
+                        human.userData.walkCycle += deltaTime * 12 * speedFactor;
+                    }
+
+                    const swingAmount = human.userData.swingAmount;
+                    const walkCycle = human.userData.walkCycle;
+
+                    if (swingAmount > 0.001) {
+                        const maxAngle = 0.6; // max swing angle in radians
+                        const angle = Math.sin(walkCycle) * maxAngle * swingAmount;
+
+                        if (human.userData.leftLeg) human.userData.leftLeg.rotation.x = angle;
+                        if (human.userData.rightLeg) human.userData.rightLeg.rotation.x = -angle;
+                        if (human.userData.leftArm) human.userData.leftArm.rotation.x = -angle;
+                        if (human.userData.rightArm) human.userData.rightArm.rotation.x = angle;
+                    } else {
+                        if (human.userData.leftLeg) human.userData.leftLeg.rotation.x = 0;
+                        if (human.userData.rightLeg) human.userData.rightLeg.rotation.x = 0;
+                        if (human.userData.leftArm) human.userData.leftArm.rotation.x = 0;
+                        if (human.userData.rightArm) human.userData.rightArm.rotation.x = 0;
+                    }
+                }
+            }
+
             // --- ANIMATION LOOP ---
             function animate() {
                 requestAnimationFrame(animate);
 
                 const deltaTime = Math.min(clock.getDelta(), 0.05);
                 updateHumanControl(deltaTime);
+                updateHumanAnimations(deltaTime);
 
                 // Avançar o ciclo dia/noite automático
                 if (dayTimeCycleAuto) {
                     // Velocidade: 1 min de jogo por segundo real → dia completo em 24s reais
-                    // Para um ciclo mais lento, use valor menor (ex: 0.5)
-                    dayTimeMinutes = (dayTimeMinutes + deltaTime * 60) % 1440;
+                    // Multiplicado pela velocidade configurável pelo utilizador
+                    dayTimeMinutes = (dayTimeMinutes + deltaTime * 60 * dayCycleSpeedMultiplier) % 1440;
                     applyDayNightCycle(dayTimeMinutes);
                 }
 
