@@ -255,6 +255,42 @@
         .accordion-body .model-item {
             font-size: 13px;
         }
+
+        /* === DIA/NOITE === */
+        .day-night-section {
+            border-bottom: 1px solid #555;
+            padding-bottom: 15px;
+        }
+
+        .time-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .time-display span {
+            font-size: 13px;
+            color: #ecf0f1;
+        }
+
+        #timeClock {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f1c40f;
+            font-family: monospace;
+        }
+
+        #timeSlider {
+            width: 100%;
+            accent-color: #f1c40f;
+            cursor: pointer;
+        }
+
+        .sun-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
     </style>
 </head>
 
@@ -312,6 +348,7 @@
             <div class="model-item" onclick="addHuman()">Ser Humano</div>
             <div class="model-item" onclick="addCact()">Cacto</div>
             <div class="model-item" onclick="addPond()">Charco</div>
+            <div class="model-item" onclick="addIceSpike()">Espigão de Gelo</div>
 
             <div class="accordion-header" onclick="toggleRockAccordion(this)">
                 <span>Pedra</span>
@@ -324,10 +361,22 @@
             </div>
         </div>
 
+        <!-- === CONTROLO DA HORA DO DIA === -->
+        <div class="menu-section day-night-section">
+            <h3>&#9728; Hora do Dia</h3>
+            <div class="time-display">
+                <span class="sun-icon" id="sunIcon">&#9728;</span>
+                <span id="timeClock">12:00</span>
+                <span class="sun-icon" id="moonIcon">&#9790;</span>
+            </div>
+            <input type="range" id="timeSlider" min="0" max="1440" step="1" value="720">
+            <button id="timeAutoButton" class="action-button tertiary" style="margin-top:8px;width:100%;">Ciclo Auto:
+                OFF</button>
+        </div>
+
         <button id="bushToggleButton" class="action-button tertiary">Bushes no Mapa: OFF</button>
         <button id="grassToggleButton" class="action-button tertiary">Erva no Mapa: OFF</button>
         <button id="tumbleweedToggleButton" class="action-button">Tumbleweeds no Mapa: OFF</button>
-        <button id="hitboxToggleButton" class="action-button tertiary">Ver Hitboxes: OFF</button>
 
         <button id="clearSceneButton" class="action-button danger">Limpar Cenário</button>
 
@@ -389,6 +438,9 @@
         const { createHuman } = await import(`./human.js?v=${v}`);
         const { createCact } = await import(`./cact.js?v=${v}`);
         const { createPond } = await import(`./pond.js?v=${v}`);
+        const { createIceSpike } = await import(`./icespike.js?v=${v}`);
+        const { createSun } = await import(`./sun.js?v=${v}`);
+        const { createMoon } = await import(`./moon.js?v=${v}`);
 
         let dinoData;
         let dino2Data;
@@ -405,6 +457,7 @@
         let humans = [];
         let cacts = [];
         let ponds = [];
+        let iceSpikes = [];
         const humanWorldScale = new THREE.Vector3();
         const collisionWorldScale = new THREE.Vector3();
         const collisionFallbackCenter = new THREE.Vector3();
@@ -413,11 +466,6 @@
         const collisionUseScreenScale = true;
         const collisionScreenRefDistance = 420; // reference distance where scale==1
         const SCENE_EXPORT_VERSION = 1;
-        let showHitboxes = false;
-        let hitboxToggleButton = null;
-        let hitboxGroup = null;
-        let hitboxCircleGeo = null;
-        let hitboxMaterial = null;
 
         let bushEffectEnabled = false;
         let bushToggleButton = null;
@@ -503,39 +551,6 @@
 
             terrain.updateMatrixWorld(true);
             return new THREE.Box3().setFromObject(terrain);
-        }
-
-        function updateHitboxHelpers() {
-            if (!hitboxGroup) return;
-            while(hitboxGroup.children.length > 0) {
-                hitboxGroup.remove(hitboxGroup.children[0]);
-            }
-
-            if (!showHitboxes) return;
-
-            // Gather all collidable objects
-            const objects = [];
-            trees.forEach(o => objects.push(o));
-            rocks.forEach(o => objects.push(o));
-            cacts.forEach(o => objects.push(o));
-            humans.forEach(o => objects.push(o));
-            ponds.forEach(o => objects.push(o));
-            if (dinoData?.model) objects.push(dinoData.model);
-            if (dino2Data?.model) objects.push(dino2Data.model);
-
-            // Draw a red ring for each collision circle
-            objects.forEach(obj => {
-                if (!obj) return;
-                const circles = getWorldCollisionCircles(obj);
-                circles.forEach(circle => {
-                    if (!hitboxCircleGeo || !hitboxMaterial) return;
-                    const line = new THREE.Line(hitboxCircleGeo, hitboxMaterial);
-                    const groundY = getTerrainHeightAt(circle.x, circle.z) ?? obj.position.y;
-                    line.position.set(circle.x, groundY + 0.5, circle.z);
-                    line.scale.set(circle.r, 1, circle.r);
-                    hitboxGroup.add(line);
-                });
-            });
         }
 
         function getHaltonValue(index, base) {
@@ -1063,6 +1078,7 @@
             if (typeof rocks !== 'undefined') rocks.forEach(snapObjectToTerrain);
             if (typeof humans !== 'undefined') humans.forEach(snapObjectToTerrain);
             if (typeof cacts !== 'undefined') cacts.forEach(snapObjectToTerrain);
+            if (typeof iceSpikes !== 'undefined') iceSpikes.forEach(snapObjectToTerrain);
         }
 
         window.updateTerrainHeights = function () {
@@ -1250,10 +1266,10 @@
         function getMeshesInObject(object, list = []) {
             if (!object) return list;
             if (object.isMesh) {
-                if (object.visible && 
-                    object.name !== 'Water' && 
-                    object.name !== 'PondBowl' && 
-                    !object.userData?.isWater && 
+                if (object.visible &&
+                    object.name !== 'Water' &&
+                    object.name !== 'PondBowl' &&
+                    !object.userData?.isWater &&
                     !object.userData?.isTerrain &&
                     object.geometry) {
                     list.push(object);
@@ -1335,6 +1351,7 @@
             removeGroupFromScene(humans);
             removeGroupFromScene(cacts);
             removeGroupFromScene(ponds);
+            removeGroupFromScene(iceSpikes);
             setBushEffectEnabled(false);
             setTumbleweedEffectEnabled(false);
 
@@ -1376,6 +1393,7 @@
             else if (removeObjectFromArray(tumbleweeds, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(humans, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(cacts, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(iceSpikes, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(ponds, object)) {
                 scene.remove(object);
                 removed = true;
@@ -1412,6 +1430,7 @@
             humans.forEach(obj => objects.push({ type: 'human', ...toTransformData(obj) }));
             cacts.forEach(obj => objects.push({ type: 'cact', ...toTransformData(obj) }));
             ponds.forEach(obj => objects.push({ type: 'pond', ...toTransformData(obj) }));
+            iceSpikes.forEach(obj => objects.push({ type: 'icespike', ...toTransformData(obj) }));
 
             return {
                 version: SCENE_EXPORT_VERSION,
@@ -1504,6 +1523,9 @@
                             break;
                         case 'cact':
                             window.addCact(entry);
+                            break;
+                        case 'icespike':
+                            window.addIceSpike(entry);
                             break;
                         case 'pond':
                             window.addPond(entry);
@@ -1687,6 +1709,24 @@
             return newCact;
         };
 
+        window.addIceSpike = function (transform = null) {
+            const newIceSpike = createIceSpike();
+            if (transform) {
+                applyTransform(newIceSpike, transform);
+            } else {
+                newIceSpike.position.set(Math.random() * 100 - 50, 0, Math.random() * 100 - 50);
+            }
+            applyShadowSettings(newIceSpike);
+            scene.add(newIceSpike);
+            if (!transform) {
+                snapObjectToTerrain(newIceSpike);
+            }
+            iceSpikes.push(newIceSpike);
+            console.log("Espigão de Gelo adicionado!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            return newIceSpike;
+        };
+
         window.addPond = function (transform = null) {
             const newPond = createPond();
             if (transform) {
@@ -1713,20 +1753,6 @@
             scene = new THREE.Scene();
             window.scene = scene;
             scene.background = new THREE.Color(0x3e7ab6);
-
-            hitboxGroup = new THREE.Group();
-            scene.add(hitboxGroup);
-
-            // Reusable circle geometry for hitboxes
-            const segments = 32;
-            hitboxCircleGeo = new THREE.BufferGeometry();
-            const positions = [];
-            for (let i = 0; i <= segments; i++) {
-                const theta = (i / segments) * Math.PI * 2;
-                positions.push(Math.cos(theta), 0, Math.sin(theta));
-            }
-            hitboxCircleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            hitboxMaterial = new THREE.LineBasicMaterial({ color: 0xff3b30, linewidth: 2 });
 
             terrain = createTerrain();
             terrain.position.y = 0;
@@ -1792,6 +1818,182 @@
             const ambientLight = new THREE.AmbientLight(0x88aacc, 0.8);
             scene.add(ambientLight);
 
+            // --- SOL E LUA 3D ---
+            // Raio orbital visual: maior que o mapa (3000x3000) para nascer/pôr do sol ficar
+            // além das montanhas nas bordas.
+            const SKY_BODY_ORBIT = 2800;
+            const sunMesh = createSun();
+            scene.add(sunMesh);
+
+            const moonMesh = createMoon();
+            scene.add(moonMesh);
+
+            // Luz direcional da lua: azulada suave, segue a posição orbital da lua
+            const moonDirLight = new THREE.DirectionalLight(0x8899cc, 0.0);
+            const moonLightOffset = new THREE.Vector3(-600, 400, 200);
+            moonDirLight.position.copy(moonLightOffset);
+            moonDirLight.target.position.set(0, 0, 0);
+            scene.add(moonDirLight);
+            scene.add(moonDirLight.target);
+
+            // --- CICLO DIA/NOITE ---
+            // Hora do dia em minutos (0 = meia-noite, 720 = meio-dia, 1440 = meia-noite)
+            let dayTimeMinutes = 720;
+            let dayTimeCycleAuto = false;
+            // Velocidade do ciclo automático: 1 dia real = ~60s (1440 min / 60s = 24 min/s)
+            const DAY_CYCLE_SPEED = 1.0; // min/seg reais para avançar no ciclo
+            // Paleta de cores do céu para horas chave (hora, skyHex, ambientHex)
+            // Estrutura: [minutos, corCeuHex, corAmbienteHex, intensidadeAmbiente, corSolHex, intensidadeSol]
+            const DAY_PALETTE = [
+                // Meia-noite
+                { t: 0, sky: 0x03061a, amb: 0x1a1a3a, ambI: 0.05, sun: 0x000000, sunI: 0.0 },
+                // Madrugada
+                { t: 300, sky: 0x050b30, amb: 0x1a1a4a, ambI: 0.05, sun: 0x000000, sunI: 0.0 },
+                // Nascer do sol (5h)
+                { t: 315, sky: 0x1a0a2a, amb: 0x3a1a2a, ambI: 0.15, sun: 0x220000, sunI: 0.05 },
+                // Aurora (5h30)
+                { t: 330, sky: 0x4a1a0a, amb: 0x5a2a10, ambI: 0.30, sun: 0x803010, sunI: 0.4 },
+                // Amanhecer dourado (6h)
+                { t: 360, sky: 0xe8560a, amb: 0x885528, ambI: 0.55, sun: 0xff8822, sunI: 1.2 },
+                // Manhã cedo (7h)
+                { t: 420, sky: 0xfca060, amb: 0xaaaacc, ambI: 0.65, sun: 0xffe0a0, sunI: 1.8 },
+                // Meio da manhã (9h)
+                { t: 540, sky: 0x5fa8e8, amb: 0x88aacc, ambI: 0.75, sun: 0xfff4e0, sunI: 2.2 },
+                // Meio-dia (12h)
+                { t: 720, sky: 0x3e7ab6, amb: 0x88aacc, ambI: 0.80, sun: 0xfff8f0, sunI: 2.5 },
+                // Tarde (15h)
+                { t: 900, sky: 0x4890cc, amb: 0x88aacc, ambI: 0.75, sun: 0xfff4d0, sunI: 2.2 },
+                // Final de tarde (17h30)
+                { t: 1050, sky: 0xfca060, amb: 0xaaaacc, ambI: 0.65, sun: 0xffcc60, sunI: 1.8 },
+                // Pôr do sol (18h30)
+                { t: 1110, sky: 0xe8560a, amb: 0x885528, ambI: 0.55, sun: 0xff6010, sunI: 1.2 },
+                // Crepúsculo (19h)
+                { t: 1140, sky: 0x4a1a0a, amb: 0x5a2a10, ambI: 0.30, sun: 0x803010, sunI: 0.4 },
+                // Dusk (19h30)
+                { t: 1155, sky: 0x1a0a2a, amb: 0x3a1a2a, ambI: 0.15, sun: 0x220000, sunI: 0.05 },
+                // Noite (20h)
+                { t: 1200, sky: 0x050b30, amb: 0x1a1a4a, ambI: 0.05, sun: 0x000000, sunI: 0.0 },
+                // Meia-noite (24h)
+                { t: 1440, sky: 0x03061a, amb: 0x1a1a3a, ambI: 0.05, sun: 0x000000, sunI: 0.0 },
+            ];
+
+            function lerpColor(hexA, hexB, t) {
+                const a = new THREE.Color(hexA);
+                const b = new THREE.Color(hexB);
+                return a.lerp(b, t);
+            }
+
+            function getDayPaletteAt(minutes) {
+                // Garante que está em [0, 1440]
+                const m = ((minutes % 1440) + 1440) % 1440;
+                // Encontra os dois keyframes vizinhos
+                let i = 0;
+                for (let k = 0; k < DAY_PALETTE.length - 1; k++) {
+                    if (m >= DAY_PALETTE[k].t && m <= DAY_PALETTE[k + 1].t) {
+                        i = k;
+                        break;
+                    }
+                }
+                const a = DAY_PALETTE[i];
+                const b = DAY_PALETTE[i + 1];
+                const span = b.t - a.t;
+                const frac = span > 0 ? (m - a.t) / span : 0;
+                return {
+                    sky: lerpColor(a.sky, b.sky, frac),
+                    amb: lerpColor(a.amb, b.amb, frac),
+                    ambI: a.ambI + (b.ambI - a.ambI) * frac,
+                    sun: lerpColor(a.sun, b.sun, frac),
+                    sunI: a.sunI + (b.sunI - a.sunI) * frac,
+                };
+            }
+
+            function applyDayNightCycle(minutes) {
+                const pal = getDayPaletteAt(minutes);
+
+                // Atualiza fundo (céu)
+                scene.background.copy(pal.sky);
+
+                // Luz ambiente
+                ambientLight.color.copy(pal.amb);
+                ambientLight.intensity = pal.ambI;
+
+                // Luz solar (cor e intensidade)
+                sunLight.color.copy(pal.sun);
+                sunLight.intensity = pal.sunI;
+
+                // Posição angular do sol no céu
+                const sunriseMin = 360; // 6h
+                const sunsetMin = 1080; // 18h
+                const m = ((minutes % 1440) + 1440) % 1440;
+                const daySpan = sunsetMin - sunriseMin; // 720 min
+                const sunAngle = Math.PI * ((m - sunriseMin) / daySpan); // 0→π durante o dia
+                const elevation = Math.sin(sunAngle); // 0→1→0
+                const azimuth = Math.cos(sunAngle); // 1→0→-1 (leste→meio→oeste)
+
+                // O offset do sol para a luz direcional
+                const orbitRadius = 1200;
+                sunLightOffset.set(
+                    azimuth * orbitRadius,
+                    Math.max(elevation * orbitRadius, 80),
+                    -200
+                );
+
+                // --- SOL E LUA: posição e visibilidade ---
+                const isDay = m > sunriseMin && m < sunsetMin;
+                // Transição suave: fade nos 20 min em torno do nascer/pôr do sol
+                const fadeDuration = 20;
+                let sunAlpha = 0;
+                if (isDay) {
+                    sunAlpha = Math.min((m - sunriseMin) / fadeDuration, 1, (sunsetMin - m) / fadeDuration);
+                }
+                const moonAlpha = 1 - sunAlpha;
+
+                // Posição do sol no espaço visual (raio SKY_BODY_ORBIT = 2800 > borda do mapa)
+                const sunPos = new THREE.Vector3(
+                    azimuth * SKY_BODY_ORBIT,
+                    elevation * SKY_BODY_ORBIT,
+                    0
+                );
+                sunMesh.position.copy(sunPos);
+                sunMesh.visible = sunAlpha > 0.01;
+
+                // Posição da lua: oposta ao sol (lado noturno do céu)
+                const moonAngle = Math.PI + sunAngle;
+                const moonElevation = Math.sin(moonAngle);
+                const moonAzimuth = Math.cos(moonAngle);
+                const moonPos = new THREE.Vector3(
+                    moonAzimuth * SKY_BODY_ORBIT,
+                    moonElevation * SKY_BODY_ORBIT,
+                    0
+                );
+                moonMesh.position.copy(moonPos);
+                moonMesh.visible = moonAlpha > 0.01;
+
+                // Luz direcional da lua: segue a direção orbital da lua
+                moonLightOffset.set(
+                    moonAzimuth * 1200,
+                    Math.max(moonElevation * 1200, 60),
+                    200
+                );
+                moonDirLight.intensity = moonAlpha * 0.45;
+
+                // Atualiza UI
+                const h = Math.floor(m / 60);
+                const min = Math.floor(m % 60);
+                const clockEl = document.getElementById('timeClock');
+                if (clockEl) clockEl.textContent = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+                const sliderEl = document.getElementById('timeSlider');
+                if (sliderEl && !sliderEl.matches(':active')) sliderEl.value = m;
+
+                // Ícone: lua quando noite, sol quando dia
+                const sunIconEl = document.getElementById('sunIcon');
+                const moonIconEl = document.getElementById('moonIcon');
+                if (sunIconEl && moonIconEl) {
+                    sunIconEl.style.opacity = isDay ? '1' : '0.3';
+                    moonIconEl.style.opacity = isDay ? '0.3' : '1';
+                }
+            }
+
             // --- RENDERER ---
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
@@ -1851,7 +2053,6 @@
             bushToggleButton = document.getElementById('bushToggleButton');
             grassToggleButton = document.getElementById('grassToggleButton');
             tumbleweedToggleButton = document.getElementById('tumbleweedToggleButton');
-            hitboxToggleButton = document.getElementById('hitboxToggleButton');
 
             // --- LÓGICA DO MENU DE CONTEXTO FLUTUANTE ---
             const contextMenu = document.getElementById('contextMenu');
@@ -1945,12 +2146,6 @@
 
             bushToggleButton.addEventListener('click', () => {
                 setBushEffectEnabled(!bushEffectEnabled);
-            });
-
-            hitboxToggleButton.addEventListener('click', () => {
-                showHitboxes = !showHitboxes;
-                hitboxToggleButton.textContent = `Ver Hitboxes: ${showHitboxes ? 'ON' : 'OFF'}`;
-                hitboxToggleButton.classList.toggle('active', showHitboxes);
             });
 
             grassToggleButton.addEventListener('click', () => {
@@ -2158,7 +2353,7 @@
                     humanMoveVector.normalize().multiplyScalar(humanControlSettings.speed * deltaTime);
                     let collision = false;
                     // Checar colisão com árvores, pedras, cactos, humanos, dino, charcos
-                    const checkGroups = [trees, rocks, cacts, humans, ponds];
+                    const checkGroups = [trees, rocks, cacts, humans, ponds, iceSpikes];
                     if (dinoData?.model) checkGroups.push([dinoData.model]);
                     if (dino2Data?.model) checkGroups.push([dino2Data.model]);
                     for (const group of checkGroups) {
@@ -2198,6 +2393,7 @@
                 cacts.forEach(o => collidables.push(o));
                 humans.forEach(o => { if (o !== controlledHuman) collidables.push(o); });
                 ponds.forEach(o => collidables.push(o));
+                iceSpikes.forEach(o => collidables.push(o));
                 if (dinoData?.model) collidables.push(dinoData.model);
                 if (dino2Data?.model) collidables.push(dino2Data.model);
 
@@ -2499,12 +2695,43 @@
                 }
 
                 shadowFocusPoint.y = 0;
+
+                // Luz solar direcional
                 sunLight.target.position.copy(shadowFocusPoint);
                 sunLight.position.copy(shadowFocusPoint).add(sunLightOffset);
                 sunLight.target.updateMatrixWorld();
+
+                // Luz lunar direcional (segue o mesmo ponto de foco)
+                moonDirLight.target.position.copy(shadowFocusPoint);
+                moonDirLight.position.copy(shadowFocusPoint).add(moonLightOffset);
+                moonDirLight.target.updateMatrixWorld();
             }
 
             const clock = new THREE.Clock();
+
+            // --- WIRING DE CONTROLOS DIA/NOITE ---
+            (function setupDayNightControls() {
+                const slider = document.getElementById('timeSlider');
+                const autoBtn = document.getElementById('timeAutoButton');
+
+                if (slider) {
+                    slider.addEventListener('input', () => {
+                        dayTimeMinutes = parseFloat(slider.value);
+                        applyDayNightCycle(dayTimeMinutes);
+                    });
+                }
+
+                if (autoBtn) {
+                    autoBtn.addEventListener('click', () => {
+                        dayTimeCycleAuto = !dayTimeCycleAuto;
+                        autoBtn.textContent = `Ciclo Auto: ${dayTimeCycleAuto ? 'ON' : 'OFF'}`;
+                        autoBtn.classList.toggle('active', dayTimeCycleAuto);
+                    });
+                }
+
+                // Aplica estado inicial
+                applyDayNightCycle(dayTimeMinutes);
+            })();
 
             function updateAmbientTumbleweeds(deltaTime) {
                 const bounds = getTerrainBounds();
@@ -2670,6 +2897,15 @@
 
                 const deltaTime = Math.min(clock.getDelta(), 0.05);
                 updateHumanControl(deltaTime);
+
+                // Avançar o ciclo dia/noite automático
+                if (dayTimeCycleAuto) {
+                    // Velocidade: 1 min de jogo por segundo real → dia completo em 24s reais
+                    // Para um ciclo mais lento, use valor menor (ex: 0.5)
+                    dayTimeMinutes = (dayTimeMinutes + deltaTime * 60) % 1440;
+                    applyDayNightCycle(dayTimeMinutes);
+                }
+
                 updateSunShadowFocus();
                 updatePondWaves();
 
@@ -2851,7 +3087,13 @@
                     // Os outlines agora são filhos dos meshes e herdam transformações automaticamente
                 }
 
-                updateHitboxHelpers();
+                // Billboard: sol e lua olham sempre para a câmara
+                if (sunMesh.visible) {
+                    sunMesh.lookAt(camera.position);
+                }
+                if (moonMesh.visible) {
+                    moonMesh.lookAt(camera.position);
+                }
 
                 if (!humanControlMode) {
                     controls.update();
