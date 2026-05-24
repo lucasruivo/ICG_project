@@ -264,16 +264,10 @@ Objetivo:
 ## 8. Melhorias futuras
 
 - menu de configuracao (velocidade do humano, altura salto, sensibilidade)
-- presets de luz/sombra (qualidade baixa/media/alta)
-- modo dia/tarde/noite
-- botao "limpar cenario"
-- undo/redo de operacoes
-- transformacoes (rodar/escalar)
-- separacao de logica de input em modulo proprio
 - mais modelos de outros animais
 - mais animações
 - animações do ser humano e interações com outros objetos no meio 
 - secao de configuracao unica para manutencao
-- colocar colisões com os objetos
+- suporte para mobile
 
 ## Deploy em: https://lucasruivo.github.io/ICG_project/index.html

@@ -199,6 +199,199 @@
             box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.35);
         }
 
+        /* Barra Lateral Modernizada - Estilos dos Botões */
+        .no-border {
+            border-bottom: none !important;
+        }
+
+        /* Grelha para Vegetação (Pills) */
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .pill-button {
+            background: #34495e;
+            color: #bdc3c7;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            font-size: 11px;
+        }
+
+        .pill-button:hover {
+            background: #3d566e;
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .pill-button.active {
+            background: #16a085;
+            color: #ffffff;
+            border-color: #1abc9c;
+            box-shadow: 0 0 8px rgba(22, 160, 133, 0.4);
+        }
+
+        /* Grelha para Ferramentas */
+        .tools-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tool-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            position: relative;
+        }
+
+        .tool-button.primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+        }
+
+        .tool-button.primary:hover {
+            background: linear-gradient(135deg, #4fa7e8, #3498db);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .tool-button.danger {
+            background: #34495e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e74c3c;
+        }
+
+        .tool-button.danger:hover {
+            background: #3d566e;
+            color: #ff6b6b;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tool-button.danger.active {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2);
+        }
+
+        .tool-button.danger.active:hover {
+            background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .tool-button .badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            right: 12px;
+        }
+
+        /* Gestão de Cenário */
+        .scenario-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .scenario-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            color: white;
+            text-align: center;
+        }
+
+        .scenario-btn.secondary {
+            background: #34495e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #3498db;
+        }
+
+        .scenario-btn.secondary:hover {
+            background: #2c3e50;
+            color: #4fa7e8;
+            border-color: rgba(52, 152, 219, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .scenario-btn.tertiary {
+            background: #34495e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #1abc9c;
+        }
+
+        .scenario-btn.tertiary:hover {
+            background: #2c3e50;
+            color: #1abc9c;
+            border-color: rgba(26, 188, 156, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .scenario-btn.history {
+            background: #34495e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f1c40f;
+        }
+
+        .scenario-btn.history:hover:not(:disabled) {
+            background: #2c3e50;
+            color: #f39c12;
+            border-color: rgba(241, 196, 15, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .clear-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            background: rgba(192, 57, 43, 0.15);
+            color: #e74c3c;
+            border: 1px dashed #e74c3c;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+            color: white;
+            border-style: solid;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(192, 57, 43, 0.2);
+        }
+
         /* Controles de Terreno */
         .terrain-control {
             margin-bottom: 12px;
@@ -374,39 +567,64 @@
                 OFF</button>
         </div>
 
-        <button id="bushToggleButton" class="action-button tertiary">Bushes no Mapa: OFF</button>
-        <button id="grassToggleButton" class="action-button tertiary">Erva no Mapa: OFF</button>
-        <button id="tumbleweedToggleButton" class="action-button">Tumbleweeds no Mapa: OFF</button>
+        <!-- === VEGETAÇÃO E EFEITOS === -->
+        <div class="menu-section">
+            <h3>&#127806; Vegetação & Efeitos</h3>
+            <div class="effects-grid">
+                <button id="bushToggleButton" class="pill-button">
+                    <span class="btn-icon">&#127809;</span>
+                    <span class="btn-label">Arbustos</span>
+                </button>
+                <button id="grassToggleButton" class="pill-button">
+                    <span class="btn-icon">&#127806;</span>
+                    <span class="btn-label">Erva</span>
+                </button>
+                <button id="tumbleweedToggleButton" class="pill-button">
+                    <span class="btn-icon">&#127810;</span>
+                    <span class="btn-label">Mofo</span>
+                </button>
+            </div>
+        </div>
 
-        <button id="clearSceneButton" class="action-button danger">Limpar Cenário</button>
+        <!-- === MODOS & FERRAMENTAS === -->
+        <div class="menu-section">
+            <h3>&#128295; Modos & Ferramentas</h3>
+            <div class="tools-grid">
+                <button id="humanControlButton" class="tool-button primary">
+                    <span class="btn-icon">&#128100;</span> Entrar no Humano <span class="badge">F</span>
+                </button>
+                <button id="deleteModeButton" class="tool-button danger">
+                    <span class="btn-icon">&#128465;</span> Modo Apagar: OFF
+                </button>
+            </div>
+        </div>
 
-        <button id="downloadSceneJsonButton" class="action-button secondary">Download Cenário JSON</button>
-        <button id="loadSceneJsonButton" class="action-button tertiary">Load Cenário JSON</button>
-        <button id="deleteModeButton" class="action-button danger">Modo Apagar: OFF</button>
-        <button id="humanControlButton" class="action-button secondary">Entrar no Humano (F)</button>
+        <!-- === GESTÃO DO CENÁRIO === -->
+        <div class="menu-section no-border" style="border-bottom: none; padding-bottom: 0;">
+            <h3>&#128190; Cenário</h3>
+            <div class="history-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <button id="undoButton" class="scenario-btn history" disabled>
+                    &#8634; Desfazer
+                </button>
+                <button id="redoButton" class="scenario-btn history" disabled>
+                    &#8635; Refazer
+                </button>
+            </div>
+            <div class="scenario-actions">
+                <button id="downloadSceneJsonButton" class="scenario-btn secondary">
+                    &#128229; Exportar
+                </button>
+                <button id="loadSceneJsonButton" class="scenario-btn tertiary">
+                    &#128228; Importar
+                </button>
+            </div>
+            <button id="clearSceneButton" class="clear-btn">
+                &#9888; Limpar Cenário
+            </button>
+        </div>
         <input type="file" id="sceneJsonFileInput" accept="application/json" style="display: none;">
     </div>
 
-    <div id="contextMenu"
-        style="display: none; position: absolute; background: rgba(44, 62, 80, 0.95); border: 1px solid #f1c40f; border-radius: 8px; padding: 15px; width: 220px; z-index: 1000; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
-        <h3 id="contextTitle"
-            style="color: #f1c40f; font-size: 14px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #555; padding-bottom: 5px;">
-            Editar Objeto</h3>
-
-        <div class="terrain-control">
-            <label>Tamanho: <span id="ctxScaleValue">1.0</span>x</label>
-            <input type="range" id="ctxScaleSlider" min="0.1" max="5" step="0.1" value="1" style="width: 100%;">
-        </div>
-
-        <div class="terrain-control" style="margin-top: 10px;">
-            <label>Rotação (Eixo Y): <span id="ctxRotationValue">0</span>°</label>
-            <input type="range" id="ctxRotationSlider" min="0" max="360" step="1" value="0" style="width: 100%;">
-        </div>
-
-        <button id="ctxCloseBtn"
-            style="margin-top: 15px; width: 100%; padding: 6px; background: #c0392b; color: white; border: none; border-radius: 4px; cursor: pointer;">Fechar
-            Menu</button>
-    </div>
 
     <div id="viewport"></div>
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
@@ -466,6 +684,9 @@
         const collisionUseScreenScale = true;
         const collisionScreenRefDistance = 420; // reference distance where scale==1
         const SCENE_EXPORT_VERSION = 1;
+        const undoStack = [];
+        const redoStack = [];
+        const MAX_HISTORY = 100;
 
         let bushEffectEnabled = false;
         let bushToggleButton = null;
@@ -666,6 +887,8 @@
             const slot = terrainTextureSlots[index];
             if (!slot) return;
 
+            saveHistoryState();
+
             terrainActiveTextureSlotIndex = index;
             if (terrain?.material) {
                 terrain.material.map = loadTerrainTextureFromUrl(slot.url);
@@ -682,6 +905,8 @@
 
             const nextUrl = window.prompt(`Cola a URL da textura para ${slot.label}:`, slot.url || '');
             if (nextUrl === null) return;
+
+            saveHistoryState();
 
             slot.url = nextUrl.trim();
             if (index === terrainActiveTextureSlotIndex) {
@@ -716,8 +941,6 @@
 
         function updateBushToggleButton() {
             if (!bushToggleButton) return;
-
-            bushToggleButton.textContent = `Bushes no Mapa: ${bushEffectEnabled ? 'ON' : 'OFF'}`;
             bushToggleButton.classList.toggle('active', bushEffectEnabled);
         }
 
@@ -763,6 +986,7 @@
         }
 
         function setBushEffectEnabled(enabled) {
+            saveHistoryState();
             bushEffectEnabled = Boolean(enabled);
             clearAmbientBushes();
 
@@ -782,8 +1006,6 @@
 
         function updateGrassToggleButton() {
             if (!grassToggleButton) return;
-
-            grassToggleButton.textContent = `Erva no Mapa: ${grassEffectEnabled ? 'ON' : 'OFF'}`;
             grassToggleButton.classList.toggle('active', grassEffectEnabled);
         }
 
@@ -830,6 +1052,7 @@
         }
 
         function setGrassEffectEnabled(enabled) {
+            saveHistoryState();
             grassEffectEnabled = Boolean(enabled);
             clearAmbientGrasses();
 
@@ -851,8 +1074,6 @@
 
         function updateTumbleweedToggleButton() {
             if (!tumbleweedToggleButton) return;
-
-            tumbleweedToggleButton.textContent = `Tumbleweeds no Mapa: ${tumbleweedEffectEnabled ? 'ON' : 'OFF'}`;
             tumbleweedToggleButton.classList.toggle('active', tumbleweedEffectEnabled);
         }
 
@@ -940,6 +1161,7 @@
         }
 
         function setTumbleweedEffectEnabled(enabled) {
+            saveHistoryState();
             tumbleweedEffectEnabled = Boolean(enabled);
             tumbleweedSpawnTimer = tumbleweedEffectEnabled ? randomTumbleweedSpawnInterval() : 0;
             clearAmbientTumbleweeds();
@@ -1337,6 +1559,8 @@
         }
 
         function clearScenarioObjects() {
+            saveHistoryState();
+
             if (dinoData?.model) {
                 scene.remove(dinoData.model);
                 dinoData = null;
@@ -1361,7 +1585,7 @@
             updateTerrainHeights();
 
             try {
-                localStorage.removeItem('tabletop_autosave');
+                if (typeof autoSaveScenario === 'function') autoSaveScenario();
             } catch (e) { }
         }
 
@@ -1376,6 +1600,8 @@
 
         function removeScenarioObject(object) {
             if (!object || object === terrain) return false;
+
+            saveHistoryState();
 
             let removed = false;
             if (dinoData?.model === object) {
@@ -1405,6 +1631,86 @@
             }
             return removed;
         }
+
+        function updateHistoryButtons() {
+            const undoBtn = document.getElementById('undoButton');
+            const redoBtn = document.getElementById('redoButton');
+            if (undoBtn) {
+                const canUndo = undoStack.length > 0;
+                undoBtn.disabled = !canUndo;
+                undoBtn.style.opacity = canUndo ? '1' : '0.4';
+                undoBtn.style.cursor = canUndo ? 'pointer' : 'not-allowed';
+            }
+            if (redoBtn) {
+                const canRedo = redoStack.length > 0;
+                redoBtn.disabled = !canRedo;
+                redoBtn.style.opacity = canRedo ? '1' : '0.4';
+                redoBtn.style.cursor = canRedo ? 'pointer' : 'not-allowed';
+            }
+        }
+
+        function saveHistoryState() {
+            if (isInitializing || isLoadingScenario) return;
+
+            const stateStr = JSON.stringify(serializeScenario());
+            // Evitar estados idênticos consecutivos
+            if (undoStack.length > 0 && undoStack[undoStack.length - 1] === stateStr) {
+                return;
+            }
+
+            undoStack.push(stateStr);
+            if (undoStack.length > MAX_HISTORY) {
+                undoStack.shift();
+            }
+
+            // Limpa o redo stack quando uma nova ação é tomada
+            redoStack.length = 0;
+            updateHistoryButtons();
+        }
+
+        window.undo = function () {
+            if (isDragging || undoStack.length === 0) return;
+
+            const currentState = JSON.stringify(serializeScenario());
+            redoStack.push(currentState);
+
+            const previousStateStr = undoStack.pop();
+            const previousState = JSON.parse(previousStateStr);
+
+            isLoadingScenario = true;
+            try {
+                loadScenario(previousState);
+            } catch (e) {
+                console.error('Erro ao desfazer:', e);
+            } finally {
+                isLoadingScenario = false;
+            }
+
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            updateHistoryButtons();
+        };
+
+        window.redo = function () {
+            if (isDragging || redoStack.length === 0) return;
+
+            const currentState = JSON.stringify(serializeScenario());
+            undoStack.push(currentState);
+
+            const nextStateStr = redoStack.pop();
+            const nextState = JSON.parse(nextStateStr);
+
+            isLoadingScenario = true;
+            try {
+                loadScenario(nextState);
+            } catch (e) {
+                console.error('Erro ao refazer:', e);
+            } finally {
+                isLoadingScenario = false;
+            }
+
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            updateHistoryButtons();
+        };
 
         function serializeScenario() {
             const objects = [];
@@ -1569,6 +1875,7 @@
         };
 
         window.addRock = function (size, transform = null) {
+            saveHistoryState();
             const rock = createRock(size);
             if (transform) {
                 applyTransform(rock, transform);
@@ -1590,6 +1897,7 @@
         window.addDino = function (options = {}) {
             const { transform = null, silent = false } = options;
             if (!dinoData) {
+                saveHistoryState();
                 dinoData = createDino();
                 if (transform) {
                     applyTransform(dinoData.model, transform);
@@ -1615,6 +1923,7 @@
         window.addDino2 = function (options = {}) {
             const { transform = null, silent = false } = options;
             if (!dino2Data) {
+                saveHistoryState();
                 dino2Data = createDino2();
                 if (transform) {
                     applyTransform(dino2Data.model, transform);
@@ -1638,6 +1947,7 @@
         };
 
         window.addTree = function (transform = null) {
+            saveHistoryState();
             const newTree = createTree();
             if (transform) {
                 applyTransform(newTree, transform);
@@ -1656,6 +1966,7 @@
         };
 
         window.addGrass = function (transform = null) {
+            saveHistoryState();
             const newGrass = createForestGrass();
             if (transform) {
                 applyTransform(newGrass, transform);
@@ -1674,6 +1985,7 @@
         };
 
         window.addHuman = function (transform = null) {
+            saveHistoryState();
             const newHuman = createHuman();
             if (transform) {
                 applyTransform(newHuman, transform);
@@ -1692,6 +2004,7 @@
         };
 
         window.addCact = function (transform = null) {
+            saveHistoryState();
             const newCact = createCact();
             if (transform) {
                 applyTransform(newCact, transform);
@@ -1710,6 +2023,7 @@
         };
 
         window.addIceSpike = function (transform = null) {
+            saveHistoryState();
             const newIceSpike = createIceSpike();
             if (transform) {
                 applyTransform(newIceSpike, transform);
@@ -1728,6 +2042,7 @@
         };
 
         window.addPond = function (transform = null) {
+            saveHistoryState();
             const newPond = createPond();
             if (transform) {
                 applyTransform(newPond, transform);
@@ -1748,7 +2063,7 @@
             return newPond;
         };
 
-        function init() {
+        async function init() {
             const container = document.getElementById('viewport');
             scene = new THREE.Scene();
             window.scene = scene;
@@ -2057,24 +2372,6 @@
             grassToggleButton = document.getElementById('grassToggleButton');
             tumbleweedToggleButton = document.getElementById('tumbleweedToggleButton');
 
-            // --- LÓGICA DO MENU DE CONTEXTO FLUTUANTE ---
-            const contextMenu = document.getElementById('contextMenu');
-            const contextTitle = document.getElementById('contextTitle');
-            const ctxScaleSlider = document.getElementById('ctxScaleSlider');
-            const ctxRotationSlider = document.getElementById('ctxRotationSlider');
-            const ctxScaleValue = document.getElementById('ctxScaleValue');
-            const ctxRotationValue = document.getElementById('ctxRotationValue');
-            const ctxCloseBtn = document.getElementById('ctxCloseBtn');
-            let contextTargetObject = null;
-
-            function syncContextRotationControls(object) {
-                if (contextTargetObject !== object || contextMenu.style.display !== 'block') return;
-
-                let currentRotDeg = THREE.MathUtils.radToDeg(object.rotation.y) % 360;
-                if (currentRotDeg < 0) currentRotDeg += 360;
-                ctxRotationSlider.value = currentRotDeg;
-                ctxRotationValue.textContent = Math.round(currentRotDeg);
-            }
 
             function scaleObjectPreservingBottom(object3D, applyScale, options = {}) {
                 if (!object3D || typeof applyScale !== 'function') return;
@@ -2101,54 +2398,8 @@
                 }
             }
 
-            window.clearPickedObject = () => {
-                lastPickedObject = null;
-                contextTargetObject = null;
-                if (contextMenu) contextMenu.style.display = 'none';
-            };
-
-            // Detetar o Botão Direito do Rato (contextmenu)
-            renderer.domElement.addEventListener('contextmenu', (event) => {
-                event.preventDefault(); // Impede o menu do browser de aparecer
-            });
-
-            ctxScaleSlider.addEventListener('input', (e) => {
-                if (!contextTargetObject) return;
-                const val = parseFloat(e.target.value);
-                const isScalingDraggedObject = isDragging && selectedObject === contextTargetObject;
-                scaleObjectPreservingBottom(contextTargetObject, (object3D) => {
-                    object3D.scale.set(val, val, val);
-                }, {
-                    updateDragPlane: isScalingDraggedObject
-                });
-                if (!isScalingDraggedObject) {
-                    snapObjectToTerrain(contextTargetObject);
-                }
-                ctxScaleValue.textContent = val.toFixed(1);
-            });
-
-            ctxRotationSlider.addEventListener('input', (e) => {
-                if (!contextTargetObject) return;
-                const val = parseFloat(e.target.value);
-                contextTargetObject.rotation.y = THREE.MathUtils.degToRad(val);
-                ctxRotationValue.textContent = Math.round(val);
-            });
-
-            ctxScaleSlider.addEventListener('change', () => {
-                if (typeof autoSaveScenario === 'function') autoSaveScenario();
-            });
-
-            ctxRotationSlider.addEventListener('change', () => {
-                if (typeof autoSaveScenario === 'function') autoSaveScenario();
-            });
-
-            ctxCloseBtn.addEventListener('click', () => {
-                contextMenu.style.display = 'none';
-                contextTargetObject = null;
-            });
-
             function updateDeleteModeButton() {
-                deleteModeButton.textContent = `Modo Apagar: ${deleteMode ? 'ON' : 'OFF'}`;
+                deleteModeButton.innerHTML = `<span class="btn-icon">&#128465;</span> Modo Apagar: ${deleteMode ? 'ON' : 'OFF'}`;
                 deleteModeButton.classList.toggle('active', deleteMode);
             }
 
@@ -2199,28 +2450,9 @@
             }
 
             function setHumanControlButtonLabel() {
-                humanControlButton.textContent = humanControlMode
-                    ? 'Sair do Humano (Esc / F)'
-                    : 'Entrar no Humano (F)';
-            }
-
-            function getSceneRootObject(object) {
-                let root = object;
-                while (root.parent && root.parent !== scene) {
-                    root = root.parent;
-                }
-                return root;
-            }
-
-            function getInteractiveObjectFromIntersections(intersections) {
-                for (const hit of intersections) {
-                    const rootObject = getSceneRootObject(hit.object);
-                    if (rootObject === terrain) continue;
-                    if (rootObject.userData?.draggable === false) continue;
-                    if (rootObject.userData?.ignoreSceneTools) continue;
-                    return rootObject;
-                }
-                return null;
+                humanControlButton.innerHTML = humanControlMode
+                    ? `<span class="btn-icon">&#128100;</span> Sair do Humano <span class="badge">F</span>`
+                    : `<span class="btn-icon">&#128100;</span> Entrar no Humano <span class="badge">F</span>`;
             }
 
             function resetHumanMoveState() {
@@ -2461,240 +2693,79 @@
 
             setHumanControlButtonLabel();
 
-            renderer.domElement.addEventListener('mousedown', (event) => {
-                if (humanControlMode) return;
+            // --- SETUP DO MÓDULO DE INPUTS ---
+            const { setupInput } = await import(`./input.js?v=${v}`);
+            const inputState = {
+                get humanControlMode() { return humanControlMode; },
+                set humanControlMode(val) { humanControlMode = val; },
 
-                if (event.button === 0) {
-                    if (contextMenu) contextMenu.style.display = 'none';
-                }
+                get selectedObject() { return selectedObject; },
+                set selectedObject(val) { selectedObject = val; },
 
-                getMouseNDC(event);
-                raycaster.setFromCamera(mouse, camera);
+                get lastPickedObject() { return lastPickedObject; },
+                set lastPickedObject(val) { lastPickedObject = val; },
 
-                // Verificamos todos os objectos da cena
-                const intersects = raycaster.intersectObjects(scene.children, true);
-                const object = getInteractiveObjectFromIntersections(intersects);
+                get isDragging() { return isDragging; },
+                set isDragging(val) { isDragging = val; },
 
-                if (!object) {
-                    if (event.button === 2) lastPickedObject = null;
-                    return;
-                }
+                get deleteMode() { return deleteMode; },
+                set deleteMode(val) { deleteMode = val; },
 
-                if (event.button === 2) {
-                    lastPickedObject = object;
+                get movementSpeed() { return movementSpeed; },
+                set movementSpeed(val) { movementSpeed = val; },
 
-                    if (deleteMode) {
-                        const removed = removeScenarioObject(object);
-                        if (removed) {
-                            console.log('Objeto removido do cenário.');
-                            if (lastPickedObject === object) {
-                                window.clearPickedObject();
-                            }
-                        }
-                        return;
-                    }
+                get humanYaw() { return humanYaw; },
+                set humanYaw(val) { humanYaw = val; },
 
-                    selectedObject = object;
-                    isDragging = true;
-                    movementSpeed = 4.0;
-                    controls.enabled = false;
+                get humanPitch() { return humanPitch; },
+                set humanPitch(val) { humanPitch = val; },
 
-                    // Levantar ligeiramente o objecto ao pegá-lo
-                    selectedObject.position.y += 30;
-                    dragPlane.constant = -selectedObject.position.y;
+                get humanVerticalVelocity() { return humanVerticalVelocity; },
+                set humanVerticalVelocity(val) { humanVerticalVelocity = val; },
 
-                    // Remover outline anterior se existe
-                    if (selectionOutline) {
-                        selectionOutline.traverse((child) => {
-                            if (child.userData.isOutline) {
-                                child.parent?.remove(child);
-                            }
-                        });
-                    }
+                get humanCanJump() { return humanCanJump; },
+                set humanCanJump(val) { humanCanJump = val; },
 
-                    // Criar novo outline baseado no modelo selecionado
-                    selectionOutline = new THREE.Group();
-                    selectionOutline.userData.isSelectionOutline = true;
-                    selectedObject.traverse((child) => {
-                        if (child.isMesh) {
-                            const outline = createModelOutline(child);
-                            if (outline) {
-                                outline.userData.isOutline = true;
-                                // Adicionar como filho do child (mesh) para herdar transformações
-                                child.add(outline);
-                            }
-                        }
-                    });
-                    selectionOutline.visible = true;
-                    if (selectionBox) selectionBox.visible = false;
-                }
-            });
+                get controlledHuman() { return controlledHuman; },
+                set controlledHuman(val) { controlledHuman = val; },
 
-            window.addEventListener('mousemove', (event) => {
-                if (humanControlMode) return;
-                if (!isDragging || !selectedObject) return;
+                get controls() { return controls; },
 
-                getMouseNDC(event);
-                raycaster.setFromCamera(mouse, camera);
+                humanMoveState,
+                humanControlSettings,
+                dragPlane,
+                intersectionPoint,
+                mouse,
+                camera,
+                scene,
+                raycaster,
+                renderer,
+                selectionBox,
+                terrain,
 
-                // Intersetar o plano horizontal fixo
-                if (raycaster.ray.intersectPlane(dragPlane, intersectionPoint)) {
-                    selectedObject.position.x = intersectionPoint.x;
-                    selectedObject.position.z = intersectionPoint.z;
-                    if (selectionBox) selectionBox.update();
-                }
-            });
+                get selectionOutline() { return selectionOutline; },
+                set selectionOutline(val) { selectionOutline = val; },
 
-            window.addEventListener('mouseup', (event) => {
-                if (humanControlMode) return;
+                removeScenarioObject,
+                snapObjectToTerrain,
+                updateTerrainHeights,
+                scaleObjectPreservingBottom,
+                enterHumanControlMode,
+                exitHumanControlMode,
+                autoSaveScenario,
+                createModelOutline,
 
-                if (isDragging && selectedObject && event.button === 2) {
-                    // Ao largar, encaixar o objecto no terreno
-                    snapObjectToTerrain(selectedObject);
-                    if (selectedObject.name === 'Pond') {
-                        updateTerrainHeights();
-                    }
-                    if (selectedObject.name === 'Tumbleweed') {
-                        selectedObject.userData.jumpHeight = 0;
-                        selectedObject.userData.jumpVelocity = 0;
-                        selectedObject.userData.nextJumpAt = Date.now() + 1000 + Math.random() * 2500;
-                    }
-                    dragPlane.constant = -selectedObject.position.y;
-                    if (selectionOutline) {
-                        // Remover os outlines
-                        selectedObject.traverse((child) => {
-                            if (child.isMesh) {
-                                for (let i = child.children.length - 1; i >= 0; i--) {
-                                    const subchild = child.children[i];
-                                    if (subchild.userData.isOutline) {
-                                        child.remove(subchild);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-                isDragging = false;
-                selectedObject = null;
-                movementSpeed = 1.0;
-                controls.enabled = true;
-                if (typeof autoSaveScenario === 'function') autoSaveScenario();
-            });
+                undoStack,
+                redoStack,
+                MAX_HISTORY,
+                saveHistoryState,
+                serializeScenario,
+                undo,
+                redo,
+                updateHistoryButtons,
+            };
 
-            window.addEventListener('wheel', (event) => {
-                if (humanControlMode) return;
-                if (!isDragging || !selectedObject) return;
-
-                const delta = event.deltaY > 0 ? 0.2 : -0.2;
-                selectedObject.rotation.y += delta;
-                syncContextRotationControls(selectedObject);
-                if (typeof autoSaveScenario === 'function') autoSaveScenario();
-                event.preventDefault();
-            });
-
-            window.addEventListener('keydown', (event) => {
-                if (humanControlMode) return;
-
-                // Controles de scale durante dragging
-                if (isDragging && selectedObject) {
-                    if (event.code === 'KeyW') {
-                        scaleObjectPreservingBottom(selectedObject, (object3D) => {
-                            object3D.scale.multiplyScalar(1.05);
-                        }, { updateDragPlane: true });
-                        event.preventDefault();
-                        return;
-                    }
-                    if (event.code === 'KeyS') {
-                        scaleObjectPreservingBottom(selectedObject, (object3D) => {
-                            object3D.scale.multiplyScalar(0.95);
-                        }, { updateDragPlane: true });
-                        event.preventDefault();
-                        return;
-                    }
-                    if (event.code === 'KeyA') {
-                        selectedObject.rotation.y -= 0.1;
-                        syncContextRotationControls(selectedObject);
-                        event.preventDefault();
-                        return;
-                    }
-                    if (event.code === 'KeyD') {
-                        selectedObject.rotation.y += 0.1;
-                        syncContextRotationControls(selectedObject);
-                        event.preventDefault();
-                        return;
-                    }
-                }
-
-                const isDeleteKey = event.key === 'Delete' || event.key === 'Backspace';
-                if (!isDeleteKey) return;
-
-                if (isDragging) return;
-                if (!lastPickedObject) return;
-
-                const removed = removeScenarioObject(lastPickedObject);
-                if (removed) {
-                    console.log('Objeto removido por teclado.');
-                    window.clearPickedObject();
-                }
-            });
-
-            window.addEventListener('mousemove', (event) => {
-                if (!humanControlMode) return;
-                if (document.pointerLockElement !== renderer.domElement) return;
-
-                humanYaw -= event.movementX * humanControlSettings.mouseSensitivity;
-                humanPitch -= event.movementY * humanControlSettings.mouseSensitivity;
-                humanPitch = THREE.MathUtils.clamp(
-                    humanPitch,
-                    -humanControlSettings.maxPitch,
-                    humanControlSettings.maxPitch
-                );
-            });
-
-            window.addEventListener('keydown', (event) => {
-                if (event.code === 'KeyF') {
-                    if (humanControlMode) {
-                        exitHumanControlMode();
-                    } else {
-                        enterHumanControlMode();
-                    }
-                    event.preventDefault();
-                    return;
-                }
-
-                if (event.code === 'Escape' && humanControlMode) {
-                    exitHumanControlMode();
-                    event.preventDefault();
-                    return;
-                }
-
-                if (!humanControlMode) return;
-
-                switch (event.code) {
-                    case 'KeyW': humanMoveState.forward = true; event.preventDefault(); break;
-                    case 'KeyS': humanMoveState.backward = true; event.preventDefault(); break;
-                    case 'KeyA': humanMoveState.left = true; event.preventDefault(); break;
-                    case 'KeyD': humanMoveState.right = true; event.preventDefault(); break;
-                    case 'Space':
-                        if (humanCanJump) {
-                            humanVerticalVelocity = humanControlSettings.jumpSpeed;
-                            humanCanJump = false;
-                        }
-                        event.preventDefault();
-                        break;
-                }
-            });
-
-            window.addEventListener('keyup', (event) => {
-                if (!humanControlMode) return;
-
-                switch (event.code) {
-                    case 'KeyW': humanMoveState.forward = false; break;
-                    case 'KeyS': humanMoveState.backward = false; break;
-                    case 'KeyA': humanMoveState.left = false; break;
-                    case 'KeyD': humanMoveState.right = false; break;
-                }
-            });
+            const inputManager = setupInput(inputState);
 
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.target.set(0, 40, 0);
@@ -2826,6 +2897,20 @@
                 }
             }
 
+            const undoButton = document.getElementById('undoButton');
+            if (undoButton) {
+                undoButton.addEventListener('click', () => {
+                    window.undo();
+                });
+            }
+
+            const redoButton = document.getElementById('redoButton');
+            if (redoButton) {
+                redoButton.addEventListener('click', () => {
+                    window.redo();
+                });
+            }
+
             document.getElementById('downloadSceneJsonButton').addEventListener('click', () => {
                 const output = JSON.stringify(serializeScenario(), null, 2);
                 const blob = new Blob([output], { type: 'application/json' });
@@ -2852,6 +2937,7 @@
                 reader.onload = () => {
                     try {
                         const data = JSON.parse(String(reader.result));
+                        saveHistoryState();
                         loadScenario(data);
                         console.log('Cenário carregado a partir de JSON.');
                     } catch (err) {
@@ -2880,6 +2966,7 @@
             }
 
             isInitializing = false;
+            updateHistoryButtons();
 
             renderer.render(scene, camera);
 
