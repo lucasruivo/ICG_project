@@ -302,6 +302,31 @@
             box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
         }
 
+        .tool-button.secondary {
+            background: #34495e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bdc3c7;
+        }
+
+        .tool-button.secondary:hover {
+            background: #3d566e;
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tool-button.secondary.active {
+            background: linear-gradient(135deg, #16a085, #1abc9c);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 6px rgba(22, 160, 133, 0.2);
+        }
+
+        .tool-button.secondary.active:hover {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(22, 160, 133, 0.3);
+        }
+
         .tool-button .badge {
             background: rgba(255, 255, 255, 0.25);
             padding: 2px 6px;
@@ -596,6 +621,9 @@
                 <button id="deleteModeButton" class="tool-button danger">
                     <span class="btn-icon">&#128465;</span> Modo Apagar: OFF
                 </button>
+                <button id="btnToggleWireframe" class="tool-button secondary">
+                    <span class="btn-icon">&#9635;</span> Modo Wireframe: OFF
+                </button>
             </div>
         </div>
 
@@ -727,6 +755,7 @@
         let cacts = [];
         let ponds = [];
         let iceSpikes = [];
+        let wireframeMode = false;
         const humanWorldScale = new THREE.Vector3();
         const collisionWorldScale = new THREE.Vector3();
         const collisionFallbackCenter = new THREE.Vector3();
@@ -914,6 +943,9 @@
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.repeat.set(10, 10);
+                if (typeof renderer !== 'undefined' && renderer) {
+                    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                }
                 terrainTextureCache.set(url, texture);
             }
             return texture;
@@ -1269,6 +1301,13 @@
                         obj.castShadow = true;
                         obj.receiveShadow = true;
                     }
+                    if (obj.material) {
+                        if (Array.isArray(obj.material)) {
+                            obj.material.forEach(mat => mat.wireframe = wireframeMode);
+                        } else {
+                            obj.material.wireframe = wireframeMode;
+                        }
+                    }
                 }
             });
         }
@@ -1314,7 +1353,31 @@
             if (!object3D) return null;
 
             object3D.updateMatrixWorld(true);
-            const bbox = new THREE.Box3().setFromObject(object3D);
+
+            let bbox;
+            const isHuman = (object3D.name === 'Human');
+            let leftLegVis, rightLegVis, leftArmVis, rightArmVis;
+            if (isHuman) {
+                leftLegVis = object3D.userData.leftLeg ? object3D.userData.leftLeg.visible : true;
+                rightLegVis = object3D.userData.rightLeg ? object3D.userData.rightLeg.visible : true;
+                leftArmVis = object3D.userData.leftArm ? object3D.userData.leftArm.visible : true;
+                rightArmVis = object3D.userData.rightArm ? object3D.userData.rightArm.visible : true;
+
+                if (object3D.userData.leftLeg) object3D.userData.leftLeg.visible = false;
+                if (object3D.userData.rightLeg) object3D.userData.rightLeg.visible = false;
+                if (object3D.userData.leftArm) object3D.userData.leftArm.visible = false;
+                if (object3D.userData.rightArm) object3D.userData.rightArm.visible = false;
+            }
+
+            bbox = new THREE.Box3().setFromObject(object3D);
+
+            if (isHuman) {
+                if (object3D.userData.leftLeg) object3D.userData.leftLeg.visible = leftLegVis;
+                if (object3D.userData.rightLeg) object3D.userData.rightLeg.visible = rightLegVis;
+                if (object3D.userData.leftArm) object3D.userData.leftArm.visible = leftArmVis;
+                if (object3D.userData.rightArm) object3D.userData.rightArm.visible = rightArmVis;
+            }
+
             return bbox.isEmpty() ? null : bbox;
         }
 
@@ -1538,6 +1601,17 @@
 
         function getMeshesInObject(object, list = []) {
             if (!object) return list;
+            // Skip human limbs to prevent them from expanding or triggering false collisions
+            if (object.parent && object.parent.name === 'Human') {
+                const ud = object.parent.userData;
+                if (object === ud.leftLeg || object === ud.rightLeg || object === ud.leftArm || object === ud.rightArm) {
+                    return list;
+                }
+            }
+            // Skip IceSubSpike meshes to keep ice spike collision on the main vertical spike
+            if (object.name === 'IceSubSpike') {
+                return list;
+            }
             if (object.isMesh) {
                 if (object.visible &&
                     object.name !== 'Water' &&
@@ -1555,7 +1629,9 @@
         }
 
         function objectsCollide3D(objectA, objectB, translationA = null) {
-            const boxA = new THREE.Box3().setFromObject(objectA);
+            const boxA = getObjectBounds(objectA);
+            if (!boxA) return false;
+
             if (translationA) {
                 boxA.min.add(translationA);
                 boxA.max.add(translationA);
@@ -2378,6 +2454,13 @@
             renderer.domElement.style.outline = 'none'; // remove o anel de foco visual
             container.appendChild(renderer.domElement);
 
+            // Filtragem anisotrópica aplicada retroativamente a todas as texturas carregadas
+            const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+            terrainTextureCache.forEach(tex => {
+                tex.anisotropy = maxAnisotropy;
+                tex.needsUpdate = true;
+            });
+
             // --- VARIÁVEIS DE CONTROLO ---
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
@@ -2663,10 +2746,7 @@
                             if (obj === controlledHuman) continue;
                             if (!obj || obj.name === 'Grass' || obj.name === 'Bush' || obj.name === 'Tumbleweed') continue;
 
-                            // Só bloqueia se o humano NÃO está já a colidir com esse objecto.
-                            // Isto evita que ele fique preso num objecto grande onde começou (como o dino).
-                            const alreadyInside = objectsCollide3D(controlledHuman, obj);
-                            if (!alreadyInside && objectsCollide3D(controlledHuman, obj, humanMoveVector)) {
+                            if (objectsCollide3D(controlledHuman, obj, humanMoveVector)) {
                                 collision = true;
                                 break;
                             }
@@ -2705,7 +2785,7 @@
                     if (hit.object.name === 'Water' || hit.object.name === 'PondBowl') continue;
 
                     const isTerrain = (hit.object === terrain);
-                    const clearance = isTerrain ? getPlacementClearance(controlledHuman) : 0;
+                    const clearance = getPlacementClearance(controlledHuman);
                     const surfaceY = hit.point.y + clearance;
 
                     // Always allow terrain, and allow steps/objects if they are not too high above our feet
@@ -2822,6 +2902,33 @@
                 updateHistoryButtons,
             };
 
+            // --- CONTROLES DE VISUALIZAÇÃO ---
+            const btnToggleWireframe = document.getElementById('btnToggleWireframe');
+
+            if (btnToggleWireframe) {
+                btnToggleWireframe.addEventListener('click', () => {
+                    toggleWireframeMode();
+                });
+            }
+
+            function toggleWireframeMode() {
+                wireframeMode = !wireframeMode;
+                if (btnToggleWireframe) {
+                    btnToggleWireframe.classList.toggle('active', wireframeMode);
+                    btnToggleWireframe.innerHTML = `<span class="btn-icon">&#9635;</span> Modo Wireframe: ${wireframeMode ? 'ON' : 'OFF'}`;
+                }
+                
+                scene.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => mat.wireframe = wireframeMode);
+                        } else {
+                            child.material.wireframe = wireframeMode;
+                        }
+                    }
+                });
+            }
+
             const inputManager = setupInput(inputState);
 
             const controls = new OrbitControls(camera, renderer.domElement);
@@ -2846,6 +2953,7 @@
                 moonDirLight.target.position.copy(shadowFocusPoint);
                 moonDirLight.position.copy(shadowFocusPoint).add(moonLightOffset);
                 moonDirLight.target.updateMatrixWorld();
+
             }
 
             const clock = new THREE.Clock();
@@ -3020,12 +3128,21 @@
             }
 
             document.getElementById('downloadSceneJsonButton').addEventListener('click', () => {
+                let filename = prompt("Introduza o nome do ficheiro para exportar:", "cenario");
+                if (filename === null) return; // User cancelled
+                filename = filename.trim();
+                if (filename === "") {
+                    filename = "cenario";
+                }
+                if (!filename.toLowerCase().endsWith('.json')) {
+                    filename += '.json';
+                }
                 const output = JSON.stringify(serializeScenario(), null, 2);
                 const blob = new Blob([output], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'cenario.json';
+                link.download = filename;
                 link.click();
                 URL.revokeObjectURL(url);
             });

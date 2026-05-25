@@ -7,13 +7,16 @@ import * as THREE from 'three';
 export function createIceSpike() {
     const iceGroup = new THREE.Group();
 
-    // Material de gelo/cristal translúcido e brilhante
-    const iceMaterial = new THREE.MeshStandardMaterial({
+    // Material de gelo/cristal translúcido e brilhante com refração física
+    const iceMaterial = new THREE.MeshPhysicalMaterial({
         color: 0x8be4f0,      // Cor azulada/ciano de gelo
-        roughness: 0.15,      // Superfície brilhante e polida
+        roughness: 0.1,       // Superfície brilhante e polida
         metalness: 0.1,
         transparent: true,
-        opacity: 0.75,        // Translúcido
+        opacity: 0.9,         // Leve opacidade do volume
+        transmission: 0.85,   // Transmissão física de luz
+        thickness: 8.0,       // Espessura física do gelo
+        ior: 1.31,            // Índice de refração do gelo
         flatShading: true,    // Flat shading para evidenciar as faces do cristal
         side: THREE.DoubleSide // Permite ver através
     });
@@ -64,6 +67,7 @@ export function createIceSpike() {
         
         const subSpikeGeo = createSpikeGeometry(subRadius, subHeight, 5, 3);
         const subSpike = new THREE.Mesh(subSpikeGeo, iceMaterial);
+        subSpike.name = 'IceSubSpike';
 
         // Posiciona ao redor do espigão central
         const angle = (i / numSubSpikes) * Math.PI * 2 + rand(-0.3, 0.3);

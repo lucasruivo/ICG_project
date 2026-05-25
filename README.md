@@ -265,9 +265,10 @@ Objetivo:
 
 - mais modelos de outros animais
 - mais animações
-- animações do ser humano e interações com outros objetos no meio 
+- interações com outros objetos no meio 
 - suporte para mobile
 - colocar coisas no Z
 - colocar musicas
+- puder escolher o nome do export
 
 ## Deploy em: https://lucasruivo.github.io/ICG_project/index.html

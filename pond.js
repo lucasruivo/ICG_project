@@ -26,13 +26,16 @@ export function createPond() {
         side: THREE.DoubleSide
     });
 
-    // Water Material (Glossy, transparent blue)
-    const waterMaterial = new THREE.MeshStandardMaterial({
+    // Water Material (Glossy, transparent blue with physical refraction)
+    const waterMaterial = new THREE.MeshPhysicalMaterial({
         color: 0x0ea5e9, // Bright sky blue
-        roughness: 0.08,
+        roughness: 0.05, // Highly polished water surface
         metalness: 0.1,
         transparent: true,
-        opacity: 0.82,
+        opacity: 0.95,        // Opacity of the volume
+        transmission: 0.8,    // Physical light transmission
+        thickness: 15.0,      // Physical thickness of the water body
+        ior: 1.333,           // Index of refraction for water
         side: THREE.DoubleSide
     });
 
