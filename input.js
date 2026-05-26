@@ -65,7 +65,7 @@ export function setupInput(state) {
             return;
         }
 
-        if (event.button === 0) {
+        if (event.pointerType === 'touch' || event.button === 0) {
             state.lastPickedObject = object;
 
             if (state.deleteMode) {
@@ -118,7 +118,7 @@ export function setupInput(state) {
             if (state.selectionBox) state.selectionBox.visible = false;
         }
     };
-    renderer.domElement.addEventListener('mousedown', onMouseDown);
+    renderer.domElement.addEventListener('pointerdown', onMouseDown);
 
     // 2. Mousemove (drag movement)
     const onMouseMove = (event) => {
@@ -134,13 +134,13 @@ export function setupInput(state) {
             if (state.selectionBox) state.selectionBox.update();
         }
     };
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('pointermove', onMouseMove);
 
     // 3. Mouseup (releasing drag)
     const onMouseUp = (event) => {
         if (state.humanControlMode) return;
 
-        if (state.isDragging && state.selectedObject && event.button === 0) {
+        if (state.isDragging && state.selectedObject && (event.pointerType === 'touch' || event.button === 0)) {
             state.snapObjectToTerrain(state.selectedObject);
             if (state.selectedObject.name === 'Pond') {
                 state.updateTerrainHeights();
@@ -182,7 +182,7 @@ export function setupInput(state) {
         state.controls.enabled = true;
         state.autoSaveScenario();
     };
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('pointerup', onMouseUp);
 
     // 4. Wheel (rotation during drag)
     const onWheel = (event) => {
@@ -303,6 +303,12 @@ export function setupInput(state) {
             case 'KeyS': humanMoveState.backward = true; event.preventDefault(); break;
             case 'KeyA': humanMoveState.left = true; event.preventDefault(); break;
             case 'KeyD': humanMoveState.right = true; event.preventDefault(); break;
+            case 'KeyE':
+                if (state.triggerFishing && typeof state.triggerFishing === 'function') {
+                    state.triggerFishing();
+                }
+                event.preventDefault();
+                break;
             case 'Space':
                 if (state.humanCanJump) {
                     state.humanVerticalVelocity = humanControlSettings.jumpSpeed;
@@ -329,9 +335,9 @@ export function setupInput(state) {
 
     return {
         destroy: () => {
-            renderer.domElement.removeEventListener('mousedown', onMouseDown);
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
+            renderer.domElement.removeEventListener('pointerdown', onMouseDown);
+            window.removeEventListener('pointermove', onMouseMove);
+            window.removeEventListener('pointerup', onMouseUp);
             window.removeEventListener('wheel', onWheel);
             window.removeEventListener('keydown', onKeyDownEditor);
             window.removeEventListener('mousemove', onMouseMoveHuman);

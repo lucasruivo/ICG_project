@@ -509,6 +509,360 @@
             font-size: 20px;
             transition: transform 0.3s;
         }
+
+        /* ===== FISHING SYSTEM HUD ===== */
+        #fishing-prompt {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            color: #f8fafc;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #fishing-prompt kbd {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            box-shadow: 0 2px 0 #94a3b8;
+        }
+        #fishing-prompt.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        #fishing-result {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            color: #38bdf8;
+            padding: 20px 40px;
+            border-radius: 16px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            letter-spacing: 0.3px;
+        }
+        #fishing-result.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* ===== APPLE SYSTEM HUD ===== */
+        #apple-prompt {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            color: #f8fafc;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #apple-prompt kbd {
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            box-shadow: 0 2px 0 #94a3b8;
+        }
+        #apple-prompt.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        #apple-result {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            color: #ef4444;
+            padding: 20px 40px;
+            border-radius: 16px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid #ef4444;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            letter-spacing: 0.3px;
+        }
+
+        #apple-result.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* ===== MOBILE COMPATIBILITY ===== */
+        #viewport {
+            touch-action: none;
+        }
+
+        #portrait-warning {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #f8fafc;
+            font-family: 'Outfit', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        @media (orientation: portrait) {
+            #portrait-warning {
+                display: flex;
+            }
+        }
+        
+        .rotate-phone-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: rotatePhone 2.5s infinite ease-in-out;
+        }
+        
+        @keyframes rotatePhone {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        #fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        
+        #fullscreen-btn:active {
+            transform: scale(0.9);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        #mobile-editor-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150px);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 16px;
+            display: flex;
+            gap: 12px;
+            z-index: 999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: auto;
+            user-select: none;
+        }
+
+        #mobile-editor-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .mobile-editor-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .mobile-editor-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .mobile-editor-btn.danger {
+            background: rgba(239, 68, 68, 0.25);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .mobile-editor-btn.danger:active {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Joysticks e Controlos do Modo Humano */
+        #mobile-human-controls {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: none;
+        }
+
+        #mobile-human-controls.visible {
+            opacity: 1;
+            display: block;
+        }
+
+        #joystick-container {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            width: 140px;
+            height: 140px;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        #joystick-base {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            position: relative;
+        }
+
+        #joystick-handle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: background 0.2s;
+        }
+
+        #mobile-action-buttons {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 16px;
+            pointer-events: auto;
+            align-items: flex-end;
+            user-select: none;
+        }
+
+        .mobile-action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.1s, opacity 0.3s;
+        }
+
+        .mobile-action-btn:active {
+            transform: scale(0.9);
+        }
+
+        .mobile-action-btn.jump {
+            background: rgba(16, 185, 129, 0.85); /* Green */
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .mobile-action-btn.interact {
+            background: rgba(59, 130, 246, 0.85); /* Blue */
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            display: none; /* Only visible when interaction prompts are visible */
+        }
+        
+        .mobile-action-btn.interact.visible {
+            display: flex;
+        }
+
+        .mobile-action-btn.exit {
+            background: rgba(239, 68, 68, 0.85); /* Red */
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
     </style>
 </head>
 
@@ -630,7 +984,8 @@
         <!-- === CONFIGURAÇÕES === -->
         <div class="menu-section">
             <div class="accordion-header" onclick="toggleConfigAccordion(this)" style="margin: 0; padding: 10px;">
-                <span style="font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; color: white;">
+                <span
+                    style="font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; color: white;">
                     &#9881; Configurações
                 </span>
                 <span class="accordion-chevron">&#9654;</span>
@@ -641,7 +996,8 @@
                         <label for="cfgSpeedSlider" style="font-size: 11px; color: #bdc3c7;">Velocidade:</label>
                         <span id="cfgSpeedValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">250</span>
                     </div>
-                    <input type="range" id="cfgSpeedSlider" min="50" max="800" step="10" value="250" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                    <input type="range" id="cfgSpeedSlider" min="50" max="800" step="10" value="250"
+                        style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
                 </div>
 
                 <div class="config-control" style="margin-bottom: 12px;">
@@ -649,31 +1005,40 @@
                         <label for="cfgJumpSlider" style="font-size: 11px; color: #bdc3c7;">Força do Salto:</label>
                         <span id="cfgJumpValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">400</span>
                     </div>
-                    <input type="range" id="cfgJumpSlider" min="100" max="1000" step="10" value="400" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                    <input type="range" id="cfgJumpSlider" min="100" max="1000" step="10" value="400"
+                        style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
                 </div>
 
                 <div class="config-control" style="margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                         <label for="cfgGravitySlider" style="font-size: 11px; color: #bdc3c7;">Gravidade:</label>
-                        <span id="cfgGravityValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">700</span>
+                        <span id="cfgGravityValue"
+                            style="font-size: 11px; font-weight: bold; color: #1abc9c;">700</span>
                     </div>
-                    <input type="range" id="cfgGravitySlider" min="200" max="2000" step="50" value="700" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                    <input type="range" id="cfgGravitySlider" min="200" max="2000" step="50" value="700"
+                        style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
                 </div>
 
                 <div class="config-control" style="margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <label for="cfgSensitivitySlider" style="font-size: 11px; color: #bdc3c7;">Sensibilidade:</label>
-                        <span id="cfgSensitivityValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">0.0022</span>
+                        <label for="cfgSensitivitySlider"
+                            style="font-size: 11px; color: #bdc3c7;">Sensibilidade:</label>
+                        <span id="cfgSensitivityValue"
+                            style="font-size: 11px; font-weight: bold; color: #1abc9c;">0.0022</span>
                     </div>
-                    <input type="range" id="cfgSensitivitySlider" min="0.0005" max="0.0100" step="0.0005" value="0.0022" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                    <input type="range" id="cfgSensitivitySlider" min="0.0005" max="0.0100" step="0.0005" value="0.0022"
+                        style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
                 </div>
 
                 <div class="config-control" style="margin-bottom: 8px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <label for="cfgTimeSpeedSlider" style="font-size: 11px; color: #bdc3c7;">Velocidade Tempo:</label>
-                        <span id="cfgTimeSpeedValue" style="font-size: 11px; font-weight: bold; color: #1abc9c;">1.0x</span>
+                        <label for="cfgTimeSpeedSlider" style="font-size: 11px; color: #bdc3c7;">Velocidade
+                            Tempo:</label>
+                        <span id="cfgTimeSpeedValue"
+                            style="font-size: 11px; font-weight: bold; color: #1abc9c;">1.0x</span>
                     </div>
-                    <input type="range" id="cfgTimeSpeedSlider" min="0.1" max="10" step="0.1" value="1" style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
+                    <input type="range" id="cfgTimeSpeedSlider" min="0.1" max="10" step="0.1" value="1"
+                        style="width: 100%; accent-color: #1abc9c; cursor: pointer;">
                 </div>
             </div>
         </div>
@@ -681,7 +1046,8 @@
         <!-- === GESTÃO DO CENÁRIO === -->
         <div class="menu-section no-border" style="border-bottom: none; padding-bottom: 0;">
             <h3>&#128190; Cenário</h3>
-            <div class="history-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div class="history-actions"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                 <button id="undoButton" class="scenario-btn history" disabled>
                     &#8634; Desfazer
                 </button>
@@ -706,6 +1072,14 @@
 
 
     <div id="viewport"></div>
+
+    <!-- ===== FISHING INTERACTION HUD ===== -->
+    <div id="fishing-prompt">Aperte <kbd>E</kbd> para pescar</div>
+    <div id="fishing-result">Apanhaste um peixe!</div>
+
+    <!-- ===== APPLE INTERACTION HUD ===== -->
+    <div id="apple-prompt">Aperte <kbd>E</kbd> para colher maçã</div>
+    <div id="apple-result">Colheste uma maçã!</div>
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
     <script type="importmap">
@@ -784,6 +1158,47 @@
         let humanPitch = 0;
         let humanVerticalVelocity = 0;
         let humanCanJump = false;
+
+        const floatClippingPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 100000);
+
+        let fishingState = {
+            active: false,
+            phase: 0,          // 0=idle, 1=windup, 2=cast, 3=settle, 4=wait, 5=bite, 6=pull, 7=display, 8=cameraReturn, 9=reset
+            timer: 0,
+            targetPond: null,
+            rod: null,
+            floatMesh: null,
+            fishMesh: null,
+            lineMesh: null,
+            rodTipAnchor: null,
+            floatStart: new THREE.Vector3(),
+            floatTarget: new THREE.Vector3(),
+            fishStart: new THREE.Vector3(),
+            fishTarget: new THREE.Vector3(),
+            cameraStartPos: null,
+            cameraStartLookTarget: null,
+            targetSet: false
+        };
+
+        const fishingPromptEl = document.getElementById('fishing-prompt');
+        const fishingResultEl = document.getElementById('fishing-result');
+
+        // --- APPLE SYSTEM STATE ---
+        let appleState = {
+            active: false,
+            phase: 0,          // 0=idle, 1=reach, 2=pick, 3=lower, 4=display, 5=cameraReturn, 6=reset
+            timer: 0,
+            targetTree: null,
+            appleMesh: null,
+            cameraStartPos: null,
+            cameraStartLookTarget: null,
+            appleStartWorld: new THREE.Vector3(),
+            appleTargetWorld: new THREE.Vector3(),
+            targetSet: false
+        };
+
+        const applePromptEl = document.getElementById('apple-prompt');
+        const appleResultEl = document.getElementById('apple-result');
         const terrainTextureLoader = new THREE.TextureLoader();
         terrainTextureLoader.setCrossOrigin('anonymous');
         const terrainTextureCache = new Map();
@@ -2450,6 +2865,7 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.localClippingEnabled = true;
             renderer.domElement.tabIndex = 0;
             renderer.domElement.style.outline = 'none'; // remove o anel de foco visual
             container.appendChild(renderer.domElement);
@@ -2676,13 +3092,24 @@
                 }
                 renderer.domElement.focus();
 
-                if (renderer.domElement.requestPointerLock) {
+                const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+                if (!isTouchDevice && renderer.domElement.requestPointerLock) {
                     renderer.domElement.requestPointerLock();
                 }
             }
 
             function exitHumanControlMode() {
                 if (!humanControlMode) return;
+
+                // Cleanup fishing if active
+                if (fishingState.active) {
+                    resetFishingState();
+                }
+
+                // Cleanup apple picking if active
+                if (appleState.active) {
+                    resetAppleState();
+                }
 
                 console.log('Saindo do modo humano');
                 humanControlMode = false;
@@ -2720,6 +3147,11 @@
 
                 if (deltaTime === undefined || deltaTime === null) {
                     console.warn('deltaTime undefined!');
+                    return;
+                }
+
+                // Block movement while fishing or apple picking animations are active
+                if (fishingState.active || appleState.active) {
                     return;
                 }
 
@@ -2892,6 +3324,8 @@
                 autoSaveScenario,
                 createModelOutline,
 
+                get triggerFishing() { return handleGeneralInteraction; },
+
                 undoStack,
                 redoStack,
                 MAX_HISTORY,
@@ -2917,7 +3351,7 @@
                     btnToggleWireframe.classList.toggle('active', wireframeMode);
                     btnToggleWireframe.innerHTML = `<span class="btn-icon">&#9635;</span> Modo Wireframe: ${wireframeMode ? 'ON' : 'OFF'}`;
                 }
-                
+
                 scene.traverse((child) => {
                     if (child.isMesh && child.material) {
                         if (Array.isArray(child.material)) {
@@ -3195,6 +3629,240 @@
 
             renderer.render(scene, camera);
 
+            // --- CONFIGURAÇÃO DE CONTROLOS MOBILE ---
+            (function setupMobileControls() {
+                const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+                
+                // Fullscreen Button
+                const fsBtn = document.getElementById('fullscreen-btn');
+                if (fsBtn) {
+                    fsBtn.addEventListener('click', () => {
+                        if (!document.fullscreenElement) {
+                            document.documentElement.requestFullscreen().catch(err => {
+                                console.warn(`Erro ao ativar Fullscreen: ${err.message}`);
+                            });
+                        } else {
+                            document.exitFullscreen().catch(err => {
+                                console.warn(`Erro ao desativar Fullscreen: ${err.message}`);
+                            });
+                        }
+                    });
+                }
+                
+                // Fullscreen state visual update
+                document.addEventListener('fullscreenchange', () => {
+                    if (fsBtn) {
+                        if (document.fullscreenElement) {
+                            fsBtn.innerHTML = '&#9975;'; // exit fullscreen icon
+                        } else {
+                            fsBtn.innerHTML = '&#9974;'; // normal icon
+                        }
+                    }
+                });
+
+                if (!isTouchDevice) {
+                    // Hide mobile elements on desktop
+                    const mobEd = document.getElementById('mobile-editor-bar');
+                    const mobHum = document.getElementById('mobile-human-controls');
+                    if (mobEd) mobEd.style.display = 'none';
+                    if (mobHum) mobHum.style.display = 'none';
+                    return;
+                }
+
+                // Editor Bar Buttons
+                document.getElementById('btn-editor-scale-up').addEventListener('click', () => {
+                    if (lastPickedObject) {
+                        scaleObjectPreservingBottom(lastPickedObject, (obj) => {
+                            obj.scale.multiplyScalar(1.05);
+                        }, { updateDragPlane: true });
+                        if (typeof autoSaveScenario === 'function') autoSaveScenario();
+                    }
+                });
+                
+                document.getElementById('btn-editor-scale-down').addEventListener('click', () => {
+                    if (lastPickedObject) {
+                        scaleObjectPreservingBottom(lastPickedObject, (obj) => {
+                            obj.scale.multiplyScalar(0.95);
+                        }, { updateDragPlane: true });
+                        if (typeof autoSaveScenario === 'function') autoSaveScenario();
+                    }
+                });
+                
+                document.getElementById('btn-editor-rot-left').addEventListener('click', () => {
+                    if (lastPickedObject) {
+                        lastPickedObject.rotation.y -= 0.15;
+                        if (typeof autoSaveScenario === 'function') autoSaveScenario();
+                    }
+                });
+                
+                document.getElementById('btn-editor-rot-right').addEventListener('click', () => {
+                    if (lastPickedObject) {
+                        lastPickedObject.rotation.y += 0.15;
+                        if (typeof autoSaveScenario === 'function') autoSaveScenario();
+                    }
+                });
+                
+                document.getElementById('btn-editor-delete').addEventListener('click', () => {
+                    if (lastPickedObject) {
+                        saveHistoryState();
+                        const removed = removeScenarioObject(lastPickedObject);
+                        if (removed) {
+                            window.clearPickedObject();
+                        }
+                    }
+                });
+
+                // Human Action Buttons
+                document.getElementById('btn-mobile-jump').addEventListener('pointerdown', (e) => {
+                    if (humanControlMode && humanCanJump) {
+                        humanVerticalVelocity = humanControlSettings.jumpSpeed;
+                        humanCanJump = false;
+                    }
+                    e.preventDefault();
+                });
+                
+                document.getElementById('btn-mobile-interact').addEventListener('pointerdown', (e) => {
+                    if (humanControlMode) {
+                        handleGeneralInteraction();
+                    }
+                    e.preventDefault();
+                });
+                
+                document.getElementById('btn-mobile-exit').addEventListener('pointerdown', (e) => {
+                    if (humanControlMode) {
+                        exitHumanControlMode();
+                    }
+                    e.preventDefault();
+                });
+
+                // Joystick Virtual (Movimento)
+                const joystickContainer = document.getElementById('joystick-container');
+                const joystickHandle = document.getElementById('joystick-handle');
+                let joystickActive = false;
+                let joystickTouchId = null;
+                const joystickStartPos = new THREE.Vector2();
+                const joystickMaxDist = 45; // pixels max radius
+                
+                joystickContainer.addEventListener('pointerdown', (e) => {
+                    joystickActive = true;
+                    joystickTouchId = e.pointerId;
+                    
+                    const rect = joystickContainer.getBoundingClientRect();
+                    joystickStartPos.set(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    
+                    updateJoystickPosition(e.clientX, e.clientY);
+                    e.preventDefault();
+                    try {
+                        joystickContainer.setPointerCapture(e.pointerId);
+                    } catch(err) {}
+                });
+                
+                joystickContainer.addEventListener('pointermove', (e) => {
+                    if (!joystickActive || e.pointerId !== joystickTouchId) return;
+                    updateJoystickPosition(e.clientX, e.clientY);
+                    e.preventDefault();
+                });
+                
+                const releaseJoystick = (e) => {
+                    if (!joystickActive || e.pointerId !== joystickTouchId) return;
+                    joystickActive = false;
+                    joystickTouchId = null;
+                    
+                    joystickHandle.style.left = '50%';
+                    joystickHandle.style.top = '50%';
+                    
+                    humanMoveState.forward = false;
+                    humanMoveState.backward = false;
+                    humanMoveState.left = false;
+                    humanMoveState.right = false;
+                    
+                    try {
+                        joystickContainer.releasePointerCapture(e.pointerId);
+                    } catch(err) {}
+                };
+                
+                joystickContainer.addEventListener('pointerup', releaseJoystick);
+                joystickContainer.addEventListener('pointercancel', releaseJoystick);
+                
+                function updateJoystickPosition(clientX, clientY) {
+                    const dx = clientX - joystickStartPos.x;
+                    const dy = clientY - joystickStartPos.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    let moveX = dx;
+                    let moveY = dy;
+                    
+                    if (dist > joystickMaxDist) {
+                        moveX = (dx / dist) * joystickMaxDist;
+                        moveY = (dy / dist) * joystickMaxDist;
+                    }
+                    
+                    joystickHandle.style.left = `calc(50% + ${moveX}px)`;
+                    joystickHandle.style.top = `calc(50% + ${moveY}px)`;
+                    
+                    const normX = moveX / joystickMaxDist;
+                    const normY = moveY / joystickMaxDist;
+                    
+                    humanMoveState.forward = (normY < -0.35);
+                    humanMoveState.backward = (normY > 0.35);
+                    humanMoveState.left = (normX < -0.35);
+                    humanMoveState.right = (normX > 0.35);
+                }
+
+                // Touch Look-Around (Rotação da Câmara pelo Viewport Drag)
+                let lookActive = false;
+                let lookPointerId = null;
+                const lastLookPos = new THREE.Vector2();
+                const viewportEl = document.getElementById('viewport');
+                
+                viewportEl.addEventListener('pointerdown', (e) => {
+                    if (!humanControlMode) return;
+                    if (e.pointerType !== 'touch') return;
+                    
+                    // Ignore touches on left side (joystick)
+                    if (e.clientX < window.innerWidth * 0.4) return;
+                    
+                    lookActive = true;
+                    lookPointerId = e.pointerId;
+                    lastLookPos.set(e.clientX, e.clientY);
+                    
+                    try {
+                        viewportEl.setPointerCapture(e.pointerId);
+                    } catch(err) {}
+                });
+                
+                viewportEl.addEventListener('pointermove', (e) => {
+                    if (!lookActive || e.pointerId !== lookPointerId) return;
+                    
+                    const deltaX = e.clientX - lastLookPos.x;
+                    const deltaY = e.clientY - lastLookPos.y;
+                    
+                    // Touch camera turn sensitivity
+                    const sensitivity = 0.006;
+                    humanYaw -= deltaX * sensitivity;
+                    humanPitch -= deltaY * sensitivity;
+                    humanPitch = THREE.MathUtils.clamp(
+                        humanPitch,
+                        -humanControlSettings.maxPitch,
+                        humanControlSettings.maxPitch
+                    );
+                    
+                    lastLookPos.set(e.clientX, e.clientY);
+                });
+                
+                const releaseLook = (e) => {
+                    if (!lookActive || e.pointerId !== lookPointerId) return;
+                    lookActive = false;
+                    lookPointerId = null;
+                    try {
+                        viewportEl.releasePointerCapture(e.pointerId);
+                    } catch(err) {}
+                };
+                
+                viewportEl.addEventListener('pointerup', releaseLook);
+                viewportEl.addEventListener('pointercancel', releaseLook);
+            })();
+
             function updatePondWaves() {
                 const time = Date.now() * 0.003;
                 if (typeof ponds === 'undefined') return;
@@ -3216,6 +3884,1009 @@
                 }
             }
 
+            // --- APPLE PICKING SYSTEM HELPERS & LOGIC ---
+            function createApple() {
+                const appleGroup = new THREE.Group();
+                appleGroup.name = 'PickedApple';
+
+                // Apple body (Red sphere, slightly squat)
+                const bodyGeo = new THREE.SphereGeometry(1.4, 8, 8);
+                bodyGeo.scale(1.0, 0.9, 1.0);
+                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3 }); // shiny red
+                const body = new THREE.Mesh(bodyGeo, bodyMat);
+                body.castShadow = true;
+                body.receiveShadow = true;
+                appleGroup.add(body);
+
+                // Stem (brown small cylinder)
+                const stemGeo = new THREE.CylinderGeometry(0.1, 0.15, 0.8, 6);
+                stemGeo.translate(0, 0.4, 0);
+                const stemMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.8 });
+                const stem = new THREE.Mesh(stemGeo, stemMat);
+                stem.position.set(0, 1.1, 0);
+                stem.rotation.z = -0.15;
+                appleGroup.add(stem);
+
+                // Leaf (tiny green box)
+                const leafGeo = new THREE.BoxGeometry(0.6, 0.1, 0.3);
+                leafGeo.translate(0.3, 0, 0);
+                const leafMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.6 });
+                const leaf = new THREE.Mesh(leafGeo, leafMat);
+                leaf.position.set(0.15, 1.4, 0);
+                leaf.rotation.z = 0.25;
+                appleGroup.add(leaf);
+
+                appleGroup.scale.setScalar(1.2);
+                return appleGroup;
+            }
+
+            function checkTreeProximity() {
+                if (!humanControlMode || !controlledHuman || appleState.active || fishingState.active) {
+                    if (applePromptEl) applePromptEl.classList.remove('visible');
+                    return;
+                }
+
+                if (typeof trees === 'undefined' || trees.length === 0) {
+                    if (applePromptEl) applePromptEl.classList.remove('visible');
+                    return;
+                }
+
+                let nearestTree = null;
+                let minDist = Infinity;
+
+                for (const tree of trees) {
+                    const dx = controlledHuman.position.x - tree.position.x;
+                    const dz = controlledHuman.position.z - tree.position.z;
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearestTree = tree;
+                    }
+                }
+
+                if (!nearestTree) {
+                    if (applePromptEl) applePromptEl.classList.remove('visible');
+                    return;
+                }
+
+                // Expanded distance range so player has space to stand back and look up
+                const minRange = 15;
+                const maxRange = 85;
+
+                if (minDist >= minRange && minDist <= maxRange) {
+                    // Check if camera is pointing towards the tree canopy (high up around y = 145)
+                    const canopyPos = new THREE.Vector3().copy(nearestTree.position);
+                    canopyPos.y += 145; // canopy center height
+                    
+                    const toCanopy = new THREE.Vector3().copy(canopyPos).sub(camera.position).normalize();
+                    const camDir = new THREE.Vector3();
+                    camera.getWorldDirection(camDir);
+                    
+                    const dot = camDir.dot(toCanopy);
+
+                    // Requires looking directly up at the canopy (leaves), not horizontally at the trunk
+                    if (dot > 0.82) {
+                        if (applePromptEl) applePromptEl.classList.add('visible');
+                        appleState.targetTree = nearestTree;
+                        if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+                        return;
+                    }
+                }
+
+                if (applePromptEl) applePromptEl.classList.remove('visible');
+                appleState.targetTree = null;
+            }
+
+            function startApplePicking() {
+                if (!humanControlMode || !controlledHuman || appleState.active) return;
+                if (!appleState.targetTree) return;
+
+                appleState.active = true;
+                appleState.phase = 1;
+                appleState.timer = 0;
+                appleState.targetSet = false;
+
+                if (applePromptEl) applePromptEl.classList.remove('visible');
+
+                // Align controlled human with the tree immediately
+                const toTree = new THREE.Vector3().copy(appleState.targetTree.position).sub(controlledHuman.position);
+                toTree.y = 0;
+                toTree.normalize();
+                controlledHuman.rotation.y = Math.atan2(toTree.x, toTree.z);
+
+                // Align humanYaw and pitch to look at tree
+                humanYaw = Math.atan2(toTree.x, toTree.z);
+                humanPitch = 0.1; // looking slightly up towards foliage
+            }
+
+            function resetAppleState() {
+                // Remove apple
+                if (appleState.appleMesh) {
+                    if (appleState.appleMesh.parent) {
+                        appleState.appleMesh.parent.remove(appleState.appleMesh);
+                    } else {
+                        scene.remove(appleState.appleMesh);
+                    }
+                    appleState.appleMesh = null;
+                }
+
+                // Reset HUD elements
+                if (applePromptEl) applePromptEl.classList.remove('visible');
+                if (appleResultEl) appleResultEl.classList.remove('visible');
+
+                // Clean arm rotations
+                if (controlledHuman) {
+                    if (controlledHuman.userData.rightArm) controlledHuman.userData.rightArm.rotation.set(0, 0, 0);
+                    if (controlledHuman.userData.leftArm) controlledHuman.userData.leftArm.rotation.set(0, 0, 0);
+                }
+
+                appleState.active = false;
+                appleState.phase = 0;
+                appleState.timer = 0;
+                appleState.targetTree = null;
+                appleState.targetSet = false;
+            }
+
+            function updateApplePickingSystem(deltaTime) {
+                if (!controlledHuman || !humanControlMode) {
+                    if (appleState.active) {
+                        resetAppleState();
+                    }
+                    return;
+                }
+
+                if (!appleState.active) {
+                    checkTreeProximity();
+                    return;
+                }
+
+                appleState.timer += deltaTime;
+                const phase = appleState.phase;
+                const timer = appleState.timer;
+
+                const rightArm = controlledHuman.userData.rightArm;
+                const leftArm = controlledHuman.userData.leftArm;
+
+                // Directions
+                const forward = new THREE.Vector3(Math.sin(humanYaw), 0, Math.cos(humanYaw)).normalize();
+                const right = new THREE.Vector3(forward.z, 0, -forward.x).normalize();
+
+                // Phase logic
+                if (phase === 1) {
+                    // Reach out (duration: 0.8s)
+                    // Lerp rightArm.rotation.x from 0 to -Math.PI * 0.8 (reaching high)
+                    // and rotation.z to -Math.PI * 0.1 (reaching inward/forward)
+                    const ratio = Math.min(timer / 0.8, 1);
+                    if (rightArm) {
+                        rightArm.rotation.x = THREE.MathUtils.lerp(0, -Math.PI * 0.8, ratio);
+                        rightArm.rotation.z = THREE.MathUtils.lerp(0, -Math.PI * 0.1, ratio);
+                    }
+
+                    // Create apple in tree canopy (height y = 135 above tree base)
+                    if (!appleState.appleMesh) {
+                        appleState.appleMesh = createApple();
+                        scene.add(appleState.appleMesh);
+
+                        const appleWorld = new THREE.Vector3().copy(appleState.targetTree.position);
+                        appleWorld.y += 135; // tree canopy height
+                        // push slightly towards player
+                        const toPlayer = new THREE.Vector3().copy(controlledHuman.position).sub(appleState.targetTree.position);
+                        toPlayer.y = 0;
+                        toPlayer.normalize();
+                        appleWorld.addScaledVector(toPlayer, 15);
+
+                        appleState.appleMesh.position.copy(appleWorld);
+                        appleState.appleStartWorld.copy(appleWorld);
+                    }
+
+                    // Camera: over shoulder looking at branches
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, -22)
+                        .addScaledVector(right, 14)
+                        .add(new THREE.Vector3(0, 24, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 5);
+
+                    // Look directly at the apple in the canopy
+                    const lookTarget = new THREE.Vector3().copy(appleState.appleStartWorld);
+                    camera.lookAt(lookTarget);
+
+                    if (timer >= 0.8) {
+                        appleState.phase = 2;
+                        appleState.timer = 0;
+                    }
+                }
+                else if (phase === 2) {
+                    // Pick (duration: 0.5s)
+                    // Hand touches the apple, add a slight rustling/plucking animation (shake apple)
+                    const ratio = Math.min(timer / 0.5, 1);
+                    if (appleState.appleMesh) {
+                        const shake = Math.sin(timer * 40) * 0.3;
+                        appleState.appleMesh.position.copy(appleState.appleStartWorld).add(new THREE.Vector3(shake, 0, 0));
+                    }
+
+                    // Camera close-up on apple (between player and apple, looking up)
+                    if (appleState.appleMesh) {
+                        const toPlayer = new THREE.Vector3().copy(controlledHuman.position).sub(appleState.appleStartWorld);
+                        toPlayer.y = 0;
+                        toPlayer.normalize();
+                        const camTargetPos = new THREE.Vector3().copy(appleState.appleStartWorld)
+                            .addScaledVector(toPlayer, 18)
+                            .add(new THREE.Vector3(0, -5, 0));
+                        camera.position.lerp(camTargetPos, deltaTime * 4);
+                        camera.lookAt(appleState.appleStartWorld);
+                    }
+
+                    if (timer >= 0.5) {
+                        appleState.phase = 3;
+                        appleState.timer = 0;
+                    }
+                }
+                else if (phase === 3) {
+                    // Bring down (duration: 0.8s)
+                    // Attach apple to hand/rightArm
+                    if (appleState.appleMesh && appleState.appleMesh.parent !== rightArm && rightArm) {
+                        rightArm.add(appleState.appleMesh);
+                        // Hand position relative to right arm is (0.75, -15.1, 0)
+                        appleState.appleMesh.position.set(0.75, -15.1, 0);
+                        appleState.appleMesh.rotation.set(0, 0, 0);
+                    }
+
+                    // Lower arm back down in front of the body
+                    const ratio = Math.min(timer / 0.8, 1);
+                    if (rightArm) {
+                        rightArm.rotation.x = THREE.MathUtils.lerp(-Math.PI * 0.8, Math.PI * 0.2, ratio);
+                        rightArm.rotation.z = THREE.MathUtils.lerp(-Math.PI * 0.1, 0, ratio);
+                    }
+
+                    // Camera swings around to front-facing wide view
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, 65)
+                        .addScaledVector(right, -24) // offset left of human to show apple in right hand
+                        .add(new THREE.Vector3(0, 48, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 3);
+
+                    const lookTarget = new THREE.Vector3().copy(controlledHuman.position).add(new THREE.Vector3(0, 32, 0));
+                    camera.lookAt(lookTarget);
+
+                    if (timer >= 0.8) {
+                        appleState.phase = 4;
+                        appleState.timer = 0;
+                    }
+                }
+                else if (phase === 4) {
+                    // Display success (duration: 2.8s)
+                    if (appleResultEl) appleResultEl.classList.add('visible');
+
+                    // Camera: front-facing wide shot (zoomed out to see full body clearly)
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, 70) // 70 units in front
+                        .addScaledVector(right, -26)  // 26 units to the left
+                        .add(new THREE.Vector3(0, 48, 0)); // height of 48 units
+                    camera.position.lerp(camTargetPos, deltaTime * 3);
+
+                    const lookTarget = new THREE.Vector3().copy(controlledHuman.position).add(new THREE.Vector3(0, 32, 0));
+                    camera.lookAt(lookTarget);
+
+                    if (timer >= 2.8) {
+                        appleState.phase = 5;
+                        appleState.timer = 0;
+
+                        // Save start position for camera return transition
+                        appleState.cameraStartPos = camera.position.clone();
+                        appleState.cameraStartLookTarget = new THREE.Vector3().copy(controlledHuman.position).add(new THREE.Vector3(0, 32, 0));
+
+                        // Hide success banner
+                        if (appleResultEl) appleResultEl.classList.remove('visible');
+
+                        // Reset apple mesh and arm immediately so they don't look weird while camera returns
+                        if (appleState.appleMesh && appleState.appleMesh.parent) {
+                            appleState.appleMesh.parent.remove(appleState.appleMesh);
+                        }
+                        appleState.appleMesh = null;
+
+                        if (rightArm) rightArm.rotation.set(0, 0, 0);
+                        if (leftArm) leftArm.rotation.set(0, 0, 0);
+                    }
+                }
+                else if (phase === 5) {
+                    // Camera Return Transition (duration: 1.2s)
+                    const ratio = Math.min(timer / 1.2, 1);
+                    const smoothT = THREE.MathUtils.smoothstep(ratio, 0, 1);
+
+                    // First person camera target position
+                    const eyePos = new THREE.Vector3();
+                    getHumanCameraEyeWorldPosition(controlledHuman, eyePos);
+                    const faceOffset = getHumanCameraForwardOffset(controlledHuman) + 1.0;
+                    const firstPersonCamPos = new THREE.Vector3().copy(eyePos).addScaledVector(forward, faceOffset);
+
+                    // First person camera look target
+                    const lookDir = new THREE.Vector3(
+                        Math.sin(humanYaw) * Math.cos(humanPitch),
+                        Math.sin(humanPitch),
+                        Math.cos(humanYaw) * Math.cos(humanPitch)
+                    );
+                    const firstPersonLookTarget = new THREE.Vector3().copy(firstPersonCamPos).add(lookDir);
+
+                    // Interpolate
+                    if (appleState.cameraStartPos && appleState.cameraStartLookTarget) {
+                        camera.position.lerpVectors(appleState.cameraStartPos, firstPersonCamPos, smoothT);
+                        const currentLookTarget = new THREE.Vector3().lerpVectors(appleState.cameraStartLookTarget, firstPersonLookTarget, smoothT);
+                        camera.lookAt(currentLookTarget);
+                    }
+
+                    if (timer >= 1.2) {
+                        appleState.phase = 6;
+                        appleState.timer = 0;
+                    }
+                }
+                else if (phase === 6) {
+                    resetAppleState();
+                }
+            }
+
+            function handleGeneralInteraction() {
+                if (fishingState.targetPond) {
+                    startFishing();
+                } else if (appleState.targetTree) {
+                    startApplePicking();
+                }
+            }
+
+            // --- FISHING SYSTEM HELPERS & LOGIC ---
+            function createFishingRod() {
+                const rodGroup = new THREE.Group();
+                rodGroup.name = 'FishingRod';
+
+                // Handle (cork / brown cylinder)
+                const handleGeo = new THREE.CylinderGeometry(0.3, 0.3, 4, 8);
+                handleGeo.translate(0, 2, 0); // pivot at bottom
+                const handleMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.8 }); // brown cork
+                const handle = new THREE.Mesh(handleGeo, handleMat);
+                rodGroup.add(handle);
+
+                // Pole (tapered wooden pole)
+                const poleGeo = new THREE.CylinderGeometry(0.08, 0.25, 22, 8);
+                poleGeo.translate(0, 11, 0); // pivot at bottom
+                const poleMat = new THREE.MeshStandardMaterial({ color: 0x4a3b32, roughness: 0.6 }); // dark wood
+                const pole = new THREE.Mesh(poleGeo, poleMat);
+                pole.position.y = 4; // starts where the handle ends
+                rodGroup.add(pole);
+
+                // Tip Anchor (dummy object to get the line endpoint in world space)
+                const tipAnchor = new THREE.Object3D();
+                tipAnchor.name = 'TipAnchor';
+                tipAnchor.position.set(0, 22, 0); // at the tip of the pole
+                pole.add(tipAnchor);
+
+                // Rotate the entire rod group slightly forward and out
+                rodGroup.rotation.x = Math.PI / 4;
+                rodGroup.rotation.z = -Math.PI / 12;
+
+                return rodGroup;
+            }
+
+            function createFishingFloat() {
+                const floatGroup = new THREE.Group();
+                floatGroup.name = 'FishingFloat';
+
+                // Use flat cylinder geometries so the float doesn't penetrate deep into the transparent water,
+                // which completely removes any submerged body reflection/visual.
+                // Add floatClippingPlane to completely hide submerged parts
+                const floatTop = new THREE.Mesh(
+                    new THREE.CylinderGeometry(1.2, 1.2, 0.4, 8),
+                    new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.4, clippingPlanes: [floatClippingPlane] })
+                );
+                floatTop.position.y = 0.2;
+
+                const floatBottom = new THREE.Mesh(
+                    new THREE.CylinderGeometry(1.2, 1.2, 0.4, 8),
+                    new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, clippingPlanes: [floatClippingPlane] })
+                );
+                floatBottom.position.y = -0.2;
+
+                floatGroup.add(floatBottom);
+                floatGroup.add(floatTop);
+
+                // Add a tiny stick on top
+                const floatStick = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.15, 0.15, 2, 6),
+                    new THREE.MeshStandardMaterial({ color: 0x000000, clippingPlanes: [floatClippingPlane] })
+                );
+                floatStick.position.y = 1.2;
+                floatGroup.add(floatStick);
+
+                // Disable shadows entirely to prevent dark shadow projection on the pond bottom which looks like reflections
+                floatGroup.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = false;
+                        child.receiveShadow = false;
+                    }
+                });
+
+                return floatGroup;
+            }
+
+            function createFish() {
+                const fishGroup = new THREE.Group();
+                fishGroup.name = 'CaughtFish';
+
+                // Fish Body: Orange/Cyan low-poly fish
+                const bodyGeo = new THREE.SphereGeometry(2.0, 8, 6);
+                bodyGeo.scale(0.6, 1.2, 2.2); // flat horizontally, tall vertically, elongated
+                const bodyMat = new THREE.MeshStandardMaterial({
+                    color: 0xff7a00, // orange fish
+                    roughness: 0.3,
+                    metalness: 0.1,
+                    flatShading: true
+                });
+                const body = new THREE.Mesh(bodyGeo, bodyMat);
+                fishGroup.add(body);
+
+                // Tail fin
+                const tailGeo = new THREE.ConeGeometry(1.2, 3.0, 4);
+                tailGeo.rotateX(Math.PI / 2);
+                tailGeo.scale(0.2, 1.5, 1.0);
+                const tail = new THREE.Mesh(tailGeo, bodyMat);
+                tail.position.set(0, 0, -2.5);
+                fishGroup.add(tail);
+
+                // Eyes
+                const eyeGeo = new THREE.SphereGeometry(0.3, 6, 6);
+                const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5 });
+                const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+                leftEye.position.set(-0.7, 0.4, 1.2);
+                const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+                rightEye.position.set(0.7, 0.4, 1.2);
+                fishGroup.add(leftEye);
+                fishGroup.add(rightEye);
+
+                // Dorsal fin
+                const finGeo = new THREE.ConeGeometry(0.8, 2.0, 4);
+                finGeo.rotateX(-Math.PI / 4);
+                finGeo.scale(0.2, 1.0, 1.0);
+                const fin = new THREE.Mesh(finGeo, bodyMat);
+                fin.position.set(0, 1.5, -0.5);
+                fishGroup.add(fin);
+
+                fishGroup.scale.setScalar(0.7);
+                return fishGroup;
+            }
+
+            function checkFishingProximity() {
+                if (!humanControlMode || !controlledHuman || fishingState.active) {
+                    if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+                    return;
+                }
+
+                if (typeof ponds === 'undefined' || ponds.length === 0) {
+                    if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+                    return;
+                }
+
+                let nearestPond = null;
+                let minDist = Infinity;
+
+                for (const pond of ponds) {
+                    const dx = controlledHuman.position.x - pond.position.x;
+                    const dz = controlledHuman.position.z - pond.position.z;
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearestPond = pond;
+                    }
+                }
+
+                if (!nearestPond) {
+                    if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+                    return;
+                }
+
+                // Radius of the shore blocks is roughly 130. Stand on the edge at dist [110, 170].
+                const radius = nearestPond.userData.pondRadius || 130;
+                const minRange = radius - 20; // 110
+                const maxRange = radius + 40; // 170
+
+                if (minDist >= minRange && minDist <= maxRange) {
+                    // Check if looking at the water
+                    const toPond = new THREE.Vector3().copy(nearestPond.position).sub(controlledHuman.position);
+                    toPond.y = 0;
+                    toPond.normalize();
+
+                    const forward = new THREE.Vector3(Math.sin(humanYaw), 0, Math.cos(humanYaw)).normalize();
+                    const dot = forward.dot(toPond);
+
+                    if (dot > 0.5) {
+                        if (fishingPromptEl) fishingPromptEl.classList.add('visible');
+                        fishingState.targetPond = nearestPond;
+                        return;
+                    }
+                }
+
+                if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+                fishingState.targetPond = null;
+            }
+
+            function startFishing() {
+                if (!humanControlMode || !controlledHuman || fishingState.active) return;
+                if (!fishingState.targetPond) return;
+
+                fishingState.active = true;
+                fishingState.phase = 1;
+                fishingState.timer = 0;
+
+                if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+
+                // Align controlled human with the center of the pond immediately
+                const toPond = new THREE.Vector3().copy(fishingState.targetPond.position).sub(controlledHuman.position);
+                toPond.y = 0;
+                toPond.normalize();
+                controlledHuman.rotation.y = Math.atan2(toPond.x, toPond.z);
+
+                // Align humanYaw so when we exit fishing, camera matches this direction
+                humanYaw = Math.atan2(toPond.x, toPond.z);
+                humanPitch = -0.15; // slightly looking down
+
+                // Set clipping plane for the float/line at water surface level
+                const waterLevel = fishingState.targetPond.position.y - 20;
+                floatClippingPlane.constant = -waterLevel;
+            }
+
+            function resetFishingState() {
+                // Remove rod
+                if (fishingState.rod) {
+                    if (fishingState.rod.parent) {
+                        fishingState.rod.parent.remove(fishingState.rod);
+                    }
+                    fishingState.rod = null;
+                }
+
+                // Remove float
+                if (fishingState.floatMesh) {
+                    if (fishingState.floatMesh.parent) {
+                        fishingState.floatMesh.parent.remove(fishingState.floatMesh);
+                    } else {
+                        scene.remove(fishingState.floatMesh);
+                    }
+                    fishingState.floatMesh = null;
+                }
+
+                // Remove fish
+                if (fishingState.fishMesh) {
+                    if (fishingState.fishMesh.parent) {
+                        fishingState.fishMesh.parent.remove(fishingState.fishMesh);
+                    } else {
+                        scene.remove(fishingState.fishMesh);
+                    }
+                    fishingState.fishMesh = null;
+                }
+
+                // Remove line
+                if (fishingState.lineMesh) {
+                    scene.remove(fishingState.lineMesh);
+                    fishingState.lineMesh = null;
+                }
+
+                // Reset HUD elements
+                if (fishingPromptEl) fishingPromptEl.classList.remove('visible');
+                if (fishingResultEl) fishingResultEl.classList.remove('visible');
+
+                // Clean arm rotations
+                if (controlledHuman) {
+                    if (controlledHuman.userData.rightArm) controlledHuman.userData.rightArm.rotation.set(0, 0, 0);
+                    if (controlledHuman.userData.leftArm) controlledHuman.userData.leftArm.rotation.set(0, 0, 0);
+                }
+
+                fishingState.active = false;
+                fishingState.phase = 0;
+                fishingState.timer = 0;
+                fishingState.targetPond = null;
+                fishingState.rodTipAnchor = null;
+
+                // Reset float clipping plane constant to deep (no clipping)
+                floatClippingPlane.constant = 100000;
+            }
+
+            function updateFishingLine(overrideTarget = null) {
+                if (!fishingState.lineMesh || !fishingState.rodTipAnchor || !controlledHuman) return;
+
+                // Force update matrix world of human to get exact rod tip position in world coordinates
+                controlledHuman.updateMatrixWorld(true);
+
+                const start = new THREE.Vector3();
+                fishingState.rodTipAnchor.getWorldPosition(start);
+
+                const end = new THREE.Vector3();
+                if (overrideTarget) {
+                    end.copy(overrideTarget);
+                } else if (fishingState.floatMesh) {
+                    end.copy(fishingState.floatMesh.position);
+                } else {
+                    end.copy(start);
+                }
+
+                const points = [];
+                const segments = 12;
+                for (let i = 0; i <= segments; i++) {
+                    const ratio = i / segments;
+                    const p = new THREE.Vector3().lerpVectors(start, end, ratio);
+                    const dist = start.distanceTo(end);
+                    // Make it sag significantly to look loose ("solta")
+                    const sag = Math.sin(ratio * Math.PI) * (dist * 0.16 + 6.0); // 16% sag + 6 units base sag
+                    p.y -= sag;
+                    points.push(p);
+                }
+
+                // Re-create tube geometry dynamically to give the line real 3D thickness and prevent culling
+                const curve = new THREE.CatmullRomCurve3(points);
+                const newGeo = new THREE.TubeGeometry(curve, 16, 0.08, 4, false);
+                if (fishingState.lineMesh.geometry) {
+                    fishingState.lineMesh.geometry.dispose();
+                }
+                fishingState.lineMesh.geometry = newGeo;
+                fishingState.lineMesh.visible = true;
+            }
+
+            function updateFishingSystem(deltaTime) {
+                if (!controlledHuman || !humanControlMode) {
+                    if (fishingState.active) {
+                        resetFishingState();
+                    }
+                    return;
+                }
+
+                if (!fishingState.active) {
+                    checkFishingProximity();
+                    return;
+                }
+
+                fishingState.timer += deltaTime;
+                const phase = fishingState.phase;
+                const timer = fishingState.timer;
+
+                const rightArm = controlledHuman.userData.rightArm;
+                const leftArm = controlledHuman.userData.leftArm;
+
+                // Directions
+                const forward = new THREE.Vector3(Math.sin(humanYaw), 0, Math.cos(humanYaw)).normalize();
+                const right = new THREE.Vector3(forward.z, 0, -forward.x).normalize();
+
+                // Phase logic
+                if (phase === 1) {
+                    // Windup (duration: 0.8s)
+                    if (!fishingState.rod && rightArm) {
+                        fishingState.rod = createFishingRod();
+                        rightArm.add(fishingState.rod);
+                        fishingState.rod.position.set(0.75, -15.1, 0);
+                        fishingState.rodTipAnchor = fishingState.rod.getObjectByName('TipAnchor');
+                    }
+
+                    // Create line and float immediately in Phase 1 so they are visible from the start
+                    if (!fishingState.floatMesh) {
+                        fishingState.floatMesh = createFishingFloat();
+                        scene.add(fishingState.floatMesh);
+                    }
+                    if (!fishingState.lineMesh) {
+                        const lineMat = new THREE.MeshBasicMaterial({
+                            color: 0xffffff,
+                            clippingPlanes: [floatClippingPlane]
+                        });
+                        fishingState.lineMesh = new THREE.Mesh(new THREE.BufferGeometry(), lineMat);
+                        fishingState.lineMesh.frustumCulled = false;
+                        scene.add(fishingState.lineMesh);
+                    }
+
+                    // Position float hanging 5 units below the rod tip
+                    const tipWorld = new THREE.Vector3();
+                    if (fishingState.rodTipAnchor) {
+                        fishingState.rodTipAnchor.getWorldPosition(tipWorld);
+                    } else {
+                        tipWorld.copy(controlledHuman.position).add(new THREE.Vector3(0, 30, 0));
+                    }
+                    fishingState.floatMesh.position.copy(tipWorld).add(new THREE.Vector3(0, -5, 0));
+
+                    // Update Line connecting rod tip to float
+                    updateFishingLine();
+
+                    // Lerp arm rotation X from 0 to -Math.PI * 0.7
+                    const ratio = Math.min(timer / 0.8, 1);
+                    if (rightArm) rightArm.rotation.x = THREE.MathUtils.lerp(0, -Math.PI * 0.7, ratio);
+                    if (leftArm) leftArm.rotation.x = THREE.MathUtils.lerp(0, 0.2, ratio);
+
+                    // Camera: behind shoulder view
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, -25)
+                        .addScaledVector(right, 18)
+                        .add(new THREE.Vector3(0, 22, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 5);
+
+                    const lookTarget = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, 40)
+                        .add(new THREE.Vector3(0, 10, 0));
+                    camera.lookAt(lookTarget);
+
+                    if (timer >= 0.8) {
+                        fishingState.phase = 2;
+                        fishingState.timer = 0;
+                    }
+                }
+                else if (phase === 2) {
+                    // Cast (duration: 1.0s)
+                    const ratio = Math.min(timer / 1.0, 1);
+                    if (rightArm) rightArm.rotation.x = THREE.MathUtils.lerp(-Math.PI * 0.7, Math.PI * 0.2, ratio * ratio); // swing ease-in
+
+                    // Calculate targets on the first frame of Phase 2
+                    if (timer - deltaTime <= 0 || !fishingState.floatTarget.x) {
+                        const targetPos = new THREE.Vector3().copy(fishingState.targetPond.position);
+                        targetPos.y = fishingState.targetPond.position.y - 20; // water surface
+                        targetPos.x += (Math.random() - 0.5) * 20;
+                        targetPos.z += (Math.random() - 0.5) * 20;
+                        fishingState.floatTarget.copy(targetPos);
+
+                        // Start position is the float's position (hanging from tip)
+                        fishingState.floatStart.copy(fishingState.floatMesh.position);
+                    }
+
+                    // Move float along parabolic curve
+                    const currentPos = new THREE.Vector3().lerpVectors(fishingState.floatStart, fishingState.floatTarget, ratio);
+                    currentPos.y += Math.sin(ratio * Math.PI) * 25; // height arc
+                    if (fishingState.floatMesh) fishingState.floatMesh.position.copy(currentPos);
+
+                    // Update Line
+                    updateFishingLine();
+
+                    // Camera tracks the flying float
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, -20 + ratio * 15)
+                        .addScaledVector(right, 15)
+                        .add(new THREE.Vector3(0, 20 - ratio * 5, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 4);
+                    camera.lookAt(fishingState.floatMesh.position);
+
+                    if (timer >= 1.0) {
+                        fishingState.phase = 3;
+                        fishingState.timer = 0;
+                    }
+                }
+                else if (phase === 3) {
+                    // Settle (duration: 1.0s)
+                    if (fishingState.floatMesh) fishingState.floatMesh.position.copy(fishingState.floatTarget);
+                    updateFishingLine();
+
+                    if (rightArm) rightArm.rotation.x = THREE.MathUtils.lerp(Math.PI * 0.2, Math.PI * 0.1, Math.min(timer / 1.0, 1));
+
+                    // Camera moves to focus on the float in water
+                    const camTargetPos = new THREE.Vector3().copy(fishingState.floatTarget)
+                        .addScaledVector(forward, -35)
+                        .add(new THREE.Vector3(0, 18, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 3);
+                    camera.lookAt(fishingState.floatTarget);
+
+                    if (timer >= 1.0) {
+                        fishingState.phase = 4;
+                        fishingState.timer = 0;
+                        fishingState.waitDuration = 2.0 + Math.random() * 2.0; // Wait 2-4 seconds
+                    }
+                }
+                else if (phase === 4) {
+                    // Wait (duration: waitDuration)
+                    const bob = Math.sin(Date.now() * 0.005) * 0.25;
+                    if (fishingState.floatMesh) fishingState.floatMesh.position.y = fishingState.floatTarget.y + bob;
+                    updateFishingLine();
+
+                    // Idle arm twitch
+                    if (rightArm) rightArm.rotation.x = Math.PI * 0.1 + Math.sin(Date.now() * 0.001) * 0.02;
+
+                    // Camera stays focused on float
+                    const camTargetPos = new THREE.Vector3().copy(fishingState.floatTarget)
+                        .addScaledVector(forward, -35)
+                        .add(new THREE.Vector3(0, 18, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 2);
+                    if (fishingState.floatMesh) camera.lookAt(fishingState.floatMesh.position);
+
+                    if (timer >= fishingState.waitDuration) {
+                        fishingState.phase = 5;
+                        fishingState.timer = 0;
+                    }
+                }
+                else if (phase === 5) {
+                    // Bite (duration: 1.2s)
+                    let offsetY = 0;
+                    if (timer < 0.3) {
+                        offsetY = -2.5 * Math.sin((timer / 0.3) * Math.PI);
+                    } else if (timer >= 0.5 && timer < 0.8) {
+                        offsetY = -3.5 * Math.sin(((timer - 0.5) / 0.3) * Math.PI);
+                    }
+                    if (fishingState.floatMesh) fishingState.floatMesh.position.y = fishingState.floatTarget.y + offsetY;
+                    updateFishingLine();
+
+                    // Camera vibrates to show tension
+                    const camTargetPos = new THREE.Vector3().copy(fishingState.floatTarget)
+                        .addScaledVector(forward, -35)
+                        .add(new THREE.Vector3(0, 18, 0));
+                    const shakeX = (Math.random() - 0.5) * 0.4;
+                    const shakeY = (Math.random() - 0.5) * 0.4;
+                    camera.position.copy(camTargetPos).add(new THREE.Vector3(shakeX, shakeY, 0));
+                    if (fishingState.floatMesh) camera.lookAt(fishingState.floatMesh.position);
+
+                    if (timer >= 1.2) {
+                        fishingState.phase = 6;
+                        fishingState.timer = 0;
+                    }
+                }
+                else if (phase === 6) {
+                    // Pull / Reel (duration: 1.2s)
+                    const ratio = Math.min(timer / 1.2, 1);
+
+                    // Pull arm back quickly
+                    if (rightArm) rightArm.rotation.x = THREE.MathUtils.lerp(Math.PI * 0.1, -Math.PI * 0.5, ratio * ratio);
+
+                    // Hide float
+                    if (fishingState.floatMesh) fishingState.floatMesh.visible = false;
+
+                    // Create fish
+                    if (!fishingState.fishMesh) {
+                        fishingState.fishMesh = createFish();
+                        scene.add(fishingState.fishMesh);
+
+                        // Set fish start pos
+                        fishingState.fishStart.copy(fishingState.floatTarget);
+
+                        // Target is human left hand
+                        const chestLocal = new THREE.Vector3(-0.75, 20, 5); // left hand position in local human coordinates
+                        chestLocal.applyMatrix4(controlledHuman.matrixWorld);
+                        fishingState.fishTarget.copy(chestLocal);
+                    }
+
+                    // Move fish along high arc
+                    const currentPos = new THREE.Vector3().lerpVectors(fishingState.fishStart, fishingState.fishTarget, ratio);
+                    currentPos.y += Math.sin(ratio * Math.PI) * 35;
+                    fishingState.fishMesh.position.copy(currentPos);
+
+                    // Rotate the fish
+                    fishingState.fishMesh.rotation.x = ratio * Math.PI * 3;
+                    fishingState.fishMesh.rotation.y = controlledHuman.rotation.y + Math.PI / 2 + ratio * Math.PI * 2;
+
+                    // Update line from tip to fish
+                    const fishWorldPos = new THREE.Vector3();
+                    if (fishingState.fishMesh) {
+                        fishingState.fishMesh.getWorldPosition(fishWorldPos);
+                        updateFishingLine(fishWorldPos);
+                    }
+
+                    // Camera moves to show the human from front-side
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, 25)
+                        .addScaledVector(right, 10)
+                        .add(new THREE.Vector3(0, 18, 0));
+                    camera.position.lerp(camTargetPos, deltaTime * 4);
+
+                    if (fishingState.fishMesh) {
+                        camera.lookAt(fishingState.fishMesh.position);
+                    } else {
+                        const lookTarget = new THREE.Vector3().copy(controlledHuman.position).add(new THREE.Vector3(0, 18, 0));
+                        camera.lookAt(lookTarget);
+                    }
+
+                    if (timer >= 1.2) {
+                        fishingState.phase = 7;
+                        fishingState.timer = 0;
+                    }
+                }
+                else if (phase === 7) {
+                    // Success Display (duration: 2.5s)
+                    const ratio = Math.min(timer / 1.0, 1);
+
+                    // Attach fish to leftArm if not done
+                    if (fishingState.fishMesh && fishingState.fishMesh.parent !== leftArm && leftArm) {
+                        leftArm.add(fishingState.fishMesh);
+                        // Hand position relative to left arm
+                        fishingState.fishMesh.position.set(-0.75, -15.1, 0);
+                        fishingState.fishMesh.rotation.set(0, Math.PI / 2, Math.PI / 2);
+                        fishingState.fishMesh.scale.setScalar(0.7);
+                    }
+
+                    // Lift left arm up to show the fish
+                    if (leftArm) leftArm.rotation.x = THREE.MathUtils.lerp(0, -Math.PI * 0.7, ratio);
+                    if (rightArm) rightArm.rotation.x = THREE.MathUtils.lerp(-Math.PI * 0.5, Math.PI * 0.2, ratio);
+
+                    // Keep updating line to follow the fish in the human's hand
+                    const fishHandWorldPos = new THREE.Vector3();
+                    if (fishingState.fishMesh) {
+                        fishingState.fishMesh.getWorldPosition(fishHandWorldPos);
+                        updateFishingLine(fishHandWorldPos);
+                    }
+
+                    // Show success banner
+                    if (fishingResultEl) fishingResultEl.classList.add('visible');
+
+                    // Camera: front-facing wide shot of human body, rod, and fish
+                    const camTargetPos = new THREE.Vector3().copy(controlledHuman.position)
+                        .addScaledVector(forward, 70) // 70 units in front (was 45)
+                        .addScaledVector(right, 26)   // 26 units to the right (was 18)
+                        .add(new THREE.Vector3(0, 48, 0)); // height of 48 units (was 38)
+                    camera.position.lerp(camTargetPos, deltaTime * 3);
+
+                    const lookTarget = new THREE.Vector3().copy(controlledHuman.position).add(new THREE.Vector3(0, 32, 0)); // look at chest/shoulders
+                    camera.lookAt(lookTarget);
+
+                    if (timer >= 2.8) { // slightly longer duration to enjoy the display
+                        fishingState.phase = 8;
+                        fishingState.timer = 0;
+
+                        // Save start position for camera return transition
+                        fishingState.cameraStartPos = camera.position.clone();
+                        fishingState.cameraStartLookTarget = new THREE.Vector3().copy(controlledHuman.position).add(new THREE.Vector3(0, 30, 0));
+
+                        // Hide success banner
+                        if (fishingResultEl) fishingResultEl.classList.remove('visible');
+
+                        // Reset items and arms immediately so they don't look weird while camera returns
+                        // Remove rod
+                        if (fishingState.rod && fishingState.rod.parent) fishingState.rod.parent.remove(fishingState.rod);
+                        fishingState.rod = null;
+
+                        // Remove fish
+                        if (fishingState.fishMesh && fishingState.fishMesh.parent) fishingState.fishMesh.parent.remove(fishingState.fishMesh);
+                        fishingState.fishMesh = null;
+
+                        // Remove line
+                        if (fishingState.lineMesh) {
+                            scene.remove(fishingState.lineMesh);
+                            fishingState.lineMesh = null;
+                        }
+
+                        // Remove float
+                        if (fishingState.floatMesh) {
+                            if (fishingState.floatMesh.parent) {
+                                fishingState.floatMesh.parent.remove(fishingState.floatMesh);
+                            } else {
+                                scene.remove(fishingState.floatMesh);
+                            }
+                            fishingState.floatMesh = null;
+                        }
+
+                        // Reset arms
+                        if (rightArm) rightArm.rotation.set(0, 0, 0);
+                        if (leftArm) leftArm.rotation.set(0, 0, 0);
+                    }
+                }
+                else if (phase === 8) {
+                    // Camera Return Transition (duration: 1.2s)
+                    const ratio = Math.min(timer / 1.2, 1);
+                    const smoothT = THREE.MathUtils.smoothstep(ratio, 0, 1);
+
+                    // First person camera target position
+                    const eyePos = new THREE.Vector3();
+                    getHumanCameraEyeWorldPosition(controlledHuman, eyePos);
+                    const faceOffset = getHumanCameraForwardOffset(controlledHuman) + 1.0;
+                    const firstPersonCamPos = new THREE.Vector3().copy(eyePos).addScaledVector(forward, faceOffset);
+
+                    // First person camera look target
+                    const lookDir = new THREE.Vector3(
+                        Math.sin(humanYaw) * Math.cos(humanPitch),
+                        Math.sin(humanPitch),
+                        Math.cos(humanYaw) * Math.cos(humanPitch)
+                    );
+                    const firstPersonLookTarget = new THREE.Vector3().copy(firstPersonCamPos).add(lookDir);
+
+                    // Interpolate camera position and lookTarget
+                    if (fishingState.cameraStartPos && fishingState.cameraStartLookTarget) {
+                        camera.position.lerpVectors(fishingState.cameraStartPos, firstPersonCamPos, smoothT);
+                        const currentLookTarget = new THREE.Vector3().lerpVectors(fishingState.cameraStartLookTarget, firstPersonLookTarget, smoothT);
+                        camera.lookAt(currentLookTarget);
+                    }
+
+                    if (timer >= 1.2) {
+                        fishingState.phase = 9;
+                        fishingState.timer = 0;
+                    }
+                }
+                else if (phase === 9) {
+                    // Reset everything and exit fishing state
+                    resetFishingState();
+                }
+            }
+
             function updateHumanAnimations(deltaTime) {
                 if (typeof humans === 'undefined' || !humans) return;
                 for (const human of humans) {
@@ -3225,7 +4896,15 @@
                     }
 
                     const isControlled = (humanControlMode && controlledHuman === human);
-                    const isMoving = isControlled && 
+
+                    // Override arm animations for controlled human if fishing or apple picking is active
+                    if ((fishingState.active || appleState.active) && isControlled) {
+                        if (human.userData.leftLeg) human.userData.leftLeg.rotation.x = 0;
+                        if (human.userData.rightLeg) human.userData.rightLeg.rotation.x = 0;
+                        continue;
+                    }
+
+                    const isMoving = isControlled &&
                         (humanMoveState.forward || humanMoveState.backward || humanMoveState.left || humanMoveState.right) &&
                         (typeof humanCanJump !== 'undefined' ? humanCanJump : true);
 
@@ -3263,7 +4942,55 @@
 
                 const deltaTime = Math.min(clock.getDelta(), 0.05);
                 updateHumanControl(deltaTime);
+                updateFishingSystem(deltaTime);
+                updateApplePickingSystem(deltaTime);
                 updateHumanAnimations(deltaTime);
+
+                // --- MOBILE UI VISIBILITY UPDATE ---
+                (function updateMobileUIVisibility() {
+                    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+                    if (!isTouchDevice) return;
+
+                    // Editor Action Bar
+                    const mobileEditorBar = document.getElementById('mobile-editor-bar');
+                    if (mobileEditorBar) {
+                        if (!humanControlMode && lastPickedObject) {
+                            mobileEditorBar.classList.add('visible');
+                        } else {
+                            mobileEditorBar.classList.remove('visible');
+                        }
+                    }
+
+                    // Human Controls
+                    const mobileHumanControls = document.getElementById('mobile-human-controls');
+                    if (mobileHumanControls) {
+                        if (humanControlMode) {
+                            mobileHumanControls.classList.add('visible');
+                        } else {
+                            mobileHumanControls.classList.remove('visible');
+                        }
+                    }
+
+                    // Dynamic Interaction Button
+                    const interactBtn = document.getElementById('btn-mobile-interact');
+                    if (interactBtn) {
+                        const fishingPromptVisible = fishingPromptEl && fishingPromptEl.classList.contains('visible');
+                        const applePromptVisible = applePromptEl && applePromptEl.classList.contains('visible');
+
+                        if (humanControlMode && (fishingPromptVisible || applePromptVisible)) {
+                            interactBtn.classList.add('visible');
+                            if (fishingPromptVisible) {
+                                interactBtn.innerHTML = '&#127907;'; // Fishing rod icon
+                                interactBtn.title = 'Pescar';
+                            } else {
+                                interactBtn.innerHTML = '&#127822;'; // Apple icon
+                                interactBtn.title = 'Colher Maçã';
+                            }
+                        } else {
+                            interactBtn.classList.remove('visible');
+                        }
+                    }
+                })();
 
                 // Avançar o ciclo dia/noite automático
                 if (dayTimeCycleAuto) {
@@ -3477,6 +5204,42 @@
             window.addEventListener('DOMContentLoaded', init);
         }
     </script>
+    <!-- ===== MOBILE UI ===== -->
+    <!-- Portrait orientation warning -->
+    <div id="portrait-warning">
+        <div class="rotate-phone-icon">&#128242;</div>
+        <h2>Modo Horizontal Requerido</h2>
+        <p>Por favor, rode o seu telemóvel para a horizontal (Landscape) para jogar.</p>
+    </div>
+
+    <!-- Fullscreen toggle button -->
+    <div id="fullscreen-btn">&#9974;</div>
+
+    <!-- Floating editor actions for selected object on mobile -->
+    <div id="mobile-editor-bar">
+        <button id="btn-editor-scale-up" class="mobile-editor-btn" title="Aumentar">&#10133;</button>
+        <button id="btn-editor-scale-down" class="mobile-editor-btn" title="Diminuir">&#10134;</button>
+        <button id="btn-editor-rot-left" class="mobile-editor-btn" title="Rodar Esquerda">&#8630;</button>
+        <button id="btn-editor-rot-right" class="mobile-editor-btn" title="Rodar Direita">&#8631;</button>
+        <button id="btn-editor-delete" class="mobile-editor-btn danger" title="Apagar">&#128465;</button>
+    </div>
+
+    <!-- Touch controls for human mode -->
+    <div id="mobile-human-controls">
+        <!-- Joystick area -->
+        <div id="joystick-container">
+            <div id="joystick-base">
+                <div id="joystick-handle"></div>
+            </div>
+        </div>
+        
+        <!-- Human actions (Jump, Interact, Exit) -->
+        <div id="mobile-action-buttons">
+            <button id="btn-mobile-interact" class="mobile-action-btn interact" title="Interagir">&#127907;</button>
+            <button id="btn-mobile-jump" class="mobile-action-btn jump" title="Saltar">&#11014;</button>
+            <button id="btn-mobile-exit" class="mobile-action-btn exit" title="Sair">&#128682;</button>
+        </div>
+    </div>
 </body>
 
 </html>
