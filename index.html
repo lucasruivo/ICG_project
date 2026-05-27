@@ -783,6 +783,7 @@
             align-items: center;
             justify-content: center;
             user-select: none;
+            touch-action: none;
         }
 
         #joystick-base {
@@ -793,6 +794,7 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
             position: relative;
+            touch-action: none;
         }
 
         #joystick-handle {
@@ -807,6 +809,105 @@
             top: 50%;
             transform: translate(-50%, -50%);
             transition: background 0.2s;
+            touch-action: none;
+        }
+
+        /* ===== CUSTOM CLEAR CONFIRMATION MODAL ===== */
+        #clear-confirm-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 11000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            user-select: none;
+        }
+
+        #clear-confirm-modal.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .clear-modal-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            color: #f8fafc;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #clear-confirm-modal.visible .clear-modal-card {
+            transform: scale(1);
+        }
+
+        .clear-modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .clear-modal-desc {
+            font-size: 15px;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .clear-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .clear-modal-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Outfit', sans-serif;
+            border: none;
+        }
+
+        .clear-modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+        }
+
+        .clear-modal-btn.cancel:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.97);
+        }
+
+        .clear-modal-btn.confirm {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .clear-modal-btn.confirm:active {
+            background: #dc2626;
+            transform: scale(0.97);
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
         }
 
         #mobile-action-buttons {
@@ -2894,6 +2995,12 @@
                 right: false,
             };
 
+            const joystickValues = {
+                x: 0,
+                y: 0,
+                active: false
+            };
+
             const humanControlSettings = {
                 speed: 250,        // terreno 3000x3000 — velocidade proporcional
                 jumpSpeed: 400,
@@ -2982,11 +3089,28 @@
             updateTumbleweedToggleButton();
 
             // Botão de limpar cenário
+            const clearConfirmModal = document.getElementById('clear-confirm-modal');
+            const btnClearCancel = document.getElementById('btn-clear-cancel');
+            const btnClearConfirm = document.getElementById('btn-clear-confirm');
             const clearSceneButton = document.getElementById('clearSceneButton');
-            if (clearSceneButton) {
+
+            if (clearSceneButton && clearConfirmModal && btnClearCancel && btnClearConfirm) {
                 clearSceneButton.addEventListener('click', () => {
-                    if (confirm('Tem certeza que deseja limpar todo o cenário?')) {
-                        clearScenarioObjects();
+                    clearConfirmModal.classList.add('visible');
+                });
+
+                btnClearCancel.addEventListener('click', () => {
+                    clearConfirmModal.classList.remove('visible');
+                });
+
+                btnClearConfirm.addEventListener('click', () => {
+                    clearScenarioObjects();
+                    clearConfirmModal.classList.remove('visible');
+                });
+
+                clearConfirmModal.addEventListener('click', (e) => {
+                    if (e.target === clearConfirmModal) {
+                        clearConfirmModal.classList.remove('visible');
                     }
                 });
             }
@@ -3159,15 +3283,29 @@
                 humanRight.set(humanForward.z, 0, -humanForward.x);
 
                 humanMoveVector.set(0, 0, 0);
-                if (humanMoveState.forward) humanMoveVector.add(humanForward);
-                if (humanMoveState.backward) humanMoveVector.sub(humanForward);
-                if (humanMoveState.left) humanMoveVector.add(humanRight);
-                if (humanMoveState.right) humanMoveVector.sub(humanRight);
-
+                if (joystickValues.active) {
+                    // Joystick control (continuous direction and speed)
+                    humanMoveVector.addScaledVector(humanForward, -joystickValues.y);
+                    humanMoveVector.addScaledVector(humanRight, -joystickValues.x);
+                    const len = humanMoveVector.length();
+                    if (len > 0.01) {
+                        const speedFactor = Math.min(len, 1.0);
+                        humanMoveVector.divideScalar(len).multiplyScalar(humanControlSettings.speed * deltaTime * speedFactor);
+                    }
+                } else {
+                    // Keyboard control (discrete binary directions)
+                    if (humanMoveState.forward) humanMoveVector.add(humanForward);
+                    if (humanMoveState.backward) humanMoveVector.sub(humanForward);
+                    if (humanMoveState.left) humanMoveVector.add(humanRight);
+                    if (humanMoveState.right) humanMoveVector.sub(humanRight);
+                    
+                    if (humanMoveVector.lengthSq() > 0) {
+                        humanMoveVector.normalize().multiplyScalar(humanControlSettings.speed * deltaTime);
+                    }
+                }
 
                 // Colisão com objetos (exceto grass, bush e tumbleweed)
                 if (humanMoveVector.lengthSq() > 0) {
-                    humanMoveVector.normalize().multiplyScalar(humanControlSettings.speed * deltaTime);
                     let collision = false;
                     // Checar colisão com árvores, pedras, cactos, humanos, dino, charcos
                     const checkGroups = [trees, rocks, cacts, humans, ponds, iceSpikes];
@@ -3301,6 +3439,7 @@
                 get controls() { return controls; },
 
                 humanMoveState,
+                joystickValues,
                 humanControlSettings,
                 dragPlane,
                 intersectionPoint,
@@ -3771,6 +3910,10 @@
                     joystickHandle.style.left = '50%';
                     joystickHandle.style.top = '50%';
                     
+                    joystickValues.x = 0;
+                    joystickValues.y = 0;
+                    joystickValues.active = false;
+                    
                     humanMoveState.forward = false;
                     humanMoveState.backward = false;
                     humanMoveState.left = false;
@@ -3802,6 +3945,10 @@
                     
                     const normX = moveX / joystickMaxDist;
                     const normY = moveY / joystickMaxDist;
+                    
+                    joystickValues.x = normX;
+                    joystickValues.y = normY;
+                    joystickValues.active = true;
                     
                     humanMoveState.forward = (normY < -0.35);
                     humanMoveState.backward = (normY > 0.35);
@@ -4905,14 +5052,19 @@
                     }
 
                     const isMoving = isControlled &&
-                        (humanMoveState.forward || humanMoveState.backward || humanMoveState.left || humanMoveState.right) &&
+                        (humanMoveState.forward || humanMoveState.backward || humanMoveState.left || humanMoveState.right || 
+                         (joystickValues.active && (Math.abs(joystickValues.x) > 0.05 || Math.abs(joystickValues.y) > 0.05))) &&
                         (typeof humanCanJump !== 'undefined' ? humanCanJump : true);
 
                     const targetSwing = isMoving ? 1.0 : 0.0;
                     human.userData.swingAmount = THREE.MathUtils.lerp(human.userData.swingAmount, targetSwing, 10 * deltaTime);
 
                     if (isMoving) {
-                        const speedFactor = (humanControlSettings ? (humanControlSettings.speed / 250) : 1.0);
+                        let speedFactor = (humanControlSettings ? (humanControlSettings.speed / 250) : 1.0);
+                        if (joystickValues.active) {
+                            const joyLen = Math.sqrt(joystickValues.x * joystickValues.x + joystickValues.y * joystickValues.y);
+                            speedFactor *= Math.min(joyLen, 1.0);
+                        }
                         human.userData.walkCycle += deltaTime * 12 * speedFactor;
                     }
 
@@ -5238,6 +5390,18 @@
             <button id="btn-mobile-interact" class="mobile-action-btn interact" title="Interagir">&#127907;</button>
             <button id="btn-mobile-jump" class="mobile-action-btn jump" title="Saltar">&#11014;</button>
             <button id="btn-mobile-exit" class="mobile-action-btn exit" title="Sair">&#128682;</button>
+        </div>
+    </div>
+
+    <!-- Custom clear confirmation modal -->
+    <div id="clear-confirm-modal">
+        <div class="clear-modal-card">
+            <div class="clear-modal-title">Limpar Cenário</div>
+            <div class="clear-modal-desc">Tem certeza que deseja limpar todo o cenário? Esta ação não pode ser desfeita.</div>
+            <div class="clear-modal-actions">
+                <button id="btn-clear-cancel" class="clear-modal-btn cancel">Cancelar</button>
+                <button id="btn-clear-confirm" class="clear-modal-btn confirm">Limpar</button>
+            </div>
         </div>
     </div>
 </body>
