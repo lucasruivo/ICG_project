@@ -15,7 +15,7 @@ export function createHuman() {
         metalness: 0.0,
     });
 
-    // Helper to add joint relative to a specific parent
+    // Articulação esférica
     function addJoint(parent, radius, x, y, z = 0) {
         const joint = new THREE.Mesh(new THREE.SphereGeometry(radius, 16, 12), woodMaterial);
         joint.position.set(x, y, z);
@@ -23,7 +23,7 @@ export function createHuman() {
         return joint;
     }
 
-    // Helper to add capsule segment relative to a specific parent
+    // Segmento cilíndrico
     function addCapsule(parent, radiusTop, radiusBottom, height, x, y, z = 0, rotX = 0, rotY = 0, rotZ = 0) {
         const segment = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 16), woodMaterial);
         segment.position.set(x, y, z);
@@ -32,7 +32,7 @@ export function createHuman() {
         return segment;
     }
 
-    // Head and neck (added directly to human group)
+    // Cabeça e âncora da câmara FPV
     const head = new THREE.Mesh(new THREE.CapsuleGeometry(2.2, 2.5, 8, 16), woodMaterial);
     head.position.set(0, 32, 0);
     head.scale.set(1.0, 1.12, 0.9);
@@ -44,7 +44,7 @@ export function createHuman() {
 
     addJoint(human, 1.05, 0, 27.6);
 
-    // Torso and pelvis (added directly to human group)
+    // Torso e pélvis
     addCapsule(human, 2.35, 2.75, 8.6, 0, 22.5);
 
     const chestAccent = new THREE.Mesh(new THREE.SphereGeometry(1.55, 14, 10), accentMaterial);
@@ -62,8 +62,7 @@ export function createHuman() {
     pelvisAccent.scale.set(1.2, 1.35, 0.4);
     human.add(pelvisAccent);
 
-    // --- LEGS GROUPS (ancored at hip joints) ---
-    // Left Leg Group (pivot at hip x=-1.25, y=10.5, z=0)
+    // Perna esquerda (pivô na anca)
     const leftLeg = new THREE.Group();
     leftLeg.position.set(-1.25, 10.5, 0);
     human.add(leftLeg);
@@ -81,7 +80,7 @@ export function createHuman() {
     leftFoot.scale.set(1.0, 0.72, 0.9);
     leftLeg.add(leftFoot);
 
-    // Right Leg Group (pivot at hip x=1.25, y=10.5, z=0)
+    // Perna direita (pivô na anca)
     const rightLeg = new THREE.Group();
     rightLeg.position.set(1.25, 10.5, 0);
     human.add(rightLeg);
@@ -99,8 +98,7 @@ export function createHuman() {
     rightFoot.scale.set(1.0, 0.72, 0.9);
     rightLeg.add(rightFoot);
 
-    // --- ARMS GROUPS (ancored at shoulder joints) ---
-    // Left Arm Group (pivot at shoulder x=-3.35, y=24.9, z=0)
+    // Braço esquerdo (pivô no ombro)
     const leftArm = new THREE.Group();
     leftArm.position.set(-3.35, 24.9, 0);
     human.add(leftArm);
@@ -111,7 +109,7 @@ export function createHuman() {
     addCapsule(leftArm, 0.8, 0.68, 6.2, -0.95, -11.6, 0, 0, 0, Math.PI * 0.02);
     addJoint(leftArm, 0.62, -0.75, -15.1, 0);
 
-    // Right Arm Group (pivot at shoulder x=3.35, y=24.9, z=0)
+    // Braço direito (pivô no ombro)
     const rightArm = new THREE.Group();
     rightArm.position.set(3.35, 24.9, 0);
     human.add(rightArm);
@@ -122,14 +120,13 @@ export function createHuman() {
     addCapsule(rightArm, 0.8, 0.68, 6.2, 0.95, -11.6, 0, 0, 0, Math.PI * -0.02);
     addJoint(rightArm, 0.62, 0.75, -15.1, 0);
 
-    // Scale character group
     human.scale.setScalar(2);
 
-    // Keep exact floor contact at local y = 0
+    // Ajusta a altura da base ao chão
     const bbox = new THREE.Box3().setFromObject(human);
     human.position.y -= bbox.min.y;
 
-    // Attach joint structures to userData for animations
+    // Guarda referências para animação
     human.userData.leftLeg = leftLeg;
     human.userData.rightLeg = rightLeg;
     human.userData.leftArm = leftArm;

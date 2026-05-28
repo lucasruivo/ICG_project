@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 
 export function createTerrain(textureType = 'grass') {
-    // 1. Dimensões: Mais largo pros dois lados (ex: 2000x1200)
+    // Dimensões e subdivisões do terreno quadrado
     const worldWidth = 3000;  
     const worldDepth = 3000;  
-    const segmentsX = 100; // Mais segmentos para suavizar as montanhas
-    const segmentsZ = 100; // igual a segmentsX porque o terreno é agora quadrado
+    const segmentsX = 100;
+    const segmentsZ = 100;
 
     const geometry = new THREE.PlaneGeometry(worldWidth, worldDepth, segmentsX, segmentsZ);
     geometry.rotateX(-Math.PI / 2);
@@ -13,32 +13,31 @@ export function createTerrain(textureType = 'grass') {
     const positionAttribute = geometry.attributes.position;
     const vertexCount = positionAttribute.count;
 
-    // 2. Parâmetros de relevo
-    const maxElevation = 180; // Altura máxima nas bordas
-    const valleyRadius = 800; // Raio da zona plana no centro
-    const maxRadius = Math.min(worldWidth, worldDepth) / 2; // até às bordas do terreno
+    // Parâmetros para elevação das montanhas periféricas
+    const maxElevation = 180;
+    const valleyRadius = 800;
+    const maxRadius = Math.min(worldWidth, worldDepth) / 2;
 
     for (let i = 0; i < vertexCount; i++) {
         const x = positionAttribute.getX(i);
         const z = positionAttribute.getZ(i);
 
-        // Distância radial ao centro para um terreno simétrico em todos os lados
+        // Distância ao centro para manter o vale plano a meio
         const dist = Math.sqrt(x * x + z * z);
 
         let elevation = 0;
 
         if (dist > valleyRadius) {
             const t = Math.min(1, (dist - valleyRadius) / (maxRadius - valleyRadius));
-            const intensity = t * t; // cresce suavemente até 1
+            const intensity = t * t;
 
-            // Relevo pseudo-aleatório mas simétrico em torno do centro
+            // Relevo irregular nas montanhas
             elevation = (
                 Math.sin(x * 0.02) * Math.cos(z * 0.02) * 40 +
                 Math.sin(x * 0.05) * 20 +
                 Math.cos(z * 0.08) * 10
             ) * intensity;
 
-            // Elevação base para criar o "anel" de montanhas à volta do vale
             elevation += intensity * maxElevation;
         }
 
@@ -47,7 +46,7 @@ export function createTerrain(textureType = 'grass') {
 
     geometry.computeVertexNormals();
 
-    // Definir material com base no tipo de textura
+    // Definição das configurações de textura e cor
     const textureConfigs = {
         grass: {
             color: 0x55aa55,
@@ -76,7 +75,7 @@ export function createTerrain(textureType = 'grass') {
     const material = new THREE.MeshStandardMaterial({ 
         color: config.color, 
         roughness: config.roughness,
-        flatShading: false // Para as montanhas parecerem suaves
+        flatShading: false
     });
     
     const terrainMesh = new THREE.Mesh(geometry, material);

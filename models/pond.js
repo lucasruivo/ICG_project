@@ -6,10 +6,9 @@ export function createPond() {
 
     const radius = 130;
     pond.userData.pondRadius = radius;
-    pond.userData.pondDepth = 64; // Maximum depth in the center (deeper basin)
+    pond.userData.pondDepth = 64; 
 
-    // --- MATERIALS ---
-    // Shore Material (Sandy/clay brown, high roughness)
+    // Materiais
     const shoreMaterial = new THREE.MeshStandardMaterial({
         color: 0xb59975,
         roughness: 0.9,
@@ -17,29 +16,26 @@ export function createPond() {
         flatShading: true
     });
 
-    // Dark Muddy Bottom (Visible under the transparent water, covers the terrain)
     const bottomMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1e3a8a, // Deep blue-tinted muddy color
+        color: 0x1e3a8a,
         roughness: 0.95,
         metalness: 0.0,
         flatShading: true,
         side: THREE.DoubleSide
     });
 
-    // Water Material (Glossy, transparent blue with physical refraction)
     const waterMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0x0ea5e9, // Bright sky blue
-        roughness: 0.05, // Highly polished water surface
+        color: 0x0ea5e9,
+        roughness: 0.05,
         metalness: 0.1,
         transparent: true,
-        opacity: 0.95,        // Opacity of the volume
-        transmission: 0.8,    // Physical light transmission
-        thickness: 15.0,      // Physical thickness of the water body
-        ior: 1.333,           // Index of refraction for water
+        opacity: 0.95,
+        transmission: 0.8,
+        thickness: 15.0,
+        ior: 1.333,
         side: THREE.DoubleSide
     });
 
-    // Rocks Material (Dark grey stone)
     const rockMaterial = new THREE.MeshStandardMaterial({
         color: 0x52525b,
         roughness: 0.85,
@@ -47,7 +43,6 @@ export function createPond() {
         flatShading: true
     });
 
-    // Reed/Plant Material (Vibrant green)
     const reedMaterial = new THREE.MeshStandardMaterial({
         color: 0x3f6212,
         roughness: 0.9,
@@ -55,31 +50,25 @@ export function createPond() {
         flatShading: true
     });
 
-    // --- 1. THE BOTTOM BASIN (Muddy Hemisphere/Bowl - Cut at the top) ---
-    // Creates a physical solid bowl that starts at the water level (y = -20)
-    // and curves down to the floor (y = -60), sealing the deep water area.
-    const thetaStart = 1.91; // ~109.5 degrees, cutting off the top part of the sphere
+    // Bacia do fundo (hemi-esfera cortada e escalada)
+    const thetaStart = 1.91; 
     const thetaLength = Math.PI - thetaStart;
     const bowlGeo = new THREE.SphereGeometry(radius - 2, 24, 16, 0, Math.PI * 2, thetaStart, thetaLength);
-    // Scale Y so the bowl goes down from -20 to -60 (total depth of 60 relative to origin)
     bowlGeo.scale(1, 60 / (radius - 2), 1);
     const bowl = new THREE.Mesh(bowlGeo, bottomMaterial);
     bowl.name = 'PondBowl';
-    bowl.position.y = 0; // Starts from water level (y = -20 after scaling) and curves down
+    bowl.position.y = 0; 
     pond.add(bowl);
 
-    // --- 2. ORGANIC / IRREGULAR SHORE ---
-    // Made by arranging 36 overlapping sand-brown cubes around the perimeter.
+    // Margem irregular de blocos de barro
     const collisionCircles = [];
     const numShoreBlocks = 36;
     for (let i = 0; i < numShoreBlocks; i++) {
         const angle = (i / numShoreBlocks) * Math.PI * 2;
-        // Generate noise for irregular/organic look matching the clay border in the image
         const noiseRadius = radius + (Math.sin(angle * 4) + Math.cos(angle * 6)) * 6;
         const x = Math.cos(angle) * noiseRadius;
         const z = Math.sin(angle) * noiseRadius;
 
-        // Border block scale and geometry
         const blockW = 22 + Math.random() * 8;
         const blockH = 22 + Math.random() * 5;
         const blockD = 22 + Math.random() * 8;
@@ -96,7 +85,7 @@ export function createPond() {
         );
         pond.add(borderMesh);
 
-        // Add a collision circle for each perimeter block
+        // Círculos de colisão para cada bloco da margem
         collisionCircles.push({
             x: x,
             z: z,
@@ -104,9 +93,7 @@ export function createPond() {
         });
     }
 
-    // --- 3. DYNAMIC WATER SURFACE ---
-    // Divided CircleGeometry so we can animate vertices in the wave loop.
-    // Placed higher than the floor (y = 2.5), but below the shore blocks.
+    // Superfície da água
     const waterGeo = new THREE.CircleGeometry(radius - 2, 32);
     waterGeo.rotateX(-Math.PI / 2);
     const water = new THREE.Mesh(waterGeo, waterMaterial);
@@ -114,23 +101,21 @@ export function createPond() {
     water.position.y = -20;
     pond.add(water);
 
-    // Save reference in userData so index.html can animate it
+    // Guarda referência da geometria para animação das ondas
     pond.userData.waterGeometry = waterGeo;
 
-    // --- 4. STONE/ROCKS INSIDE THE POND ---
-    // Rock 1 (Large, left - starts on the floor at y=-60 and sticks out of water)
+    // Rochas dentro do lago
     const rock1 = new THREE.Mesh(new THREE.BoxGeometry(32, 75, 24), rockMaterial);
     rock1.position.set(-36, -22.5, 20);
     rock1.rotation.set(0.1, 0.4, -0.15);
     pond.add(rock1);
 
-    // Rock 2 (Medium-large, right - starts on the floor at y=-60 and sticks out of water)
     const rock2 = new THREE.Mesh(new THREE.BoxGeometry(26, 70, 20), rockMaterial);
     rock2.position.set(30, -25, -26);
     rock2.rotation.set(-0.15, -0.3, 0.2);
     pond.add(rock2);
 
-    // Add collision circles for the two inner rocks
+    // Círculos de colisão para as rochas internas
     collisionCircles.push({
         x: -36,
         z: 20,
@@ -142,9 +127,9 @@ export function createPond() {
         r: 13
     });
 
-    // --- 5. GREEN REEDS/PLANTS IN WATER ---
+    // Plantas e juncos
     const reedGeo = new THREE.CylinderGeometry(0.4, 0.7, 68, 4);
-    reedGeo.translate(0, 34, 0); // pivot at bottom
+    reedGeo.translate(0, 34, 0); 
 
     const reedClusters = [
         [-54, -13], [-32, 38], [19, 45], [38, -13], [10, -54], [-10, -29]
@@ -157,7 +142,6 @@ export function createPond() {
             const rx = pos[0] + (Math.random() - 0.5) * 8;
             const rz = pos[1] + (Math.random() - 0.5) * 8;
             
-            // Reeds start on the floor (y=-60) and stick out of the water
             reed.position.set(rx, -60, rz);
             reed.rotation.set(
                 (Math.random() - 0.5) * 0.25,
@@ -170,7 +154,6 @@ export function createPond() {
         }
     });
 
-    // Make the pond draggable and set its name for UI interactions
     pond.userData.draggable = true;
     pond.userData.collisionCircles = collisionCircles;
 

@@ -11,13 +11,13 @@ export function createDino() {
 
     dino.add(grupoCabecaSuperior, grupoMandibula, grupopernaa, grupopernab);
 
-    //loader 
+    // Carregamento de texturas
     const loader = new THREE.TextureLoader();
     const escamas = loader.load('https://thumbs.dreamstime.com/b/pele-do-lagarto-21407373.jpg');
     const osso = loader.load('https://media.istockphoto.com/id/149170269/pt/foto/alta-resolução-média-desenho-de-dente-monocromático-textura-do-papel.jpg?s=170667a&w=0&k=20&c=MyUep2AtW6XDijffMgYBcwfI9lEZs_N1Xiz_pYcmgAo=')
     const pelo = loader.load('https://thumbs.dreamstime.com/b/peles-com-pelo-de-coelho-bege-textura-fundo-da-pele-animal-167583860.jpg')
 
-    // --- MATERIAIS ---
+    // Materiais
     const white_material = new THREE.MeshStandardMaterial({ map: osso, roughness: 0.9 });
     const grey_material = new THREE.MeshStandardMaterial({ map: escamas, roughness: 0.9 });
     const iris_material = new THREE.MeshStandardMaterial({
@@ -31,7 +31,6 @@ export function createDino() {
     const osso_material = new THREE.MeshStandardMaterial({ map: osso, roughness: 0.9 });
     const pelo_material = new THREE.MeshStandardMaterial({ map: pelo, roughness: 0.9 });
 
-    // --- GEOMETRIAS E MESHES ---
     const face_geometry = new THREE.BoxGeometry(85, 20, 50);
     const face = new THREE.Mesh(face_geometry, grey_material);
     face.position.x = -110;
@@ -84,8 +83,6 @@ export function createDino() {
     celha5.position.z = -20
     celha5.rotation.z = Math.PI / 2 + 0.9;
     grupoCabecaSuperior.add(celha5);
-
-    // Cone
 
     const cone_geometry = new THREE.ConeGeometry(10, 30, 4);
 
@@ -241,7 +238,6 @@ export function createDino() {
     garra8.rotation.z = Math.PI / 2
     grupopernab.add(garra8);
 
-    // Sphere
     const corpo_geometry = new THREE.BoxGeometry(140, 60, 60);
     const corpo = new THREE.Mesh(corpo_geometry, grey_material);
     corpo.position.x = 50
@@ -516,9 +512,9 @@ export function createDino() {
 
     dino.userData.draggable = true;
     dino.userData.collisionCircles = [
-        { x: -45, z: 0, r: 35 }, // Head and chest area
-        { x: 0, z: 0, r: 45 },   // Main torso and hips
-        { x: 45, z: 0, r: 25 }   // Tail base
+        { x: -45, z: 0, r: 35 }, // Área da cabeça/peito
+        { x: 0, z: 0, r: 45 },   // Área do torso/ancas
+        { x: 45, z: 0, r: 25 }   // Área da cauda
     ];
 
     return {

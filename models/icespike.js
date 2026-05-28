@@ -1,43 +1,38 @@
 import * as THREE from 'three';
 
-/**
- * Cria um cluster de espigões de gelo (IceSpike).
- * @returns {THREE.Group}
- */
+// Cria um cluster de espigões de gelo (IceSpike)
 export function createIceSpike() {
     const iceGroup = new THREE.Group();
 
-    // Material de gelo/cristal translúcido e brilhante com refração física
+    // Material físico para simular gelo translúcido
     const iceMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0x8be4f0,      // Cor azulada/ciano de gelo
-        roughness: 0.1,       // Superfície brilhante e polida
+        color: 0x8be4f0,
+        roughness: 0.1,
         metalness: 0.1,
         transparent: true,
-        opacity: 0.9,         // Leve opacidade do volume
-        transmission: 0.85,   // Transmissão física de luz
-        thickness: 8.0,       // Espessura física do gelo
-        ior: 1.31,            // Índice de refração do gelo
-        flatShading: true,    // Flat shading para evidenciar as faces do cristal
-        side: THREE.DoubleSide // Permite ver através
+        opacity: 0.9,
+        transmission: 0.85,
+        thickness: 8.0,
+        ior: 1.31,
+        flatShading: true,
+        side: THREE.DoubleSide
     });
 
     const rand = (min, max) => THREE.MathUtils.randFloat(min, max);
 
-    // Função auxiliar para gerar um cone deformado (espigão de gelo)
+    // Cria cone com deformação nas faces para simular cristal natural
     function createSpikeGeometry(radius, height, radialSegments, heightSegments) {
         const geo = new THREE.ConeGeometry(radius, height, radialSegments, heightSegments);
         
-        // Deforma ligeiramente os vértices para criar facetas irregulares (estilo cristalino natural)
         const pos = geo.attributes.position;
         for (let i = 0; i < pos.count; i++) {
             let x = pos.getX(i);
             let y = pos.getY(i);
             let z = pos.getZ(i);
 
-            // Não deformar a ponta do cone (onde y é próximo de height/2) nem a base extrema
+            // Não deforma as extremidades (ponta e base)
             const halfHeight = height / 2;
             if (y < halfHeight - 1 && y > -halfHeight + 1) {
-                // Fator de perturbação
                 const angle = (y / height) * Math.PI * 4;
                 const jitter = radius * 0.12;
                 x += Math.sin(angle) * jitter;
@@ -49,17 +44,16 @@ export function createIceSpike() {
         return geo;
     }
 
-    // Criar o espigão central principal (grande)
+    // Espigão central
     const mainRadius = rand(7.0, 9.0);
     const mainHeight = rand(65.0, 80.0);
     const mainSpikeGeo = createSpikeGeometry(mainRadius, mainHeight, 5, 4);
     const mainSpike = new THREE.Mesh(mainSpikeGeo, iceMaterial);
     
-    // Posiciona e adiciona o espigão principal
     mainSpike.position.y = mainHeight / 2;
     iceGroup.add(mainSpike);
 
-    // Adicionar múltiplos espigões secundários ao redor
+    // Espigões secundários circundantes
     const numSubSpikes = THREE.MathUtils.randInt(4, 7);
     for (let i = 0; i < numSubSpikes; i++) {
         const subRadius = mainRadius * rand(0.4, 0.6);
@@ -69,7 +63,6 @@ export function createIceSpike() {
         const subSpike = new THREE.Mesh(subSpikeGeo, iceMaterial);
         subSpike.name = 'IceSubSpike';
 
-        // Posiciona ao redor do espigão central
         const angle = (i / numSubSpikes) * Math.PI * 2 + rand(-0.3, 0.3);
         const distance = mainRadius * rand(0.9, 1.3);
         const x = Math.cos(angle) * distance;
@@ -77,7 +70,7 @@ export function createIceSpike() {
 
         subSpike.position.set(x, subHeight / 2, z);
 
-        // Inclina o espigão secundário ligeiramente para fora
+        // Inclinação lateral
         subSpike.rotation.z = -Math.cos(angle) * rand(0.15, 0.35);
         subSpike.rotation.x = Math.sin(angle) * rand(0.15, 0.35);
         subSpike.rotation.y = rand(0, Math.PI * 2);
@@ -85,15 +78,14 @@ export function createIceSpike() {
         iceGroup.add(subSpike);
     }
 
-    // Alinha a base do grupo a y = 0
+    // Ajusta a altura da base ao chão
     iceGroup.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(iceGroup);
     iceGroup.position.y -= box.min.y;
 
-    // Configurações e propriedades do grupo para a cena
     iceGroup.name = "IceSpike";
     iceGroup.userData.draggable = true;
-    // Ligeiro afundamento no terreno para encaixe estético perfeito
+    // Ligeiro afundamento para melhor integração com o terreno
     iceGroup.userData.terrainSurfaceOffset = -2.5; 
     iceGroup.userData.collisionCircles = [
         { x: 0, z: 0, r: mainRadius * 1.5 }

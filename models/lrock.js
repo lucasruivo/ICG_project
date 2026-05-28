@@ -1,10 +1,6 @@
 import * as THREE from 'three';
 
-/**
- * Cria uma pedra de tamanho variável.
- * @param {string} size  'small' | 'medium' | 'large'
- * @returns {THREE.Group}
- */
+// Cria uma pedra de tamanho variável ('small' | 'medium' | 'large')
 export function createRock(size = 'medium') {
     const rockGroup = new THREE.Group();
 
@@ -16,7 +12,6 @@ export function createRock(size = 'medium') {
     });
 
     function createLowPolyChunk(radius) {
-        // Sem deformacao por vertice para manter faces planas e regulares.
         const geo = new THREE.IcosahedronGeometry(radius, 0);
         geo.computeVertexNormals();
         return geo;
@@ -37,7 +32,7 @@ export function createRock(size = 'medium') {
         mesh.scale.copy(chunk.scale);
         mesh.position.copy(chunk.offset);
 
-        // Faz cada bloco assentar no chao local em y=0 (sem ficar afundado).
+        // Ajusta cada bloco ao solo
         mesh.updateMatrixWorld(true);
         const meshBox = new THREE.Box3().setFromObject(mesh);
         mesh.position.y -= meshBox.min.y;
@@ -45,11 +40,10 @@ export function createRock(size = 'medium') {
         rockGroup.add(mesh);
     }
 
-    // Assenta o conjunto no chao mantendo o volume agrupado.
+    // Ajusta a altura da base do grupo
     const box = new THREE.Box3().setFromObject(rockGroup);
     rockGroup.position.y -= box.min.y;
 
-    // Escala global conforme o tamanho pedido
     const scales = { small: 0.8, medium: 1.8, large: 4.5 };
     const s = scales[size] ?? 4.5;
     rockGroup.scale.setScalar(s);
@@ -57,7 +51,7 @@ export function createRock(size = 'medium') {
     rockGroup.userData.draggable = true;
     rockGroup.name = 'Rock';
 
-    // Define hitboxes matching each chunk's position and scale
+    // Define hitboxes para as colisões
     const collisionCircles = [];
     if (size === 'small') {
         collisionCircles.push({ x: -9, z: -1, r: 16.2 });

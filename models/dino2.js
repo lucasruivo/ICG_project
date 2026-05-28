@@ -5,19 +5,18 @@ export function createDino2() {
     dino2.name = 'Ankylosaurus';
     dino2.userData.groundOffset = 20;
 
-    // --- GRUPOS HIERÁRQUICOS ---
+    // Grupos hierárquicos para animação
     const grupoCabeca = new THREE.Group();
-    const grupoPernaFL = new THREE.Group(); // Front Left
-    const grupoPernaFR = new THREE.Group(); // Front Right
-    const grupoPernaBL = new THREE.Group(); // Back Left
-    const grupoPernaBR = new THREE.Group(); // Back Right
+    const grupoPernaFL = new THREE.Group();
+    const grupoPernaFR = new THREE.Group();
+    const grupoPernaBL = new THREE.Group();
+    const grupoPernaBR = new THREE.Group();
 
-    const grupoCoxaFL = new THREE.Group(); // Front Left Thigh
-    const grupoCoxaFR = new THREE.Group(); // Front Right Thigh
-    const grupoCoxaBL = new THREE.Group(); // Back Left Thigh
-    const grupoCoxaBR = new THREE.Group(); // Back Right Thigh
+    const grupoCoxaFL = new THREE.Group();
+    const grupoCoxaFR = new THREE.Group();
+    const grupoCoxaBL = new THREE.Group();
+    const grupoCoxaBR = new THREE.Group();
 
-    // Cauda hierárquica
     const grupoCauda1 = new THREE.Group();
     const grupoCauda2 = new THREE.Group();
     const grupoCauda3 = new THREE.Group();
@@ -29,40 +28,40 @@ export function createDino2() {
     grupoCauda2.add(grupoCauda3);
     grupoCauda3.add(grupoCauda4);
 
-    // --- TEXTURAS ---
+    // Carregamento de texturas
     const loader = new THREE.TextureLoader();
     const escamas = loader.load('https://thumbs.dreamstime.com/b/pele-do-lagarto-21407373.jpg');
     const osso = loader.load('https://media.istockphoto.com/id/149170269/pt/foto/alta-resolução-média-desenho-de-dente-monocromático-textura-do-papel.jpg?s=170667a&w=0&k=20&c=MyUep2AtW6XDijffMgYBcwfI9lEZs_N1Xiz_pYcmgAo=');
 
-    // --- MATERIAIS ---
+    // Materiais
     const bodyMaterial = new THREE.MeshStandardMaterial({
         map: escamas,
-        color: 0x8b7355, // Tom acastanhado/couro
+        color: 0x8b7355,
         roughness: 0.9,
         flatShading: true
     });
 
     const armorMaterial = new THREE.MeshStandardMaterial({
         map: escamas,
-        color: 0x4a3b32, // Carapaça castanho-escura
+        color: 0x4a3b32,
         roughness: 0.85,
         flatShading: true
     });
 
     const spikeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xe65c00, // Laranja vibrante nas pontas
+        color: 0xe65c00,
         roughness: 0.6,
         flatShading: true
     });
 
     const boneMaterial = new THREE.MeshStandardMaterial({
         map: osso,
-        color: 0xcccccc, // Tom osso para a clava e unhas
+        color: 0xcccccc,
         roughness: 0.9
     });
 
     const eyeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffcc00, // Olhos amarelos
+        color: 0xffcc00,
         roughness: 0.2
     });
 
@@ -74,22 +73,20 @@ export function createDino2() {
         polygonOffsetUnits: -2
     });
 
-    // --- CORPO (Torso Achatado e Largo) ---
+    // Corpo e carapaça
     const torsoGeo = new THREE.BoxGeometry(110, 36, 75);
     const torso = new THREE.Mesh(torsoGeo, bodyMaterial);
     torso.position.y = 25;
     dino2.add(torso);
 
-    // Carapaça Superior (Armadura)
     const carapaceGeo = new THREE.BoxGeometry(100, 10, 80);
     const carapace = new THREE.Mesh(carapaceGeo, armorMaterial);
-    carapace.position.set(0, 23, 0); // Posicionada no topo do torso
+    carapace.position.set(0, 23, 0);
     torso.add(carapace);
 
-    // --- PICOS DA CARAPAÇA (Osteodermes) ---
+    // Picos da carapaça (Osteodermes)
     const spikeGeo = new THREE.ConeGeometry(4.5, 14, 4);
 
-    // Adicionar 4 filas de picos no dorso
     const rowsX = [-40, -20, 0, 20, 40];
     const rowsZ = [-28, -7, 7, 28];
 
@@ -97,27 +94,24 @@ export function createDino2() {
         rowsZ.forEach((z, cIdx) => {
             const spike = new THREE.Mesh(spikeGeo, spikeMaterial);
             spike.position.set(x, 10, z);
-            // Inclinar ligeiramente os picos laterais para fora
             if (cIdx === 0) spike.rotation.x = -Math.PI / 8;
             if (cIdx === 3) spike.rotation.x = Math.PI / 8;
             carapace.add(spike);
         });
     });
 
-    // Grandes Espinhos Laterais de Proteção
+    // Espinhos laterais de proteção
     const lateralSpikeGeo = new THREE.ConeGeometry(6, 22, 4);
     lateralSpikeGeo.rotateX(Math.PI / 2);
 
     const latX = [-30, -10, 10, 30];
     latX.forEach(x => {
-        // Lado Esquerdo
         const lSpike = new THREE.Mesh(lateralSpikeGeo, spikeMaterial);
         lSpike.position.set(x, 0, 40);
         lSpike.rotation.y = Math.PI / 10;
         lSpike.rotation.x = Math.PI * 2 - 0.1;
         carapace.add(lSpike);
 
-        // Lado Direito
         const rSpike = new THREE.Mesh(lateralSpikeGeo, spikeMaterial);
         rSpike.position.set(x, 0, -40);
         rSpike.rotation.y = Math.PI - Math.PI / 10;
@@ -125,9 +119,7 @@ export function createDino2() {
         carapace.add(rSpike);
     });
 
-
-    // --- CABEÇA E PESCOÇO ---
-    // Pescoço curto e largo
+    // Cabeça e pescoço
     const neckGeo = new THREE.BoxGeometry(22, 22, 32);
     const neck = new THREE.Mesh(neckGeo, bodyMaterial);
     neck.position.set(-62, 22, 0);
@@ -145,7 +137,7 @@ export function createDino2() {
     headArmor.position.set(0, 11, 0);
     skull.add(headArmor);
 
-    // Chifres Traseiros (Proteção da Nuca)
+    // Chifres e proteção da nuca
     const hornGeo = new THREE.ConeGeometry(4, 12, 4);
     hornGeo.rotateX(Math.PI / 2);
 
@@ -161,7 +153,7 @@ export function createDino2() {
     hornR.rotation.x =  -Math.PI / 2 - Math.PI / 3;
     skull.add(hornR);
 
-    // Chifres das Bochechas
+    // Chifres das bochechas
     const cheekL = new THREE.Mesh(hornGeo, spikeMaterial);
     cheekL.position.set(10, -10, 17);
     cheekL.rotation.y = Math.PI /6;
@@ -192,40 +184,34 @@ export function createDino2() {
     irisR.position.set(-11, 4, -17.2);
     skull.add(irisR);
 
-
-    // --- CAUDA HIERÁRQUICA E CLAVA ---
+    // Cauda hierárquica e clava (Bony Club)
     const tailSegGeo = new THREE.BoxGeometry(20, 16, 16);
 
-    // Segmento 1
     const tail1 = new THREE.Mesh(tailSegGeo, bodyMaterial);
     tail1.position.set(8, 0, 0);
     grupoCauda1.add(tail1);
-    grupoCauda1.position.set(55, 22, 0); // Junta-se à traseira do torso
+    grupoCauda1.position.set(55, 22, 0);
 
-    // Segmento 2
     const tail2 = new THREE.Mesh(tailSegGeo, bodyMaterial);
     tail2.position.set(7, 0, 0);
     tail2.scale.set(0.85, 0.85, 0.85);
     grupoCauda2.add(tail2);
     grupoCauda2.position.set(18, 0, 0);
 
-    // Segmento 3
     const tail3 = new THREE.Mesh(tailSegGeo, bodyMaterial);
     tail3.position.set(4, 0, 0);
     tail3.scale.set(0.7, 0.7, 0.7);
     grupoCauda3.add(tail3);
     grupoCauda3.position.set(16, 0, 0);
 
-    // Segmento 4 (Base da Clava)
     const tail4 = new THREE.Mesh(tailSegGeo, bodyMaterial);
     tail4.position.set(1, 0, 0);
     tail4.scale.set(0.55, 0.55, 0.55);
     grupoCauda4.add(tail4);
     grupoCauda4.position.set(14, 0, 0);
 
-    // Clava da cauda (Bony Club) - Composta por dois grandes lobos esféricos achatados
     const clubLoboGeo = new THREE.SphereGeometry(13, 20, 20);
-    clubLoboGeo.scale(1.3, 0.7, 0.9); // Alongada e achatada
+    clubLoboGeo.scale(1.3, 0.7, 0.9);
 
     const clubL = new THREE.Mesh(clubLoboGeo, boneMaterial);
     clubL.position.set(12, 0, 6);
@@ -235,7 +221,7 @@ export function createDino2() {
     clubR.position.set(12, 0, -6);
     grupoCauda4.add(clubR);
 
-    // Picos protetores da cauda (Pequenos cones ao longo dos segmentos)
+    // Cones/picos de proteção na cauda
     const smallSpikeGeo = new THREE.ConeGeometry(2, 6, 4);
 
     [tail1, tail2, tail3].forEach(seg => {
@@ -244,33 +230,28 @@ export function createDino2() {
         seg.add(sp1);
     });
 
-
-    // --- PERNAS (4 Pernas Curtas e Robustas para Suportar o Peso) ---
+    // Pernas (4 robustas para suportar o peso)
     const thighGeo = new THREE.BoxGeometry(20, 24, 20);
     const shinGeo = new THREE.BoxGeometry(14, 18, 14);
     const footGeo = new THREE.BoxGeometry(22, 6, 24);
 
-    // Função auxiliar para montar uma perna
+    // Função auxiliar para construir cada perna
     function buildLeg(groupThigh, groupShin, x, z) {
         groupThigh.position.set(x, 18, z);
         groupShin.position.set(x, 18, z);
 
-        // Coxa (Thigh)
         const thigh = new THREE.Mesh(thighGeo, bodyMaterial);
         thigh.position.y = -6;
         groupThigh.add(thigh);
 
-        // Canela (Shin)
         const shin = new THREE.Mesh(shinGeo, bodyMaterial);
         shin.position.y = -22;
         groupShin.add(shin);
 
-        // Pé (Foot)
         const foot = new THREE.Mesh(footGeo, boneMaterial);
         foot.position.set(-2, -30, 0);
         groupShin.add(foot);
 
-        // Garras/Unhas (3 cones à frente)
         const clawGeo = new THREE.ConeGeometry(2.5, 6, 4);
         clawGeo.rotateX(Math.PI / 2);
 
@@ -288,16 +269,15 @@ export function createDino2() {
     buildLeg(grupoCoxaBL, grupoPernaBL, 30, 32);
     buildLeg(grupoCoxaBR, grupoPernaBR, 30, -32);
 
-    // --- POSICIONAMENTO E ESCALA ---
-    // Centraliza o modelo no chão de forma que a base fique em y = 0
+    // Ajuste da altura do modelo ao solo
     const bbox = new THREE.Box3().setFromObject(dino2);
     dino2.position.y -= bbox.min.y;
 
     dino2.userData.draggable = true;
     dino2.userData.collisionCircles = [
-        { x: -25, z: 0, r: 35 }, // Head and shoulders
-        { x: 5, z: 0, r: 42 },   // Main body
-        { x: 35, z: 0, r: 25 }   // Tail
+        { x: -25, z: 0, r: 35 }, // Cabeça e ombros
+        { x: 5, z: 0, r: 42 },   // Torso
+        { x: 35, z: 0, r: 25 }   // Cauda
     ];
 
     return {

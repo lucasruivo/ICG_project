@@ -1,17 +1,12 @@
 import * as THREE from 'three';
 
-/**
- * Cria a lua low-poly: esfera icosaedral com cara pixelada serena e halo de luar suave.
- * O grupo faz billboard na cena (lookAt camera) para a cara ficar sempre visível.
- * @returns {THREE.Group}
- */
+// Cria o modelo 3D da Lua com halo luminoso
 export function createMoon() {
     const moonGroup = new THREE.Group();
     moonGroup.name = 'Moon';
 
     const radius = 46;
 
-    // Material da esfera: branco-azulado frio, emissivo subtil (luar)
     const moonMaterial = new THREE.MeshStandardMaterial({
         color: 0xdde8ff,
         emissive: 0x8899cc,
@@ -21,7 +16,7 @@ export function createMoon() {
         flatShading: true,
     });
 
-    // === HALO DE LUAR (Sprite) ===
+    // Criação do halo luminoso da lua
     const canvas = document.createElement('canvas');
     canvas.width = 128;
     canvas.height = 128;

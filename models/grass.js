@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-// Shared Materials (Flyweight pattern - instantiated once globally)
+// Materiais partilhados (Padrão Flyweight)
 const greenMaterial = new THREE.MeshStandardMaterial({
     color: 0x2f8d3f,
     roughness: 0.9,
@@ -13,16 +13,11 @@ const darkGreenMaterial = new THREE.MeshStandardMaterial({
     metalness: 0.0,
 });
 
-// Shared Base Geometry (Flyweight pattern - instantiated once globally)
-// Pivot is translated to the bottom so that Y-scaling scales upwards from the ground.
+// Geometria base partilhada (Flyweight, com pivô na base)
 const baseBladeGeo = new THREE.CylinderGeometry(0.08, 1, 1, 6);
 baseBladeGeo.translate(0, 0.5, 0);
 
-/**
- * Creates low-poly grass using the Flyweight pattern with InstancedMesh to optimize
- * memory usage, rendering performance (draw calls), and creation speed.
- * @returns {THREE.Group}
- */
+// Cria relva com InstancedMesh para otimizar desempenho
 export function createForestGrass() {
     const grassGroup = new THREE.Group();
     grassGroup.name = 'Grass';
@@ -30,7 +25,7 @@ export function createForestGrass() {
 
     const bladeCount = 16 + Math.floor(Math.random() * 10);
 
-    // Split blades between green and dark green materials
+    // Divisão das folhas entre verde claro e escuro
     const greenIndices = [];
     const darkGreenIndices = [];
     for (let i = 0; i < bladeCount; i++) {
@@ -58,7 +53,7 @@ export function createForestGrass() {
             dummy.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
             dummy.scale.set(width, height, width);
 
-            // Apply rotations
+            // Rotações aleatórias nas folhas de relva
             dummy.rotation.set(0, 0, 0);
             dummy.rotation.z = (Math.random() - 0.5) * 0.45;
             dummy.rotation.x = (Math.random() - 0.5) * 0.25;

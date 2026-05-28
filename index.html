@@ -1203,7 +1203,7 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // Cache-busting dynamic imports for local modules to prevent browser caching issues in Live Server
+        // Importações dinâmicas para evitar problemas de cache no Live Server
         const v = Date.now();
         const { createDino } = await import(`./models/dino.js?v=${v}`);
         const { createDino2 } = await import(`./models/dino2.js?v=${v}`);
@@ -1242,10 +1242,9 @@
         const humanWorldScale = new THREE.Vector3();
         const collisionWorldScale = new THREE.Vector3();
         const collisionFallbackCenter = new THREE.Vector3();
-        // When true, adjust collision radii so they match the model's apparent
-        // screen size (reduces perceived overlap when camera is far).
+        // Ajuste opcional dos raios de colisão conforme a distância da câmara
         const collisionUseScreenScale = true;
-        const collisionScreenRefDistance = 420; // reference distance where scale==1
+        const collisionScreenRefDistance = 420; 
         const SCENE_EXPORT_VERSION = 1;
         const undoStack = [];
         const redoStack = [];
@@ -1272,7 +1271,7 @@
 
         let fishingState = {
             active: false,
-            phase: 0,          // 0=idle, 1=windup, 2=cast, 3=settle, 4=wait, 5=bite, 6=pull, 7=display, 8=cameraReturn, 9=reset
+            phase: 0,          // Fases: 0=inativo, 1-9=preparação, lançamento, recolha, etc.
             timer: 0,
             targetPond: null,
             rod: null,
@@ -1292,10 +1291,10 @@
         const fishingPromptEl = document.getElementById('fishing-prompt');
         const fishingResultEl = document.getElementById('fishing-result');
 
-        // --- APPLE SYSTEM STATE ---
+        // Estado do minijogo de colheita de maçãs
         let appleState = {
             active: false,
-            phase: 0,          // 0=idle, 1=reach, 2=pick, 3=lower, 4=display, 5=cameraReturn, 6=reset
+            phase: 0,          // Fases do minijogo
             timer: 0,
             targetTree: null,
             appleMesh: null,
@@ -2079,7 +2078,6 @@
                 const radius = Math.sqrt(Math.max(halfWidth, 0.01) * Math.max(halfDepth, 0.01));
                 bbox.getCenter(collisionFallbackCenter);
 
-                // compute optional screen-scale based on camera distance
                 let screenScale = 1;
                 if (collisionUseScreenScale && typeof camera !== 'undefined' && !humanControlMode) {
                     const pos = new THREE.Vector3();
@@ -2102,7 +2100,6 @@
             const translatedX = translation?.x ?? 0;
             const translatedZ = translation?.z ?? 0;
 
-            // compute optional screen-scale based on camera distance
             let screenScale = 1;
             if (collisionUseScreenScale && typeof camera !== 'undefined' && !humanControlMode) {
                 const pos = new THREE.Vector3();
@@ -2126,14 +2123,14 @@
 
         function getMeshesInObject(object, list = []) {
             if (!object) return list;
-            // Skip human limbs to prevent them from expanding or triggering false collisions
+            // Ignora membros do humano para evitar colisões secundárias
             if (object.parent && object.parent.name === 'Human') {
                 const ud = object.parent.userData;
                 if (object === ud.leftLeg || object === ud.rightLeg || object === ud.leftArm || object === ud.rightArm) {
                     return list;
                 }
             }
-            // Skip IceSubSpike meshes to keep ice spike collision on the main vertical spike
+            // Ignora espigões secundários de gelo para colidir apenas com o principal
             if (object.name === 'IceSubSpike') {
                 return list;
             }
@@ -2170,7 +2167,7 @@
                 mesh.updateMatrixWorld(true);
                 meshBox.setFromObject(mesh);
 
-                // If the character is standing on top of the mesh, ignore collision
+                // Se o personagem estiver por cima da mesh, ignora a colisão
                 if (boxA.min.y >= meshBox.max.y - 1.0) {
                     continue;
                 }
@@ -2779,7 +2776,7 @@
             refreshTerrainTextureSlotUI();
             applyTerrainTextureSlot(0);
 
-            // --- CAMERA ---
+            // Câmara
             const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 5000);
             camera.position.set(420, 260, 420);
             camera.lookAt(0, 40, 0);
@@ -2787,8 +2784,7 @@
 
             scene.add(camera);
 
-            // --- LIGHTING ---
-            // Sol: DirectionalLight simula raios paralelos vindos de longe
+            // Iluminação
             const sunLight = new THREE.DirectionalLight(0xfff4e0, 2.5);
             const sunLightOffset = new THREE.Vector3(600, 800, 400);
             const shadowFocusPoint = new THREE.Vector3(0, 0, 0);
@@ -2804,25 +2800,21 @@
 
             sunLight.shadow.camera.near = 40;
             sunLight.shadow.camera.far = 2600;
-            // Frustum suficientemente grande para não cortar, mas ainda com bom detalhe.
             sunLight.shadow.camera.left = -shadowFrustumHalfSize;
             sunLight.shadow.camera.right = shadowFrustumHalfSize;
             sunLight.shadow.camera.top = shadowFrustumHalfSize;
             sunLight.shadow.camera.bottom = -shadowFrustumHalfSize;
-            // Bias afinado para reduzir acne sem criar efeito de flutuação de sombra.
             sunLight.shadow.bias = -0.00003;
             sunLight.shadow.normalBias = 0.008;
             sunLight.shadow.radius = 2;
             scene.add(sunLight);
             scene.add(sunLight.target);
 
-            // Luz ambiente suave para que as zonas de sombra não fiquem completamente escuras
+            // Luz ambiente
             const ambientLight = new THREE.AmbientLight(0x88aacc, 0.8);
             scene.add(ambientLight);
 
-            // --- SOL E LUA 3D ---
-            // Raio orbital visual: maior que o mapa (3000x3000) para nascer/pôr do sol ficar
-            // além das montanhas nas bordas.
+            // Sol e Lua
             const SKY_BODY_ORBIT = 2800;
             const sunMesh = createSun();
             scene.add(sunMesh);
@@ -2830,7 +2822,7 @@
             const moonMesh = createMoon();
             scene.add(moonMesh);
 
-            // Luz direcional da lua: azulada suave, segue a posição orbital da lua
+            // Luz da lua
             const moonDirLight = new THREE.DirectionalLight(0x8899cc, 0.0);
             const moonLightOffset = new THREE.Vector3(-600, 400, 200);
             moonDirLight.position.copy(moonLightOffset);
@@ -2838,13 +2830,10 @@
             scene.add(moonDirLight);
             scene.add(moonDirLight.target);
 
-            // --- CICLO DIA/NOITE ---
-            // Hora do dia em minutos (0 = meia-noite, 720 = meio-dia, 1440 = meia-noite)
+            // Ciclo dia/noite
             let dayTimeMinutes = 720;
             let dayTimeCycleAuto = false;
             let dayCycleSpeedMultiplier = 1.0;
-            // Paleta de cores do céu para horas chave (hora, skyHex, ambientHex)
-            // Estrutura: [minutos, corCeuHex, corAmbienteHex, intensidadeAmbiente, corSolHex, intensidadeSol]
             const DAY_PALETTE = [
                 // Meia-noite
                 { t: 0, sky: 0x03061a, amb: 0x1a1a3a, ambI: 0.05, sun: 0x000000, sunI: 0.0 },
@@ -3259,12 +3248,11 @@
             function exitHumanControlMode() {
                 if (!humanControlMode) return;
 
-                // Cleanup fishing if active
+                // Limpa o estado dos minijogos se estiverem ativos
                 if (fishingState.active) {
                     resetFishingState();
                 }
 
-                // Cleanup apple picking if active
                 if (appleState.active) {
                     resetAppleState();
                 }
@@ -3308,7 +3296,7 @@
                     return;
                 }
 
-                // Block movement while fishing or apple picking animations are active
+                // Bloqueia movimento se estiver a pescar ou colher maçãs
                 if (fishingState.active || appleState.active) {
                     return;
                 }
@@ -3318,7 +3306,7 @@
 
                 humanMoveVector.set(0, 0, 0);
                 if (joystickValues.active) {
-                    // Joystick control (continuous direction and speed)
+                    // Controlo analógico por joystick
                     humanMoveVector.addScaledVector(humanForward, -joystickValues.y);
                     humanMoveVector.addScaledVector(humanRight, -joystickValues.x);
                     const len = humanMoveVector.length();
@@ -3327,7 +3315,7 @@
                         humanMoveVector.divideScalar(len).multiplyScalar(humanControlSettings.speed * deltaTime * speedFactor);
                     }
                 } else {
-                    // Keyboard control (discrete binary directions)
+                    // Controlo por teclado (WASD)
                     if (humanMoveState.forward) humanMoveVector.add(humanForward);
                     if (humanMoveState.backward) humanMoveVector.sub(humanForward);
                     if (humanMoveState.left) humanMoveVector.add(humanRight);
@@ -3338,10 +3326,9 @@
                     }
                 }
 
-                // Colisão com objetos (exceto grass, bush e tumbleweed)
+                // Colisão com objetos do cenário
                 if (humanMoveVector.lengthSq() > 0) {
                     let collision = false;
-                    // Checar colisão com árvores, pedras, cactos, humanos, dino, charcos
                     const checkGroups = [trees, rocks, cacts, humans, ponds, iceSpikes, campfires];
                     if (dinoData?.model) checkGroups.push([dinoData.model]);
                     if (dino2Data?.model) checkGroups.push([dino2Data.model]);
@@ -3372,7 +3359,7 @@
                     new THREE.Vector3(0, -1, 0)
                 );
 
-                // Build dynamic list of all collidable surfaces: terrain + trees + rocks + cacts + humans + ponds + dinos
+                // Lista de elementos para cálculo de solo/altura
                 const collidables = [terrain];
                 trees.forEach(o => collidables.push(o));
                 rocks.forEach(o => collidables.push(o));
@@ -3393,7 +3380,6 @@
                     const clearance = getPlacementClearance(controlledHuman);
                     const surfaceY = hit.point.y + clearance;
 
-                    // Always allow terrain, and allow steps/objects if they are not too high above our feet
                     const stepHeight = 8.0;
                     if (isTerrain || surfaceY <= previousY + stepHeight) {
                         if (surfaceY > groundY) {
@@ -4069,21 +4055,19 @@
                 }
             }
 
-            // --- APPLE PICKING SYSTEM HELPERS & LOGIC ---
+            // Sistema de colheita de maçãs
             function createApple() {
                 const appleGroup = new THREE.Group();
                 appleGroup.name = 'PickedApple';
 
-                // Apple body (Red sphere, slightly squat)
                 const bodyGeo = new THREE.SphereGeometry(1.4, 8, 8);
                 bodyGeo.scale(1.0, 0.9, 1.0);
-                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3 }); // shiny red
+                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3 });
                 const body = new THREE.Mesh(bodyGeo, bodyMat);
                 body.castShadow = true;
                 body.receiveShadow = true;
                 appleGroup.add(body);
 
-                // Stem (brown small cylinder)
                 const stemGeo = new THREE.CylinderGeometry(0.1, 0.15, 0.8, 6);
                 stemGeo.translate(0, 0.4, 0);
                 const stemMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.8 });
@@ -4092,7 +4076,6 @@
                 stem.rotation.z = -0.15;
                 appleGroup.add(stem);
 
-                // Leaf (tiny green box)
                 const leafGeo = new THREE.BoxGeometry(0.6, 0.1, 0.3);
                 leafGeo.translate(0.3, 0, 0);
                 const leafMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.6 });
@@ -4480,7 +4463,6 @@
                 floatStick.position.y = 1.2;
                 floatGroup.add(floatStick);
 
-                // Disable shadows entirely to prevent dark shadow projection on the pond bottom which looks like reflections
                 floatGroup.traverse(child => {
                     if (child.isMesh) {
                         child.castShadow = false;
@@ -4495,11 +4477,10 @@
                 const fishGroup = new THREE.Group();
                 fishGroup.name = 'CaughtFish';
 
-                // Fish Body: Orange/Cyan low-poly fish
                 const bodyGeo = new THREE.SphereGeometry(2.0, 8, 6);
-                bodyGeo.scale(0.6, 1.2, 2.2); // flat horizontally, tall vertically, elongated
+                bodyGeo.scale(0.6, 1.2, 2.2); 
                 const bodyMat = new THREE.MeshStandardMaterial({
-                    color: 0xff7a00, // orange fish
+                    color: 0xff7a00,
                     roughness: 0.3,
                     metalness: 0.1,
                     flatShading: true
@@ -4507,7 +4488,6 @@
                 const body = new THREE.Mesh(bodyGeo, bodyMat);
                 fishGroup.add(body);
 
-                // Tail fin
                 const tailGeo = new THREE.ConeGeometry(1.2, 3.0, 4);
                 tailGeo.rotateX(Math.PI / 2);
                 tailGeo.scale(0.2, 1.5, 1.0);
@@ -4515,7 +4495,6 @@
                 tail.position.set(0, 0, -2.5);
                 fishGroup.add(tail);
 
-                // Eyes
                 const eyeGeo = new THREE.SphereGeometry(0.3, 6, 6);
                 const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5 });
                 const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
@@ -5201,15 +5180,12 @@
                         const flames = campfire.userData.fireGroup;
                         const baseInt = campfire.userData.baseIntensity || 24;
                         
-                        // Flickering light intensity using multiple sines
                         const flicker = Math.sin(elapsed * 25) * 0.15 + Math.cos(elapsed * 15) * 0.1;
                         light.intensity = baseInt * (1.0 + flicker);
                         
-                        // Jitter the light position slightly
                         light.position.x = (Math.random() - 0.5) * 0.45;
                         light.position.z = (Math.random() - 0.5) * 0.45;
                         
-                        // Animate flames scale and rotation
                         flames.scale.set(
                             1.0 + Math.sin(elapsed * 12) * 0.08,
                             1.0 + Math.cos(elapsed * 18) * 0.12,
@@ -5224,7 +5200,7 @@
                 if (dinoData) {
                     const p = dinoData.parts;
 
-                    //Rugir
+                    // Animação de rugido e respiração
                     const breatheCycle = Math.sin(time * 0.5);
                     const breatheOffset = breatheCycle * 2;
                     const lookCycle = Math.sin(time * 0.3);

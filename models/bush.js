@@ -1,23 +1,18 @@
 import * as THREE from 'three';
 
-// Shared Materials (Flyweight pattern)
+// Materiais partilhados (Padrão Flyweight)
 const twigMaterial = new THREE.MeshStandardMaterial({
     color: 0xbfa66a,
     roughness: 0.95,
     metalness: 0.0,
 });
 
-// Shared Geometry (Flyweight pattern)
-// Keep the pivot at the center just like the original twig geometry to preserve the exact organic shape.
+// Geometria base partilhada (Flyweight)
 const baseTwigGeo = new THREE.CylinderGeometry(0.08, 0.14, 1, 6);
 
 const up = new THREE.Vector3(0, 1, 0);
 
-/**
- * Creates low-poly dry bush using the Flyweight pattern with InstancedMesh to optimize
- * memory usage, rendering performance (draw calls), and creation speed.
- * @returns {THREE.Group}
- */
+// Cria um arbusto seco com InstancedMesh para otimizar o desempenho
 export function createBush() {
     const bushGroup = new THREE.Group();
     bushGroup.name = 'Bush';
@@ -48,7 +43,7 @@ export function createBush() {
         dummy.position.y *= 0.62;
         dummy.position.add(jitter);
 
-        // Inclina para fora, mas com tendencia para cima como capim seco.
+        // Inclinação dos ramos para fora e para cima
         const orientDir = dir.clone().lerp(up, 0.35).normalize();
         dummy.quaternion.setFromUnitVectors(up, orientDir);
         dummy.scale.set(1, length, 1);
@@ -60,7 +55,7 @@ export function createBush() {
     instancedMesh.instanceMatrix.needsUpdate = true;
     bushGroup.add(instancedMesh);
 
-    // Assentar a base exatamente em y=0
+    // Ajusta a base no chão (y = 0)
     const bbox = new THREE.Box3().setFromObject(bushGroup);
     bushGroup.position.y -= bbox.min.y;
 

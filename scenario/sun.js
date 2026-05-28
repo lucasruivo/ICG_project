@@ -1,17 +1,12 @@
 import * as THREE from 'three';
 
-/**
- * Cria o sol low-poly: esfera icosaedral com cara pixelada e halo brilhante.
- * O grupo faz billboard na cena (lookAt camera) para a cara ficar sempre visível.
- * @returns {THREE.Group}
- */
+// Cria o sol low-poly com halo luminoso
 export function createSun() {
     const sunGroup = new THREE.Group();
     sunGroup.name = 'Sun';
 
     const radius = 58;
 
-    // Material da esfera: amarelo solar com emissive forte
     const sunMaterial = new THREE.MeshStandardMaterial({
         color: 0xffdd00,
         emissive: 0xffaa00,
@@ -21,7 +16,7 @@ export function createSun() {
         flatShading: true,
     });
 
-    // === HALO DE LUZ (Sprite) ===
+    // Criação do halo luminoso do sol
     const canvas = document.createElement('canvas');
     canvas.width = 128;
     canvas.height = 128;

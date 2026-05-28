@@ -1,11 +1,6 @@
 import * as THREE from 'three';
 
-/**
- * Setup and bind all keyboard and mouse event listeners for scenario editing and first-person human control.
- * Uses a shared state object to communicate mutations with the main module.
- * @param {Object} state - The shared state object containing references and getters/setters.
- * @returns {Object} A destroy object containing a cleanup function.
- */
+// Configura os ouvintes de eventos para o editor e controlo em primeira pessoa (FPV)
 export function setupInput(state) {
     const renderer = state.renderer;
     const scene = state.scene;
@@ -19,7 +14,7 @@ export function setupInput(state) {
 
     let preDragState = null;
 
-    // Helper functions
+    // Funções auxiliares
     function getSceneRootObject(object) {
         let root = object;
         while (root.parent && root.parent !== scene) {
@@ -45,12 +40,12 @@ export function setupInput(state) {
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     }
 
-    // Register a global picked object clearer to link with scenario logic
+    // Regista função global para limpar o objeto selecionado
     window.clearPickedObject = () => {
         state.lastPickedObject = null;
     };
 
-    // 1. Mousedown (dragging initialization or deletion)
+    // 1. Início do arrasto (pointerdown) ou remoção
     const onMouseDown = (event) => {
         if (state.humanControlMode) return;
 
@@ -69,7 +64,6 @@ export function setupInput(state) {
             state.lastPickedObject = object;
 
             if (state.deleteMode) {
-                // Guardar histórico antes de apagar
                 state.saveHistoryState();
                 const removed = state.removeScenarioObject(object);
                 if (removed) {
@@ -81,7 +75,6 @@ export function setupInput(state) {
                 return;
             }
 
-            // Capturar estado inicial pré-drag
             preDragState = JSON.stringify(state.serializeScenario());
 
             state.selectedObject = object;
@@ -89,11 +82,9 @@ export function setupInput(state) {
             state.movementSpeed = 4.0;
             state.controls.enabled = false;
 
-            // Lift object slightly when picking it up
             state.selectedObject.position.y += 30;
             dragPlane.constant = -state.selectedObject.position.y;
 
-            // Remove old outline if it exists
             if (state.selectionOutline) {
                 state.selectionOutline.traverse((child) => {
                     if (child.userData.isOutline) {
@@ -102,7 +93,6 @@ export function setupInput(state) {
                 });
             }
 
-            // Create new outline on the selected mesh
             state.selectionOutline = new THREE.Group();
             state.selectionOutline.userData.isSelectionOutline = true;
             state.selectedObject.traverse((child) => {
@@ -120,7 +110,7 @@ export function setupInput(state) {
     };
     renderer.domElement.addEventListener('pointerdown', onMouseDown);
 
-    // 2. Mousemove (drag movement)
+    // 2. Movimento de arrasto (pointermove)
     const onMouseMove = (event) => {
         if (state.humanControlMode) return;
         if (!state.isDragging || !state.selectedObject) return;
@@ -136,7 +126,7 @@ export function setupInput(state) {
     };
     window.addEventListener('pointermove', onMouseMove);
 
-    // 3. Mouseup (releasing drag)
+    // 3. Fim do arrasto (pointerup)
     const onMouseUp = (event) => {
         if (state.humanControlMode) return;
 
@@ -164,14 +154,13 @@ export function setupInput(state) {
                 });
             }
 
-            // Comparar estado pós-drag com pré-drag e salvar no histórico se mudou
             const postDragState = JSON.stringify(state.serializeScenario());
             if (preDragState && postDragState !== preDragState) {
                 state.undoStack.push(preDragState);
                 if (state.undoStack.length > state.MAX_HISTORY) {
                     state.undoStack.shift();
                 }
-                state.redoStack.length = 0; // Limpa redo
+                state.redoStack.length = 0;
                 state.updateHistoryButtons();
             }
             preDragState = null;
@@ -184,7 +173,7 @@ export function setupInput(state) {
     };
     window.addEventListener('pointerup', onMouseUp);
 
-    // 4. Wheel (rotation during drag)
+    // 4. Rotação do objeto com a roda do rato (wheel)
     const onWheel = (event) => {
         if (state.humanControlMode) return;
         if (!state.isDragging || !state.selectedObject) return;
@@ -196,28 +185,24 @@ export function setupInput(state) {
     };
     window.addEventListener('wheel', onWheel, { passive: false });
 
-    // 5. Keydown editor keyboard hotkeys
+    // 5. Atalhos do teclado no modo editor (keydown)
     const onKeyDownEditor = (event) => {
         if (state.humanControlMode) return;
 
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         const modifier = isMac ? event.metaKey : event.ctrlKey;
 
-        // Atalhos de Undo / Redo (apenas se não estiver a arrastar)
         if (!state.isDragging && modifier) {
             if (event.key.toLowerCase() === 'z') {
                 if (event.shiftKey) {
-                    // Redo: Cmd+Shift+Z ou Ctrl+Shift+Z
                     state.redo();
                 } else {
-                    // Undo: Cmd+Z ou Ctrl+Z
                     state.undo();
                 }
                 event.preventDefault();
                 return;
             }
             if (event.key.toLowerCase() === 'y') {
-                // Redo: Cmd+Y ou Ctrl+Y
                 state.redo();
                 event.preventDefault();
                 return;
@@ -263,7 +248,7 @@ export function setupInput(state) {
     };
     window.addEventListener('keydown', onKeyDownEditor);
 
-    // 6. Mousemove human camera look direction
+    // 6. Orientação da câmara em modo humano (mousemove)
     const onMouseMoveHuman = (event) => {
         if (!state.humanControlMode) return;
         if (document.pointerLockElement !== renderer.domElement) return;
@@ -278,7 +263,7 @@ export function setupInput(state) {
     };
     window.addEventListener('mousemove', onMouseMoveHuman);
 
-    // 7. Keydown human modes & keyboard movements
+    // 7. Movimento do humano e alternância de modos (keydown)
     const onKeyDownHuman = (event) => {
         if (event.code === 'KeyF') {
             if (state.humanControlMode) {
@@ -320,7 +305,7 @@ export function setupInput(state) {
     };
     window.addEventListener('keydown', onKeyDownHuman);
 
-    // 8. Keyup human movements
+    // 8. Fim do movimento do humano (keyup)
     const onKeyUpHuman = (event) => {
         if (!state.humanControlMode) return;
 

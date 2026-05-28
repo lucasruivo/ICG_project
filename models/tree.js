@@ -19,9 +19,7 @@ export function createTree() {
         overallScale: rand(0.9, 1.2),
     };
 
-    // == HELPERS DE FORMA ==
-
-    // Forma em lozange/folha para ramos: base estreita, alarga no meio, afunila na ponta
+    // Auxiliares de forma
     function makeBranchShape(length, width) {
         const s = new THREE.Shape();
         s.moveTo(0, 0);
@@ -32,7 +30,7 @@ export function createTree() {
         return s;
     }
 
-    // Forma de estrela para a copa
+    // Desenha a copa em estrela
     function makeStarShape(outerR, innerR, points) {
         const s = new THREE.Shape();
         for (let i = 0; i < points * 2; i++) {
@@ -44,7 +42,8 @@ export function createTree() {
         s.closePath();
         return s;
     }
-    // == MATERIAIS ==
+
+    // Materiais
     const brownMaterial = new THREE.MeshStandardMaterial({ map: barkTexture });
     const baseGreen = new THREE.Color(0x228B22);
     const greenHsl = { h: 0, s: 0, l: 0 };
@@ -56,7 +55,7 @@ export function createTree() {
     );
     const greenMaterial  = new THREE.MeshLambertMaterial({ color: variedGreen, side: THREE.DoubleSide });
 
-    // == TRONCO (caixa quadrada) ==
+    // Tronco principal
     const trunkW = 30 * variation.trunkWidth;
     const trunkH = 100 * variation.trunkHeight;
     const trunk = new THREE.Mesh(new THREE.BoxGeometry(trunkW, trunkH, trunkW), brownMaterial);
@@ -161,7 +160,7 @@ export function createTree() {
     root16.position.z = 34
     treeGroup.add(root16);
 
-    // == RAMOS com ExtrudeGeometry ==
+    // Ramos com ExtrudeGeometry
     const branchExtrudeOpts = {
         depth: 7,
         bevelEnabled: true,
@@ -171,7 +170,6 @@ export function createTree() {
         curveSegments: 16
     };
 
-    // [altura no tronco, rotação Y (direção), inclinação X (ângulo de saída), comprimento, largura]
     const branchDefs = [
         { y: 48,  rotY: 0,              rotX: -Math.PI / 3.5, len: 65, w: 9 },
         { y: 56,  rotY: Math.PI / 2,    rotX: -Math.PI / 3.5, len: 60, w: 9 },
@@ -190,7 +188,6 @@ export function createTree() {
         const y = b.y * variation.trunkHeight;
 
         const geo = new THREE.ExtrudeGeometry(makeBranchShape(len, width), branchExtrudeOpts);
-        // Centrar a profundidade no eixo Z para o bevel ficar centrado
         geo.translate(0, 0, -branchExtrudeOpts.depth / 2);
         const mesh = new THREE.Mesh(geo, brownMaterial);
         mesh.rotation.order = 'YXZ';
@@ -199,18 +196,17 @@ export function createTree() {
         mesh.position.y = y;
         treeGroup.add(mesh);
 
-        // Mini folhagem no topo de cada ramo (estrela pequena extrudida)
+        // Pequena folhagem no topo de cada ramo
         const miniOuter = 22 * rand(0.9, 1.12);
         const miniInner = 12 * rand(0.9, 1.12);
         const miniCanopyGeo = new THREE.ExtrudeGeometry(makeStarShape(miniOuter, miniInner, 8), {
             depth: 8, bevelEnabled: true, bevelThickness: 3, bevelSize: 2, bevelSegments: 8, curveSegments: 32
         });
         const miniCanopy = new THREE.Mesh(miniCanopyGeo, greenMaterial);
-        // Posicionar no extremo do ramo (b.len ao longo do eixo do ramo)
         const dist = len * 0.9;
         miniCanopy.rotation.order = 'YXZ';
         miniCanopy.rotation.y = rotY;
-        miniCanopy.rotation.x = rotX - Math.PI / 2; // deitar horizontal
+        miniCanopy.rotation.x = rotX - Math.PI / 2;
         miniCanopy.position.set(
             Math.sin(rotY) * Math.cos(rotX) * dist * -1,
             y + Math.abs(Math.sin(rotX)) * dist,
@@ -219,7 +215,7 @@ export function createTree() {
         treeGroup.add(miniCanopy);
     });
 
-    // == COPA PRINCIPAL: estrela extrudida em 3 camadas horizontais ==
+    // Copa principal em 3 camadas
     const canopyExtrudeOpts = {
         depth: 20,
         bevelEnabled: true,
@@ -239,7 +235,7 @@ export function createTree() {
     ].forEach(layer => {
         const geo = new THREE.ExtrudeGeometry(makeStarShape(canopyOuter, canopyInner, 12), canopyExtrudeOpts);
         const mesh = new THREE.Mesh(geo, greenMaterial);
-        mesh.rotation.x = Math.PI / 2;  // deitado (horizontal)
+        mesh.rotation.x = Math.PI / 2;
         mesh.rotation.z = layer.rotZ + rand(-0.12, 0.12);
         mesh.scale.setScalar(layer.scale * rand(0.95, 1.06));
         mesh.position.y = layer.y * variation.trunkHeight;
@@ -250,7 +246,7 @@ export function createTree() {
     treeGroup.rotation.y = rand(0, Math.PI * 2);
 
     treeGroup.userData.draggable = true;
-    // Enterra ligeiramente a base para integrar melhor as raizes.
+    // Enterra ligeiramente a base para integrar as raízes
     treeGroup.userData.terrainSurfaceOffset = -2.6;
     treeGroup.userData.collisionCircles = [
         { x: 0, z: 0, r: 24 }
