@@ -1205,21 +1205,21 @@
 
         // Cache-busting dynamic imports for local modules to prevent browser caching issues in Live Server
         const v = Date.now();
-        const { createDino } = await import(`./dino.js?v=${v}`);
-        const { createDino2 } = await import(`./dino2.js?v=${v}`);
-        const { createTerrain } = await import(`./terrain.js?v=${v}`);
-        const { createTree } = await import(`./tree.js?v=${v}`);
-        const { createForestGrass } = await import(`./grass.js?v=${v}`);
-        const { createBush } = await import(`./bush.js?v=${v}`);
-        const { createRock } = await import(`./lrock.js?v=${v}`);
-        const { createTumbleweed } = await import(`./tumbleweed.js?v=${v}`);
-        const { createHuman } = await import(`./human.js?v=${v}`);
-        const { createCact } = await import(`./cact.js?v=${v}`);
-        const { createPond } = await import(`./pond.js?v=${v}`);
-        const { createIceSpike } = await import(`./icespike.js?v=${v}`);
-        const { createCampfire } = await import(`./campfire.js?v=${v}`);
-        const { createSun } = await import(`./sun.js?v=${v}`);
-        const { createMoon } = await import(`./moon.js?v=${v}`);
+        const { createDino } = await import(`./models/dino.js?v=${v}`);
+        const { createDino2 } = await import(`./models/dino2.js?v=${v}`);
+        const { createTerrain } = await import(`./scenario/terrain.js?v=${v}`);
+        const { createTree } = await import(`./models/tree.js?v=${v}`);
+        const { createForestGrass } = await import(`./models/grass.js?v=${v}`);
+        const { createBush } = await import(`./models/bush.js?v=${v}`);
+        const { createRock } = await import(`./models/lrock.js?v=${v}`);
+        const { createTumbleweed } = await import(`./models/tumbleweed.js?v=${v}`);
+        const { createHuman } = await import(`./models/human.js?v=${v}`);
+        const { createCact } = await import(`./models/cact.js?v=${v}`);
+        const { createPond } = await import(`./models/pond.js?v=${v}`);
+        const { createIceSpike } = await import(`./models/icespike.js?v=${v}`);
+        const { createCampfire } = await import(`./models/campfire.js?v=${v}`);
+        const { createSun } = await import(`./scenario/sun.js?v=${v}`);
+        const { createMoon } = await import(`./scenario/moon.js?v=${v}`);
 
         let dinoData;
         let dino2Data;
