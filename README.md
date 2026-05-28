@@ -261,11 +261,4 @@ Objetivo:
 - esconder sidebar no modo humano e restaurar ao sair
 - sombras dinamicas com foco adaptativo
 
-## 8. Melhorias futuras
-
-- mais modelos de outros animais
-- interações com outros objetos no meio
-- suporte para mobile
-- colocar musicas
-
 ## Deploy em: https://lucasruivo.github.io/ICG_project/index.html

@@ -610,6 +610,11 @@
             transform: translateX(-50%) scale(1);
         }
 
+        body.is-touch #fishing-prompt,
+        body.is-touch #apple-prompt {
+            display: none !important;
+        }
+
         #apple-result {
             position: fixed;
             top: 30%;
@@ -1022,6 +1027,7 @@
             <div class="model-item" onclick="addCact()">Cacto</div>
             <div class="model-item" onclick="addPond()">Charco</div>
             <div class="model-item" onclick="addIceSpike()">Espigão de Gelo</div>
+            <div class="model-item" onclick="addCampfire()">Lareira / Fogueira</div>
 
             <div class="accordion-header" onclick="toggleRockAccordion(this)">
                 <span>Pedra</span>
@@ -1211,6 +1217,7 @@
         const { createCact } = await import(`./cact.js?v=${v}`);
         const { createPond } = await import(`./pond.js?v=${v}`);
         const { createIceSpike } = await import(`./icespike.js?v=${v}`);
+        const { createCampfire } = await import(`./campfire.js?v=${v}`);
         const { createSun } = await import(`./sun.js?v=${v}`);
         const { createMoon } = await import(`./moon.js?v=${v}`);
 
@@ -1230,6 +1237,7 @@
         let cacts = [];
         let ponds = [];
         let iceSpikes = [];
+        let campfires = [];
         let wireframeMode = false;
         const humanWorldScale = new THREE.Vector3();
         const collisionWorldScale = new THREE.Vector3();
@@ -1931,6 +1939,7 @@
             if (typeof humans !== 'undefined') humans.forEach(snapObjectToTerrain);
             if (typeof cacts !== 'undefined') cacts.forEach(snapObjectToTerrain);
             if (typeof iceSpikes !== 'undefined') iceSpikes.forEach(snapObjectToTerrain);
+            if (typeof campfires !== 'undefined') campfires.forEach(snapObjectToTerrain);
         }
 
         window.updateTerrainHeights = function () {
@@ -2219,6 +2228,7 @@
             removeGroupFromScene(cacts);
             removeGroupFromScene(ponds);
             removeGroupFromScene(iceSpikes);
+            removeGroupFromScene(campfires);
             setBushEffectEnabled(false);
             setTumbleweedEffectEnabled(false);
 
@@ -2263,6 +2273,7 @@
             else if (removeObjectFromArray(humans, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(cacts, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(iceSpikes, object)) { scene.remove(object); removed = true; }
+            else if (removeObjectFromArray(campfires, object)) { scene.remove(object); removed = true; }
             else if (removeObjectFromArray(ponds, object)) {
                 scene.remove(object);
                 removed = true;
@@ -2380,6 +2391,7 @@
             cacts.forEach(obj => objects.push({ type: 'cact', ...toTransformData(obj) }));
             ponds.forEach(obj => objects.push({ type: 'pond', ...toTransformData(obj) }));
             iceSpikes.forEach(obj => objects.push({ type: 'icespike', ...toTransformData(obj) }));
+            campfires.forEach(obj => objects.push({ type: 'campfire', ...toTransformData(obj) }));
 
             return {
                 version: SCENE_EXPORT_VERSION,
@@ -2481,6 +2493,9 @@
                             break;
                         case 'human':
                             window.addHuman(entry);
+                            break;
+                        case 'campfire':
+                            window.addCampfire(entry);
                             break;
                         default:
                             console.warn('Tipo de objeto não suportado no JSON:', entry.type);
@@ -2594,6 +2609,25 @@
                 }
                 return dino2Data.model;
             }
+        };
+
+        window.addCampfire = function (transform = null) {
+            saveHistoryState();
+            const newCampfire = createCampfire();
+            if (transform) {
+                applyTransform(newCampfire, transform);
+            } else {
+                newCampfire.position.set(Math.random() * 100 - 50, 0, Math.random() * 100 - 50);
+            }
+            applyShadowSettings(newCampfire);
+            scene.add(newCampfire);
+            if (!transform) {
+                snapObjectToTerrain(newCampfire);
+            }
+            campfires.push(newCampfire);
+            console.log("Lareira adicionada!");
+            if (typeof autoSaveScenario === 'function') autoSaveScenario();
+            return newCampfire;
         };
 
         window.addTree = function (transform = null) {
@@ -3308,7 +3342,7 @@
                 if (humanMoveVector.lengthSq() > 0) {
                     let collision = false;
                     // Checar colisão com árvores, pedras, cactos, humanos, dino, charcos
-                    const checkGroups = [trees, rocks, cacts, humans, ponds, iceSpikes];
+                    const checkGroups = [trees, rocks, cacts, humans, ponds, iceSpikes, campfires];
                     if (dinoData?.model) checkGroups.push([dinoData.model]);
                     if (dino2Data?.model) checkGroups.push([dino2Data.model]);
                     for (const group of checkGroups) {
@@ -3346,6 +3380,7 @@
                 humans.forEach(o => { if (o !== controlledHuman) collidables.push(o); });
                 ponds.forEach(o => collidables.push(o));
                 iceSpikes.forEach(o => collidables.push(o));
+                campfires.forEach(o => collidables.push(o));
                 if (dinoData?.model) collidables.push(dinoData.model);
                 if (dino2Data?.model) collidables.push(dino2Data.model);
 
@@ -3771,6 +3806,9 @@
             // --- CONFIGURAÇÃO DE CONTROLOS MOBILE ---
             (function setupMobileControls() {
                 const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+                if (isTouchDevice) {
+                    document.body.classList.add('is-touch');
+                }
                 
                 // Fullscreen Button
                 const fsBtn = document.getElementById('fullscreen-btn');
@@ -5154,6 +5192,32 @@
 
                 updateSunShadowFocus();
                 updatePondWaves();
+
+                // Animate campfires (flickering fire & light)
+                const elapsed = clock.getElapsedTime();
+                for (const campfire of campfires) {
+                    if (campfire.userData.fireLight && campfire.userData.fireGroup) {
+                        const light = campfire.userData.fireLight;
+                        const flames = campfire.userData.fireGroup;
+                        const baseInt = campfire.userData.baseIntensity || 24;
+                        
+                        // Flickering light intensity using multiple sines
+                        const flicker = Math.sin(elapsed * 25) * 0.15 + Math.cos(elapsed * 15) * 0.1;
+                        light.intensity = baseInt * (1.0 + flicker);
+                        
+                        // Jitter the light position slightly
+                        light.position.x = (Math.random() - 0.5) * 0.45;
+                        light.position.z = (Math.random() - 0.5) * 0.45;
+                        
+                        // Animate flames scale and rotation
+                        flames.scale.set(
+                            1.0 + Math.sin(elapsed * 12) * 0.08,
+                            1.0 + Math.cos(elapsed * 18) * 0.12,
+                            1.0 + Math.sin(elapsed * 12) * 0.08
+                        );
+                        flames.rotation.y = elapsed * 0.5;
+                    }
+                }
 
                 const time = Date.now() * 0.003;
 
